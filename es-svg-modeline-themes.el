@@ -4,16 +4,67 @@
 
 (defvar es-mt/bg-grey1
   (let (( width (es-mt/window-width))
-        ( height (frame-char-height))
-        ( header-line-background "#ccc"))
+        ( height (frame-char-height)))
     (xmlgen
      `(g
-       (rect :width "100%" :height "100%" :x 0 :y 0 :fill ,header-line-background :fill-opacity 0.3)
+       (defs
+           (linearGradient
+            :id "grad1" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
+            (stop :offset "0%" :style "stop-color:rgb(255,255,255);stop-opacity:0.1")
+            (stop :offset "100%" :style "stop-color:rgb(0,0,0);stop-opacity:0.1"))
+           (linearGradient
+            :id "grad2" :x1 "0%" :y1 "0%" :x2 "100%" :y2 "0%"
+            (stop :offset "0%" :style "stop-color:rgb(255,255,255);stop-opacity:0.0")
+            (stop :offset "50%" :style "stop-color:rgb(255,255,255);stop-opacity:0.2")
+            (stop :offset "100%" :style "stop-color:rgb(255,255,255);stop-opacity:0.0")))
+       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "#ccc" :fill-opacity 0.3)
        (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad1)")
        (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad2)")
        (rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
-       (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.1))
-     )))
+       (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.1)
+       ))))
+
+(defvar es-mt/bg-black-crystal
+  (let (( width (es-mt/window-width))
+        ( height (frame-char-height)))
+    (xmlgen
+     `(g
+       (defs
+           (linearGradient
+            :id "grad1" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
+            (stop :offset "0%" :style "stop-color:#000")
+            (stop :offset "50%" :style "stop-color:#222")
+            (stop :offset "51%" :style "stop-color:#000")
+            (stop :offset "100%" :style "stop-color:#000")
+            ))
+       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad1)")
+       (rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
+       ))))
+
+(defvar es-mt/bg-nasa
+  (let (( width (es-mt/window-width))
+        ( height (frame-char-height)))
+    (xmlgen
+     `(g
+       (defs
+           (linearGradient
+            :id "grad1" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
+            (stop :offset "0%" :style "stop-color:#000;stop-opacity:0.2")
+            (stop :offset "25%" :style "stop-color:#000;stop-opacity:0.0")
+            (stop :offset "75%" :style "stop-color:#000;stop-opacity:0.0")
+            (stop :offset "100%" :style "stop-color:#000;stop-opacity:0.2")
+            )
+           (linearGradient
+            :id "grad2" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
+            (stop :offset "0%" :style "stop-color:#000;stop-opacity:0.0")
+            (stop :offset "100%" :style "stop-color:#000;stop-opacity:0.3")
+            ))
+       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "#fff")
+       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad2)")
+       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad1)")
+       (rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
+       (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.1)
+       ))))
 
 (defun es-svg-modeline-theme1 ()
   (xmlgen
@@ -47,16 +98,6 @@
        :width ,width
        :height ,height
        ;; :version "1.1"
-       (defs
-           (linearGradient
-            :id "grad1" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
-            (stop :offset "0%" :style "stop-color:rgb(255,255,255);stop-opacity:0.1")
-            (stop :offset "100%" :style "stop-color:rgb(0,0,0);stop-opacity:0.1"))
-           (linearGradient
-            :id "grad2" :x1 "0%" :y1 "0%" :x2 "100%" :y2 "0%"
-            (stop :offset "0%" :style "stop-color:rgb(255,255,255);stop-opacity:0.0")
-            (stop :offset "50%" :style "stop-color:rgb(255,255,255);stop-opacity:0.2")
-            (stop :offset "100%" :style "stop-color:rgb(255,255,255);stop-opacity:0.0")))
        (filter :id "inset" :height "130%"
                (feOffset :in "sourceGraphic" :dx -1 :dy -1 :result "o_up")
                (feOffset :in "sourceGraphic" :dx 2 :dy 2 :result "o_down")
@@ -82,26 +123,26 @@
                    0  0  0  0  1
                    0  0  0 0.0 0")
 
-                (feColorMatrix :type "matrix"
-                               :in "o_up" :result "o_up2"
-                               :values "0  0  0  0  -1
+               (feColorMatrix :type "matrix"
+                              :in "o_up" :result "o_up2"
+                              :values "0  0  0  0  -1
                    0  0  0  0  -1
                    0  0  0  0  -1
                    0  0  0 0.3 0")
-         ;; (feColorMatrix :type "hueRotate"
-         ;;  :values "90"
-         ;;  ;; :values ".33 .33 .33 0 0
-         ;;  ;;          .33 .33 .33 0 0
-         ;;  ;;          .33 .33 .33 0 0
-         ;;  ;;          .33 .33 .33 0 0"
-         ;;  )
-         (feMerge
-          (feMergeNode :in "o_up2")
-          ;; (feMergeNode :in "o_down2")
-          (feMergeNode :in "SourceGraphic")
-          ))
+               ;; (feColorMatrix :type "hueRotate"
+               ;;  :values "90"
+               ;;  ;; :values ".33 .33 .33 0 0
+               ;;  ;;          .33 .33 .33 0 0
+               ;;  ;;          .33 .33 .33 0 0
+               ;;  ;;          .33 .33 .33 0 0"
+               ;;  )
+               (feMerge
+                (feMergeNode :in "o_up2")
+                ;; (feMergeNode :in "o_down2")
+                (feMergeNode :in "SourceGraphic")
+                ))
        (!escape
-        ,es-mt/bg-grey1)
+        ,es-mt/bg-nasa)
        (text :x ,(- width horizontal-margin (* (frame-char-width) 12))
              :y ,text-base-line
              :font-family ,default-font-family
@@ -132,10 +173,10 @@
        (text :x ,(- width horizontal-margin) :y ,text-base-line
              :font-family ,default-font-family
              :font-size ,font-size
-              :text-anchor "end"
-              :style "filter:url(#inset)"
-              :fill ,default-font-color
-              ,(format-mode-line "%l:%p"))
+             :text-anchor "end"
+             :style "filter:url(#inset)"
+             :fill ,default-font-color
+             ,(format-mode-line "%l:%p"))
        (text :x ,horizontal-margin :y ,text-base-line
              :text-anchor "start" :font-family ,default-font-family
              :font-weight "bold"
