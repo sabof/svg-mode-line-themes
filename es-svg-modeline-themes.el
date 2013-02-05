@@ -49,19 +49,22 @@
      (feOffset :in "sourceGraphic" :dx 2 :dy 2 :result "o_down")
      ;; http://www.w3.org/TR/SVG/filters.html#feColorMatrixElement
      ;; http://en.wikipedia.org/wiki/Matrix_multiplication#Illustration
-     (feColorMatrix :type "matrix"
-                    :in "o_down" :result "o_down2"
-                    :values "0  0  0  0  1
-                   0  0  0  0  1
-                   0  0  0  0  1
-                   0  0  0 0.0 0")
-     (feColorMatrix :type "matrix"
-                    :in "o_up" :result "o_up2"
-                    :values (concat
-                             "0  0  0  0  -1 "
-                             "0  0  0  0  -1 "
-                             "0  0  0  0  -1 "
-                             "0  0  0  0   0 "))
+     (feColorMatrix
+      :type "matrix"
+      :in "o_down" :result "o_down2"
+      :values (concat
+               "0  0  0  0  1 "
+               "0  0  0  0  1 "
+               "0  0  0  0  1 "
+               "0  0  0  0  0 "))
+     (feColorMatrix
+      :type "matrix"
+      :in "o_up" :result "o_up2"
+      :values (concat
+               "0  0  0  0  -1 "
+               "0  0  0  0  -1 "
+               "0  0  0  0  -1 "
+               "0  0  0  0  0 "))
      (feMerge
       (feMergeNode :in "o_up2")
       (feMergeNode :in "SourceGraphic")
@@ -144,7 +147,7 @@
        :height ,height
        ;; :version "1.1"
        (!escape
-        ,es-mt/bg-nasa
+        ,es-mt/bg-grey1
         ,es-mt/fr-inset)
        (g :font-family ,default-font-family
           :fill ,default-font-color
@@ -187,6 +190,7 @@
                   (if (and buffer-offer-save (buffer-modified-p))
                       "*"))))))))
 
+
 (defun es-svg-modeline-format ()
   (let* ((image (create-image (es-svg-modeline-theme1) 'svg t)))
     (propertize "."
@@ -202,6 +206,5 @@
    'header-line nil
    :box 'unspecified))
 
-
-(provide 'es-svg-modeline)
-;; es-svg-modeline.el ends here
+(provide 'es-svg-modeline-themes)
+;; es-svg-modeline-themes.el ends here
