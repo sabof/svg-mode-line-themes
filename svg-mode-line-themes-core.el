@@ -1,4 +1,6 @@
 (require 'cl)
+(or (require 'xmlgen nil t)
+    (require 'xmlgen "xml-gen"))
 
 (defvar smt/themes nil)
 (defvar smt/current-theme nil)
@@ -103,7 +105,9 @@
        ;; Mode info
        (text :x ,(- width
                     horizontal-pixel-margin
-                    (* (frame-char-width) 12))
+                    (* (frame-char-width)
+                       (smt/maybe-funcall (smt/theme-position-width theme)))
+                    0.5)
              :y ,text-base-line
              :text-anchor "end"
              ;; Major-mode
@@ -121,8 +125,8 @@
               ,(smt/maybe-funcall (smt/theme-minor-mode-text theme))))
        ;; Position Info
        (text ,@(smt/get-style theme :position-style)
-             :y ,text-base-line
              :x ,(- width horizontal-pixel-margin)
+             :y ,text-base-line
              :text-anchor "end"
              ,(format-mode-line "%l:%p"))
        ;; Left
@@ -144,6 +148,7 @@
   overlay
   defs
   (margin 2)
+  (position-width 12)
 
   (base-style 'es-mt/default-base-style)
   buffer-name-style
@@ -174,6 +179,9 @@
      (or (buffer-file-name)
          (ignore-errors
            (dired-current-directory))))))
+
+(defun smt/get-current-theme ()
+  (cdr (assoc smt/current-theme smt/themes)))
 
 (defmacro smt/deftheme (name &rest pairs)
   `(let ((theme (make-smt/theme)))

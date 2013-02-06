@@ -1,24 +1,25 @@
 (require 'cl)
 
 (defun es-mt/grey-title-style ()
-  (smt/+
-   (es-mt/grey-default-style)
-   `(:fill ,(if (and (eq (frame-selected-window (selected-frame))
-                         (selected-window)))
-                "#D4A535"
-                "#4C5055")
-           ;; :font-family "Georgia, Serif"
-           ;; :font-style "italic"
-           :font-weight "bold"
-           )))
+  `(:fill ,(if (and (eq (frame-selected-window (selected-frame))
+                        (selected-window)))
+               "#D4A535"
+               "#4C5055")
+          :font-weight "bold"))
 
 (defun smt/nasa-title-style ()
-  (smt/+ (es-mt/default-base-style)
-         (list :font-weight "bold"
-               :fill (if (and (eq (frame-selected-window (selected-frame))
-                                  (selected-window)))
-                         "#4A68D4"
-                         "#70767D"))))
+  (list :font-weight "bold"
+        :fill (if (and (eq (frame-selected-window (selected-frame))
+                           (selected-window)))
+                  "#4A68D4"
+                  "#70767D")))
+
+(defun smt/black-crystal-title-style ()
+  (list ;; :font-weight "bold"
+   :fill (if (and (eq (frame-selected-window (selected-frame))
+                      (selected-window)))
+             "#EE0000"
+             "#4C5055")))
 
 (defun es-mt/bg-grey1 ()
   (let (( width (es-mt/window-width))
@@ -46,22 +47,26 @@
       (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.6)
       )))
 
-(defun es-mt/bg-black-crystal ()
+(defun smt/bg-black-crystal ()
+  `((rect :width "100%" :height "100%" :x 0 :y 0 :fill "#000")))
+
+(defun smt/black-crystal-overlay ()
   (let (( width (es-mt/window-width))
         ( height (frame-char-height)))
     `((\defs
        (linearGradient
         :id "grad1" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
-        (stop :offset "0%" :style "stop-color:#000")
-        (stop :offset "50%" :style "stop-color:#222")
-        (stop :offset "51%" :style "stop-color:#000")
-        (stop :offset "100%" :style "stop-color:#000")
+        (stop :offset "0%" :style "stop-color:#fff;stop-opacity:0.0")
+        (stop :offset "50%" :style "stop-color:#fff;stop-opacity:0.15")
+        (stop :offset "51%" :style "stop-color:#fff;stop-opacity:0.0")
+        (stop :offset "100%" :style "stop-color:#fff;stop-opacity:0.05")
         ))
       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad1)")
-      (rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
+      (rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.2)
+      (rect :width "100%" :height 1 :x 0 :y ,(- height 2) :fill "#2F2F2F")
       )))
 
-(defun* smt/fr-inset (&optional (dark-opacity 0.5) (light-opacity 0.5))
+(defun* smt/filter-inset (&optional (dark-opacity 0.5) (light-opacity 0.5))
   `((filter
      :id "inset"
      (feOffset :in "sourceGraphic" :dx -1 :dy -1 :result "o_dark")

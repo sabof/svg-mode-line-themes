@@ -7,23 +7,36 @@
   :base-style (smt/+
                (es-mt/default-base-style)
                `(:fill "#5D6368"))
-  :title-style 'smt/nasa-title-style
+  :buffer-name-style 'smt/nasa-title-style
   :minor-mode-style 'smt/nasa-title-style
   :major-mode-style 'smt/nasa-major-mode-style
   :overlay 'smt/nasa-overlay)
 
 (smt/deftheme diesel
-  :defs (smt/fr-inset 0.5 0.3)
+  :defs (smt/filter-inset 0.5 0.3)
   :background 'es-mt/bg-grey1
   :base-style (smt/+
                (es-mt/default-base-style)
                `(:filter
                  "url(#inset)"
                  :fill "#b7c3cd"))
-  :title-style 'es-mt/grey-title-style
+  :buffer-name-style 'es-mt/grey-title-style
   :minor-mode-style 'es-mt/grey-title-style
   :major-mode-style 'smt/diesel-major-mode-style
   :overlay 'smt/bg-grey1-top)
+
+(smt/deftheme black-crystal
+  :defs (smt/filter-inset 1 0.3)
+  :background 'smt/bg-black-crystal
+  :base-style (smt/+
+               (es-mt/default-base-style)
+               `(;; :filter
+                 ;; "url(#inset)"
+                 :fill "#7E868D"))
+  :buffer-name-style 'smt/black-crystal-title-style
+  :minor-mode-style 'smt/black-crystal-title-style
+  :major-mode-style 'smt/diesel-major-mode-style
+  :overlay 'smt/black-crystal-overlay)
 
 (defun smt/next-theme ()
   (interactive)
@@ -36,7 +49,7 @@
     (when (called-interactively-p 'interactive)
       (message "Current mode-line theme: %s" next-theme))))
 
-(defun smt/choose-theme (theme)
+(defun smt/set-theme (theme)
   (interactive
    (list (intern (completing-read
                   "Set mode-line theme to: "
