@@ -4,116 +4,7 @@
   (let (( window-edges (window-pixel-edges)))
     (- (nth 2 window-edges) (nth 0 window-edges))))
 
-(defun es-mt/bg-grey1 ()
-  (let (( width (es-mt/window-width))
-        ( height (frame-char-height)))
-    `((\defs
-       (linearGradient
-        :id "grad1" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
-        (stop :offset "0%" :style "stop-color:rgb(255,255,255);stop-opacity:0.1")
-        (stop :offset "100%" :style "stop-color:rgb(0,0,0);stop-opacity:0.1"))
-       (linearGradient
-        :id "grad2" :x1 "0%" :y1 "0%" :x2 "100%" :y2 "0%"
-        (stop :offset "0%" :style "stop-color:rgb(255,255,255);stop-opacity:0.0")
-        (stop :offset "50%" :style "stop-color:rgb(255,255,255);stop-opacity:0.2")
-        (stop :offset "100%" :style "stop-color:rgb(255,255,255);stop-opacity:0.0")))
-      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "#ccc" :fill-opacity 0.3)
-      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad1)")
-      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad2)")
-      )))
-
-(defun smt/bg-grey1-top ()
-  (let (( width (es-mt/window-width))
-        ( height (frame-char-height)))
-    `((rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
-      (rect :width "100%" :height 1 :x 0 :y ,(- height 2) :fill "black" :fill-opacity 0.2)
-      (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.6)
-      )))
-
-(defun es-mt/bg-black-crystal ()
-  (let (( width (es-mt/window-width))
-        ( height (frame-char-height)))
-    `((\defs
-       (linearGradient
-        :id "grad1" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
-        (stop :offset "0%" :style "stop-color:#000")
-        (stop :offset "50%" :style "stop-color:#222")
-        (stop :offset "51%" :style "stop-color:#000")
-        (stop :offset "100%" :style "stop-color:#000")
-        ))
-      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad1)")
-      (rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
-      )))
-
-(defun* smt/fr-inset (&optional (dark-opacity 0.5) (light-opacity 0.5))
-  `((filter
-     :id "inset"
-     (feOffset :in "sourceGraphic" :dx -1 :dy -1 :result "o_dark")
-     (feOffset :in "sourceGraphic" :dx 2 :dy 2 :result "o_light")
-     ;; http://www.w3.org/TR/SVG/filters.html#feColorMatrixElement
-     ;; http://en.wikipedia.org/wiki/Matrix_multiplication#Illustration
-     (feColorMatrix
-      :type "matrix"
-      :in "o_light" :result "o_light"
-      :values ,(concat
-                "0  0  0  0  1 "
-                "0  0  0  0  1 "
-                "0  0  0  0  1 "
-                (format
-                 "0  0  0  %s  0 "
-                 light-opacity)
-                ))
-     (feColorMatrix
-      :type "matrix"
-      :in "o_dark" :result "o_dark"
-      :values ,(concat
-                "0  0  0  0  -1 "
-                "0  0  0  0  -1 "
-                "0  0  0  0  -1 "
-                (format
-                 "0  0  0  %s  0 "
-                 dark-opacity)
-                ))
-     (feMerge
-      (feMergeNode :in "o_dark")
-      (feMergeNode :in "o_light")
-      (feMergeNode :in "SourceGraphic")
-      ))))
-
-(defun smt/bg-nasa ()
-  (let (( width (es-mt/window-width))
-        ( height (frame-char-height)))
-    `((\defs
-       (filter
-        :id "blur"
-        (feGaussianBlur
-         :stdDeviation "5")
-        (feComposite))
-       (linearGradient
-        :id "grad1" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
-        (stop :offset "0%" :style "stop-color:#000;stop-opacity:0.2")
-        (stop :offset "25%" :style "stop-color:#000;stop-opacity:0.0")
-        (stop :offset "75%" :style "stop-color:#000;stop-opacity:0.0")
-        (stop :offset "100%" :style "stop-color:#000;stop-opacity:0.2")
-        ))
-      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "#888")
-      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "white" :filter "url(#blur)")
-      (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.1)
-      )))
-
-(defun smt/nasa-overlay ()
-  (let (( width (es-mt/window-width))
-        ( height (frame-char-height)))
-    `((\defs
-       (linearGradient
-        :id "grad2" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
-        (stop :offset "0%" :style "stop-color:#fff;stop-opacity:0.3")
-        (stop :offset "100%" :style "stop-color:#000;stop-opacity:0.5")
-        ))
-      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad2)" )
-      )))
-
-(defun smt/mode-indicators ()
+(defun smt/minor-mode-indicators ()
   (concat
    (when (bound-and-true-p es-aai-mode) "I")
    (when (or (bound-and-true-p evil-local-mode)
@@ -135,7 +26,7 @@
               font-size)
            2)))))
 
-(defun es-mt/text-style ()
+(defun es-mt/default-base-style ()
   `(:font-family
     ,(face-attribute 'default :family)
     :font-size ,(es-mt/font-size)))
@@ -158,35 +49,16 @@
       (funcall thing)
       thing))
 
-(defun smt/diesel-default-style ()
-  (smt/+
-   (es-mt/text-style)
-   `(:filter
-     "url(#inset)"
-     :fill "#b7c3cd"
-     )))
+(defun smt/buffer-indicators-text ()
+  (concat
+   (unless (or (eq system-type 'windows-nt) (daemonp))
+     "S")
+   (when (window-dedicated-p) "D")
+   (when buffer-read-only "R")
+   (when (mfile-remote-p) " REMOTE")
+   " "))
 
-(defun es-mt/grey-title-style ()
-  (smt/+
-   (es-mt/grey-default-style)
-   `(:fill ,(if (and (eq (frame-selected-window (selected-frame))
-                         (selected-window)))
-                "#D4A535"
-                "#4C5055")
-           ;; :font-family "Georgia, Serif"
-           ;; :font-style "italic"
-           :font-weight "bold"
-           )))
-
-(defun smt/nasa-title-style ()
-  (smt/+ (es-mt/text-style)
-         (list :font-weight "bold"
-               :fill (if (and (eq (frame-selected-window (selected-frame))
-                                  (selected-window)))
-                         "#4A68D4"
-                         "#70767D"))))
-
-(defun es-mt/text-left ()
+(defun smt/buffer-name-text ()
   (let (( project-name
           (esprj-project-name
            (esprj-file-project
@@ -194,31 +66,12 @@
                 (ignore-errors (dired-current-directory))))))
         )
     (concat
-     (if (or (eq system-type 'windows-nt) (daemonp))
-         "" "S")
-     (when (window-dedicated-p) "D")
-     (when buffer-read-only "R")
-     (when (mfile-remote-p) " REMOTE")
-     " "
      (when project-name (concat project-name " => "))
      (format-mode-line "%b")
      (if (and (or (buffer-file-name)
                   buffer-offer-save)
               (buffer-modified-p))
          "*"))))
-
-(defun smt/diesel-major-mode-style ()
-  `(:fill
-    "#ccc"
-    :font-family "Georgia, Serif"
-    :font-style "italic"
-    :filter nil
-    :font-weight "bold"
-    ))
-
-(defun smt/nasa-major-mode-style ()
-  (smt/+ (smt/diesel-major-mode-style)
-         (list :fill "#B62208")))
 
 (defun smt/get-style (theme style)
   (smt/+ (smt/maybe-funcall
@@ -276,7 +129,10 @@
         :y ,text-base-line
         :text-anchor "start"
         (tspan
-         ,@(smt/get-style theme :title-style)
+         ,@(smt/get-style theme :buffer-indicators-style)
+         ,(smt/maybe-funcall (smt/theme-buffer-indicators-text theme)))
+        (tspan
+         ,@(smt/get-style theme :buffer-name-style)
          ,(smt/maybe-funcall (smt/theme-buffer-name-text theme))))
        ,@(smt/maybe-funcall (smt/theme-overlay theme))))))
 
@@ -287,15 +143,17 @@
   defs
   (margin 2)
 
-  (base-style 'es-mt/text-style)
-  title-style
+  (base-style 'es-mt/default-base-style)
+  buffer-name-style
+  buffer-indicators-style
   vc-style
   position-style
   minor-mode-style
   major-mode-style
 
-  (minor-mode-text 'smt/mode-indicators)
-  (buffer-name-text 'es-mt/text-left)
+  (minor-mode-text 'smt/minor-mode-indicators)
+  (buffer-name-text 'smt/buffer-name-text)
+  (buffer-indicators-text 'smt/buffer-indicators-text)
   (xml-converter 'es-mt/default-xml-coverter)
   )
 
