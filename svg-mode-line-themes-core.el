@@ -4,7 +4,7 @@
 
 (defvar smt/themes nil)
 (defvar smt/current-theme nil)
-(defun es-mt/window-width ()
+(defun smt/window-width ()
   (let (( window-edges (window-pixel-edges)))
     (- (nth 2 window-edges) (nth 0 window-edges))))
 
@@ -30,7 +30,7 @@
   ;; (- (frame-char-height) 4)
   )
 
-(defun es-mt/text-base-line ()
+(defun smt/text-base-line ()
   ;; Sucky
   (let ((font-size (* 0.7 (smt/font-pixel-size))))
     (floor
@@ -39,7 +39,7 @@
               font-size)
            2)))))
 
-(defun es-mt/default-base-style ()
+(defun smt/default-base-style ()
   `(:font-family
     ,(face-attribute 'default :family)
     :font-size
@@ -128,10 +128,10 @@
 
 (defun smt/default-xml-coverter (theme)
   (assert (smt/theme-p theme))
-  (let* (( width (es-mt/window-width))
+  (let* (( width (smt/window-width))
          ( height (frame-char-height))
          ( text-base-line
-           (es-mt/text-base-line))
+           (smt/text-base-line))
          ( horizontal-pixel-margin
            (* (smt/theme-margin theme)
               (frame-char-width)))
@@ -217,7 +217,7 @@
   (xml-converter 'smt/default-xml-coverter)
   (setup-hook 'ignore)
 
-  (base-style 'es-mt/default-base-style)
+  (base-style 'smt/default-base-style)
   buffer-name-style
   buffer-indicators-style
   vc-style

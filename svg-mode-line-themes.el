@@ -8,7 +8,7 @@
   :background 'smt/bg-nasa
   :base-style (lambda ()
                 (smt/+
-                 (es-mt/default-base-style)
+                 (smt/default-base-style)
                  `(:filter
                    "url(#inset)"
                    :fill "#404448")))
@@ -19,15 +19,15 @@
 
 (smt/deftheme diesel
   :defs (smt/filter-inset 0.5 0.3)
-  :background 'es-mt/bg-grey1
+  :background 'smt/bg-grey1
   :base-style (lambda ()
                 (smt/+
-                 (es-mt/default-base-style)
+                 (smt/default-base-style)
                  `(:filter
                    "url(#inset)"
                    :fill "#b7c3cd")))
-  :buffer-name-style 'es-mt/grey-title-style
-  :minor-mode-style 'es-mt/grey-title-style
+  :buffer-name-style 'smt/grey-title-style
+  :minor-mode-style 'smt/grey-title-style
   :major-mode-style 'smt/diesel-major-mode-style
   :overlay 'smt/bg-grey1-top)
 
@@ -36,7 +36,7 @@
   :background 'smt/bg-black-crystal
   :base-style (lambda ()
                 (smt/+
-                 (es-mt/default-base-style)
+                 (smt/default-base-style)
                  `(:fill "#7E868D")))
   :buffer-name-style 'smt/black-crystal-title-style
   :minor-mode-style 'smt/black-crystal-title-style

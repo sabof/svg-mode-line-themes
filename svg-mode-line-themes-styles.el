@@ -1,6 +1,6 @@
 (require 'cl)
 
-(defun es-mt/grey-title-style ()
+(defun smt/grey-title-style ()
   `(:fill ,(if (and (eq (frame-selected-window (selected-frame))
                         (selected-window)))
                "#D4A535"
@@ -22,7 +22,7 @@
              "#EE0000"
              "#4C5055")))
 
-(defun es-mt/bg-grey1 ()
+(defun smt/bg-grey1 ()
   (let (( width (es-mt/window-width))
         ( height (frame-char-height)))
     `((\defs
