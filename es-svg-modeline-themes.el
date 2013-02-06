@@ -1,3 +1,4 @@
+(defvar es-mt/current-theme nil)
 (defun es-mt/window-width ()
   (let (( window-edges (window-pixel-edges)))
     (- (nth 2 window-edges) (nth 0 window-edges))))
@@ -44,39 +45,39 @@
       )))
 
 (defun* es-mt/fr-inset (&optional (dark-opacity 0.5) (light-opacity 0.5))
-  `(filter
-    :id "inset"
-    (feOffset :in "sourceGraphic" :dx -1 :dy -1 :result "o_dark")
-    (feOffset :in "sourceGraphic" :dx 2 :dy 2 :result "o_light")
-    ;; http://www.w3.org/TR/SVG/filters.html#feColorMatrixElement
-    ;; http://en.wikipedia.org/wiki/Matrix_multiplication#Illustration
-    (feColorMatrix
-     :type "matrix"
-     :in "o_light" :result "o_light"
-     :values ,(concat
-               "0  0  0  0  1 "
-               "0  0  0  0  1 "
-               "0  0  0  0  1 "
-               (format
-                "0  0  0  %s  0 "
-                light-opacity)
-               ))
-    (feColorMatrix
-     :type "matrix"
-     :in "o_dark" :result "o_dark"
-     :values ,(concat
-               "0  0  0  0  -1 "
-               "0  0  0  0  -1 "
-               "0  0  0  0  -1 "
-               (format
-                "0  0  0  %s  0 "
-                dark-opacity)
-               ))
-    (feMerge
-     (feMergeNode :in "o_dark")
-     (feMergeNode :in "o_light")
-     (feMergeNode :in "SourceGraphic")
-     )))
+  `((filter
+     :id "inset"
+     (feOffset :in "sourceGraphic" :dx -1 :dy -1 :result "o_dark")
+     (feOffset :in "sourceGraphic" :dx 2 :dy 2 :result "o_light")
+     ;; http://www.w3.org/TR/SVG/filters.html#feColorMatrixElement
+     ;; http://en.wikipedia.org/wiki/Matrix_multiplication#Illustration
+     (feColorMatrix
+      :type "matrix"
+      :in "o_light" :result "o_light"
+      :values ,(concat
+                "0  0  0  0  1 "
+                "0  0  0  0  1 "
+                "0  0  0  0  1 "
+                (format
+                 "0  0  0  %s  0 "
+                 light-opacity)
+                ))
+     (feColorMatrix
+      :type "matrix"
+      :in "o_dark" :result "o_dark"
+      :values ,(concat
+                "0  0  0  0  -1 "
+                "0  0  0  0  -1 "
+                "0  0  0  0  -1 "
+                (format
+                 "0  0  0  %s  0 "
+                 dark-opacity)
+                ))
+     (feMerge
+      (feMergeNode :in "o_dark")
+      (feMergeNode :in "o_light")
+      (feMergeNode :in "SourceGraphic")
+      ))))
 
 (defun es-mt/bg-nasa ()
   (let (( width (es-mt/window-width))
@@ -201,15 +202,7 @@
      :font-weight "bold"
      )))
 
-(defstruct es-mt/style
-  (background (lambda () '(null)))
-  (defs (lambda () '(null)))
-  (margin 2)
-  (title-style es-mt/text-style)
-  (default-style es-mt/text-style)
-  (major-mode-style es-mt/text-style))
-
-(defun es-mt/position-theme (style)
+(defun es-mt/default-xml-coverter (style)
   (assert (es-mt/style-p style))
   (let* (( width (es-mt/window-width))
          ( height (frame-char-height))
@@ -225,7 +218,6 @@
        :height ,height
        ,@(funcall (es-mt/style-defs style))
        ,@(funcall (es-mt/style-background style))
-
        ;; Mode info
        (text :x ,(- width
                     horizontal-pixel-margin
@@ -259,22 +251,48 @@
          (tspan
           ,@(funcall (es-mt/style-title-style style))
           ,(es-mt/text-left)))
-        ,@(es-mt/bg-grey1-top)))))
+       ,@(es-mt/bg-grey1-top)))))
 
-(defun es-svg-modeline-theme1 ()
+(defstruct es-mt/style
+  (name "Untitled")
+  (background (lambda () '(null)))
+  (defs (lambda () '(null)))
+  (margin 2)
+  (title-style 'es-mt/text-style)
+  (minor-mode-style 'es-mt/text-style)
+  (default-style 'es-mt/text-style)
+  (major-mode-style 'es-mt/text-style)
+  (xml-converter 'es-mt/default-xml-coverter))
+
+(defun es-mt/get-current-theme-xml ()
+  (funcall (es-mt/style-xml-converter es-mt/current-theme)
+           es-mt/current-theme))
+
+(defun es-svg-modeline-gray-theme ()
   (let ((style (make-es-mt/style)))
-    (setf (es-mt/style-background style) 'es-mt/bg-black-crystal
-          (es-mt/style-title-style style) 'es-mt/grey-title-style
-          ;; (es-mt/style-title-style style) 'es-mt/grey-title-style
-          )
+    (setf
+
+     (es-mt/style-defs style) (lambda () (es-mt/fr-inset 0.5 0.5))
+     ;; (es-mt/style-background style) 'es-mt/bg-black-crystal
+     (es-mt/style-background style) 'es-mt/bg-grey1
+     (es-mt/style-default-style style) 'es-mt/grey-default-style
+     (es-mt/style-title-style style) 'es-mt/grey-title-style
+     ;; (es-mt/style-title-style style) 'es-mt/grey-title-style
+     )
     (es-mt/position-theme style)))
 
 (defun es-svg-modeline-format ()
-  (let* ((image (create-image (es-svg-modeline-theme1) 'svg t)))
-    (propertize "."
-                'display image
-                'help-echo (or (buffer-file-name)
-                               (ignore-errors (dired-current-directory))))))
+  (let* (( image
+           (create-image
+            (es-svg-modeline-gray-theme)
+            'svg t)))
+    (propertize
+     "."
+     'display image
+     'help-echo
+     (or (buffer-file-name)
+         (ignore-errors
+           (dired-current-directory))))))
 
 (defun es-svg-modeline-set ()
   (interactive)
