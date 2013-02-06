@@ -1,6 +1,7 @@
 (require 'cl)
 (require 'svg-mode-line-themes-core)
 (require 'svg-mode-line-themes-styles)
+(defvar smt/line-format 'mode-line-format)
 
 (smt/deftheme nasa
   :background 'smt/bg-nasa
@@ -30,9 +31,7 @@
   :background 'smt/bg-black-crystal
   :base-style (smt/+
                (es-mt/default-base-style)
-               `(;; :filter
-                 ;; "url(#inset)"
-                 :fill "#7E868D"))
+               `(:fill "#7E868D"))
   :buffer-name-style 'smt/black-crystal-title-style
   :minor-mode-style 'smt/black-crystal-title-style
   :major-mode-style 'smt/diesel-major-mode-style
@@ -40,11 +39,12 @@
 
 (defun smt/next-theme ()
   (interactive)
-  (let* ((position (position smt/current-theme smt/themes :key 'car))
+  (let* (( position (position smt/current-theme smt/themes :key 'car))
          ( next-theme
            (or (car (nth (1+ position) smt/themes))
                (car (nth 0 smt/themes)))))
     (setq smt/current-theme next-theme)
+    (funcall (smt/theme-setup-hook (smt/get-current-theme)))
     (force-mode-line-update)
     (when (called-interactively-p 'interactive)
       (message "Current mode-line theme: %s" next-theme))))
@@ -55,11 +55,15 @@
                   "Set mode-line theme to: "
                   (mapcar 'symbol-name (mapcar 'car smt/themes)) nil t))))
   (setq smt/current-theme theme)
+  (funcall (smt/theme-setup-hook (smt/get-current-theme)))
   (force-mode-line-update))
 
-(defun smt/enable ()
-  (setq-default mode-line-format
-                '(:eval (es-svg-modeline-format)))
+(defun smt/enable (&optional use-header-line)
+  (set-default (if use-header-line
+                   'header-line-format
+                   'mode-line-format)
+               '(:eval (smt/modeline-format)))
+  (funcall (smt/theme-setup-hook (smt/get-current-theme)))
   (force-mode-line-update))
 
 (provide 'svg-mode-line-themes)

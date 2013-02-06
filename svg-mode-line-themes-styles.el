@@ -63,7 +63,7 @@
         ))
       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad1)")
       (rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.2)
-      (rect :width "100%" :height 1 :x 0 :y ,(- height 2) :fill "#2F2F2F")
+      (rect :width "100%" :height 1 :x 0 :y ,(- height 2) :fill "#fff" :fill-opacity 0.2)
       )))
 
 (defun* smt/filter-inset (&optional (dark-opacity 0.5) (light-opacity 0.5))

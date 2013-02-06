@@ -53,22 +53,25 @@
       (funcall thing)
       thing))
 
-(defun smt/buffer-indicators-text ()
-  (concat
-   (unless (or (eq system-type 'windows-nt) (daemonp))
-     "S")
-   (when (window-dedicated-p) "D")
-   (when buffer-read-only "R")
-   (when (mfile-remote-p) " REMOTE")
-   " "))
+(defun smt/default-buffer-indicators-text ()
+  (let ((indicators
+         (concat
+          (unless (or (eq system-type 'windows-nt) (daemonp))
+            "S")
+          (when (window-dedicated-p) "D")
+          (when buffer-read-only "R")
+          (when (mfile-remote-p) " REMOTE")
+          " ")))
+    (if (> (length indicators) 1)
+        indicators
+        "")))
 
-(defun smt/buffer-name-text ()
+(defun smt/default-buffer-name-text ()
   (let (( project-name
           (esprj-project-name
            (esprj-file-project
             (or (buffer-file-name)
-                (ignore-errors (dired-current-directory))))))
-        )
+                (ignore-errors (dired-current-directory)))))))
     (concat
      (when project-name (concat project-name " => "))
      (format-mode-line "%b")
@@ -86,7 +89,30 @@
                            (substring (symbol-name style) 1)))
            theme))))
 
-(defun es-mt/default-xml-coverter (theme)
+(defun smt/left-text-width (theme)
+  (+ (smt/theme-margin theme)
+     (length
+      (concat
+       (smt/maybe-funcall
+        (smt/theme-buffer-name-text theme))
+       (smt/maybe-funcall
+        (smt/theme-buffer-indicators-text theme))))))
+
+(defun smt/right-text-width (theme)
+  (+ (smt/theme-margin theme)
+     (smt/theme-position-width theme)
+     (length
+      (concat
+       (smt/maybe-funcall
+        (smt/theme-major-mode-text theme))
+       (smt/maybe-funcall
+        (smt/theme-minor-mode-text theme))
+       (smt/maybe-funcall
+        (smt/theme-vc-text theme))))
+     ;; Variable-width text safety-margin
+     6))
+
+(defun smt/default-xml-coverter (theme)
   (assert (smt/theme-p theme))
   (let* (( width (es-mt/window-width))
          ( height (frame-char-height))
@@ -94,7 +120,27 @@
            (es-mt/text-base-line))
          ( horizontal-pixel-margin
            (* (smt/theme-margin theme)
-              (frame-char-width))))
+              (frame-char-width)))
+         ( left-width
+           (funcall (smt/theme-left-text-width theme)
+                    theme))
+         ( right-width
+           (funcall (smt/theme-right-text-width theme)
+                    theme))
+         ( position-width
+           (smt/maybe-funcall
+            (smt/theme-position-width theme)))
+         ( char-width
+           (let ((edges (window-edges)))
+             (- (nth 2 edges) (nth 0 edges))))
+         ( width-mode
+           (cond ( (>= char-width
+                       (+ left-width right-width))
+                   3)
+                 ( (>= char-width
+                       (+ left-width position-width))
+                   2)
+                 (t 1))))
     (xmlgen
      `(svg
        :xmlns "http://www.w3.org/2000/svg"
@@ -103,32 +149,37 @@
        ,@(smt/maybe-funcall (smt/theme-defs theme))
        ,@(smt/maybe-funcall (smt/theme-background theme))
        ;; Mode info
-       (text :x ,(- width
-                    horizontal-pixel-margin
-                    (* (frame-char-width)
-                       (smt/maybe-funcall (smt/theme-position-width theme)))
-                    0.5)
-             :y ,text-base-line
-             :text-anchor "end"
-             ;; Major-mode
-             (tspan
-              ,@(smt/get-style theme :major-mode-style)
-              ,(format-mode-line " %m"))
-             ;; Version Control
-             (tspan
-              ,@(smt/get-style theme :vc-style)
-              ,(bound-and-true-p vc-mode)
-              " ")
-             ;; Minor Modes
-             (tspan
-              ,@(smt/get-style theme :minor-mode-style)
-              ,(smt/maybe-funcall (smt/theme-minor-mode-text theme))))
+       ,@(when
+          (> width-mode 2)
+          `((text :x ,(- width
+                         horizontal-pixel-margin
+                         (* (frame-char-width)
+                            position-width)
+                         0.5)
+                  :y ,text-base-line
+                  :text-anchor "end"
+                  ;; Major-mode
+                  (tspan
+                   ,@(smt/get-style theme :major-mode-style)
+                   " "
+                   ,(smt/maybe-funcall (smt/theme-major-mode-text theme)))
+                  ;; Version Control
+                  (tspan
+                   ,@(smt/get-style theme :vc-style)
+                   ,(smt/maybe-funcall (smt/theme-vc-text theme))
+                   " ")
+                  ;; Minor Modes
+                  (tspan
+                   ,@(smt/get-style theme :minor-mode-style)
+                   ,(smt/maybe-funcall (smt/theme-minor-mode-text theme))))))
        ;; Position Info
-       (text ,@(smt/get-style theme :position-style)
-             :x ,(- width horizontal-pixel-margin)
-             :y ,text-base-line
-             :text-anchor "end"
-             ,(format-mode-line "%l:%p"))
+       ,@(when
+          (> width-mode 1)
+          `((text ,@(smt/get-style theme :position-style)
+                  :x ,(- width horizontal-pixel-margin)
+                  :y ,text-base-line
+                  :text-anchor "end"
+                  ,(format-mode-line "%l:%p"))))
        ;; Left
        (text
         :x ,horizontal-pixel-margin
@@ -149,22 +200,26 @@
   defs
   (margin 2)
   (position-width 12)
+  (xml-converter 'smt/default-xml-coverter)
+  (setup-hook 'ignore)
 
   (base-style 'es-mt/default-base-style)
   buffer-name-style
   buffer-indicators-style
   vc-style
   position-style
+  (left-text-width 'smt/left-text-width)
+  (right-text-width 'smt/right-text-width)
   minor-mode-style
   major-mode-style
 
+  (vc-text (lambda () (bound-and-true-p vc-mode)))
+  (major-mode-text (lambda () (format-mode-line "%m")))
   (minor-mode-text 'smt/minor-mode-indicators)
-  (buffer-name-text 'smt/buffer-name-text)
-  (buffer-indicators-text 'smt/buffer-indicators-text)
-  (xml-converter 'es-mt/default-xml-coverter)
-  )
+  (buffer-name-text 'smt/default-buffer-name-text)
+  (buffer-indicators-text 'smt/default-buffer-indicators-text))
 
-(defun es-svg-modeline-format ()
+(defun smt/modeline-format ()
   (let* ((theme (cdr (assoc smt/current-theme smt/themes)))
          ( image
            (create-image
@@ -206,6 +261,16 @@
      (setq smt/current-theme ',name)))
 (put 'smt/deftheme 'common-lisp-indent-function
      '(1 &body))
+
+(defun smt/reset ()
+  (interactive)
+  (ignore-errors
+    (unload-feature 'svg-mode-line-themes t))
+  (ignore-errors
+    (unload-feature 'svg-mode-line-themes-styles t))
+  (ignore-errors
+    (unload-feature 'svg-mode-line-themes-core t))
+  (require (quote svg-mode-line-themes)))
 
 (provide 'svg-mode-line-themes-core)
 ;; svg-mode-line-themes-core.el ends here
