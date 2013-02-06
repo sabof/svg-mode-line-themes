@@ -4,10 +4,14 @@
 (defvar smt/line-format 'mode-line-format)
 
 (smt/deftheme nasa
+  :defs (smt/filter-inset 0 1)
   :background 'smt/bg-nasa
-  :base-style (smt/+
-               (es-mt/default-base-style)
-               `(:fill "#5D6368"))
+  :base-style (lambda ()
+                (smt/+
+                 (es-mt/default-base-style)
+                 `(:filter
+                   "url(#inset)"
+                   :fill "#404448")))
   :buffer-name-style 'smt/nasa-title-style
   :minor-mode-style 'smt/nasa-title-style
   :major-mode-style 'smt/nasa-major-mode-style
@@ -16,11 +20,12 @@
 (smt/deftheme diesel
   :defs (smt/filter-inset 0.5 0.3)
   :background 'es-mt/bg-grey1
-  :base-style (smt/+
-               (es-mt/default-base-style)
-               `(:filter
-                 "url(#inset)"
-                 :fill "#b7c3cd"))
+  :base-style (lambda ()
+                (smt/+
+                 (es-mt/default-base-style)
+                 `(:filter
+                   "url(#inset)"
+                   :fill "#b7c3cd")))
   :buffer-name-style 'es-mt/grey-title-style
   :minor-mode-style 'es-mt/grey-title-style
   :major-mode-style 'smt/diesel-major-mode-style
@@ -29,9 +34,10 @@
 (smt/deftheme black-crystal
   :defs (smt/filter-inset 1 0.3)
   :background 'smt/bg-black-crystal
-  :base-style (smt/+
-               (es-mt/default-base-style)
-               `(:fill "#7E868D"))
+  :base-style (lambda ()
+                (smt/+
+                 (es-mt/default-base-style)
+                 `(:fill "#7E868D")))
   :buffer-name-style 'smt/black-crystal-title-style
   :minor-mode-style 'smt/black-crystal-title-style
   :major-mode-style 'smt/diesel-major-mode-style
@@ -46,8 +52,7 @@
     (setq smt/current-theme next-theme)
     (funcall (smt/theme-setup-hook (smt/get-current-theme)))
     (force-mode-line-update)
-    (when (called-interactively-p 'interactive)
-      (message "Current mode-line theme: %s" next-theme))))
+    (message "Current mode-line theme: %s" next-theme)))
 
 (defun smt/set-theme (theme)
   (interactive

@@ -18,12 +18,21 @@
    (when (bound-and-true-p save-auto-hook) "A")
    (when (bound-and-true-p wmi) "M")))
 
-(defun es-mt/font-size ()
-  (- (frame-char-height) 4))
+(defun smt/points-to-pixels (points)
+  ;; points = pixels * 72 / 96
+  ;;  = pixels * 72
+  (/ (* 96 points) 72))
+
+(defun smt/font-pixel-size ()
+  (round
+   (smt/points-to-pixels
+    (/ (face-attribute 'default :height) 10)))
+  ;; (- (frame-char-height) 4)
+  )
 
 (defun es-mt/text-base-line ()
   ;; Sucky
-  (let ((font-size (* 0.7 (es-mt/font-size))))
+  (let ((font-size (* 0.7 (smt/font-pixel-size))))
     (floor
      (+ font-size
         (/ (- (frame-char-height)
@@ -33,7 +42,12 @@
 (defun es-mt/default-base-style ()
   `(:font-family
     ,(face-attribute 'default :family)
-    :font-size ,(es-mt/font-size)))
+    :font-size
+    ,(concat (int-to-string
+              (round
+               (/ (face-attribute 'default :height)
+                  10.0)))
+             "pt")))
 
 (defun smt/+ (plistA plistB)
   (let ((plistC (copy-list plistA))
@@ -220,7 +234,7 @@
   (buffer-indicators-text 'smt/default-buffer-indicators-text))
 
 (defun smt/modeline-format ()
-  (let* ((theme (cdr (assoc smt/current-theme smt/themes)))
+  (let* (( theme (smt/get-current-theme))
          ( image
            (create-image
             (funcall (smt/theme-xml-converter
