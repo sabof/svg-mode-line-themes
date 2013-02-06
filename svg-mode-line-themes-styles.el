@@ -1,3 +1,5 @@
+(require 'cl)
+
 (defun es-mt/grey-title-style ()
   (smt/+
    (es-mt/grey-default-style)

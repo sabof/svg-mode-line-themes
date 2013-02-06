@@ -1,3 +1,5 @@
+(require 'cl)
+
 (defvar smt/themes nil)
 (defvar smt/current-theme nil)
 (defun es-mt/window-width ()
@@ -158,10 +160,12 @@
   )
 
 (defun es-svg-modeline-format ()
-  (let* (( image
+  (let* ((theme (cdr (assoc smt/current-theme smt/themes)))
+         ( image
            (create-image
-            (funcall (smt/theme-xml-converter smt/current-theme)
-                     smt/current-theme)
+            (funcall (smt/theme-xml-converter
+                      theme)
+                     theme)
             'svg t)))
     (propertize
      "."
@@ -173,7 +177,7 @@
 
 (defmacro smt/deftheme (name &rest pairs)
   `(let ((theme (make-smt/theme)))
-     (setf (smt/theme-name theme) ,name)
+     (setf (smt/theme-name theme) ',name)
      ,@(progn
         (let (result)
           (while pairs
@@ -188,9 +192,10 @@
                   result))
           (nreverse result)))
      (setq smt/themes
-           (acons ,name theme smt/themes))
-     (setq smt/current-theme theme)
-     ))
+           (cl-delete ',name smt/themes :key 'car))
+     (setq smt/themes
+           (acons ',name theme smt/themes))
+     (setq smt/current-theme ',name)))
 (put 'smt/deftheme 'common-lisp-indent-function
      '(1 &body))
 
