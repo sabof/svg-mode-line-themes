@@ -45,7 +45,7 @@
       (rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
       )))
 
-(defun* es-mt/fr-inset (&optional (dark-opacity 0.5) (light-opacity 0.5))
+(defun* smt/fr-inset (&optional (dark-opacity 0.5) (light-opacity 0.5))
   `((filter
      :id "inset"
      (feOffset :in "sourceGraphic" :dx -1 :dy -1 :result "o_dark")
@@ -80,7 +80,7 @@
       (feMergeNode :in "SourceGraphic")
       ))))
 
-(defun es-mt/bg-nasa ()
+(defun smt/bg-nasa ()
   (let (( width (es-mt/window-width))
         ( height (frame-char-height)))
     `((\defs
@@ -110,7 +110,7 @@
       (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.1)
       )))
 
-(defun es-mt/mode-indicators ()
+(defun smt/mode-indicators ()
   (concat
    (when (bound-and-true-p es-aai-mode) "I")
    (when (or (bound-and-true-p evil-local-mode)
@@ -137,7 +137,7 @@
     ,(face-attribute 'default :family)
     :font-size ,(es-mt/font-size)))
 
-(defun es-mt/+ (plistA plistB)
+(defun smt/+ (plistA plistB)
   (let ((plistC (copy-list plistA))
         key val)
     (dotimes (iter (/ (length plistB) 2))
@@ -156,7 +156,7 @@
       thing))
 
 (defun es-mt/grey-default-style ()
-  (es-mt/+
+  (smt/+
    (es-mt/text-style)
    `(:filter
      "url(#inset)"
@@ -164,14 +164,14 @@
      )))
 
 (defun es-mt/grey-title-style ()
-  (es-mt/+
+  (smt/+
    (es-mt/grey-default-style)
    `(:filter
      "url(#inset)"
      :fill ,(if (and (eq (frame-selected-window (selected-frame))
                          (selected-window)))
-                "#ccad42"
-                "#b7c3cd")
+                "#D4A535"
+                "#4C5055")
      ;; :font-family "Georgia, Serif"
      ;; :font-style "italic"
      :y nil
@@ -199,14 +199,13 @@
               (buffer-modified-p))
          "*"))))
 
-(defun es-mt/grey-mode-style ()
-  (es-mt/+
+(defun smt/diesel-major-mode-style ()
+  (smt/+
    (es-mt/text-style)
    `(:fill
      "#ccc"
      :font-family "Georgia, Serif"
      :font-style "italic"
-     ;; :y nil
      :font-weight "bold"
      )))
 
@@ -244,7 +243,7 @@
              ;; Minor Modes
              (tspan
               ,@(smt/maybe-funcall (smt/theme-minor-mode-style theme))
-              ,(es-mt/mode-indicators)))
+              ,(smt/maybe-funcall (smt/theme-minor-mode-text theme))))
        ;; Position Info
        (text ,@(smt/maybe-funcall (smt/theme-default-style theme))
              :y ,text-base-line
@@ -258,19 +257,20 @@
         :text-anchor "start"
         (tspan
          ,@(smt/maybe-funcall (smt/theme-title-style theme))
-         ,(es-mt/text-left)))
+         ,(smt/maybe-funcall (smt/theme-buffer-name-text theme))))
        ,@(es-mt/bg-grey1-top)))))
 
 (defstruct smt/theme
-  (name "Untitled")
-  symbol
+  name
   (background (lambda () '(null)))
   (defs (lambda () '(null)))
   (margin 2)
   (title-style 'es-mt/text-style)
   (minor-mode-style 'es-mt/text-style)
+  (minor-mode-text 'smt/mode-indicators)
   (default-style 'es-mt/text-style)
   (major-mode-style 'es-mt/text-style)
+  (buffer-name-text 'es-mt/text-left)
   (xml-converter 'es-mt/default-xml-coverter))
 
 (defun es-svg-modeline-format ()
@@ -286,6 +286,27 @@
      (or (buffer-file-name)
          (ignore-errors
            (dired-current-directory))))))
+
+(defmacro smt/deftheme (name &rest pairs)
+  `(let ((theme (make-smt/theme)))
+     (setf (smt/theme-name theme) ,name)
+     ,@(progn
+        (let (result)
+          (while pairs
+            (push `(setf (,(intern
+                            (concat
+                             "smt/theme-"
+                             (symbol-name (pop pairs))))
+                           theme)
+                         ,(pop pairs))
+                  result))
+          (nreverse result)))
+     (setq smt/themes
+           (acons ,name theme smt/themes))
+     (setq smt/current-theme theme)
+     ))
+(put 'smt/deftheme 'common-lisp-indent-function
+     '(1 &body))
 
 (provide 'svg-mode-line-themes-core)
 ;; svg-mode-line-themes-core.el ends here
