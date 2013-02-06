@@ -22,7 +22,7 @@
       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad2)")
       )))
 
-(defun es-mt/bg-grey1-top ()
+(defun smt/bg-grey1-top ()
   (let (( width (es-mt/window-width))
         ( height (frame-char-height)))
     `((rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
@@ -95,19 +95,22 @@
         (stop :offset "25%" :style "stop-color:#000;stop-opacity:0.0")
         (stop :offset "75%" :style "stop-color:#000;stop-opacity:0.0")
         (stop :offset "100%" :style "stop-color:#000;stop-opacity:0.2")
-        )
-       (linearGradient
-        :id "grad2" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
-        (stop :offset "0%" :style "stop-color:#000;stop-opacity:0.0")
-        (stop :offset "100%" :style "stop-color:#000;stop-opacity:0.3")
         ))
       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "#888")
       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "white" :filter "url(#blur)")
-      ;; (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad1)")
-      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad2)")
-      ;; (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad1)")
-      ;; (rect :width "100%" :height 1 :x 0 :y 1 :fill "white" :fill-opacity 1)
       (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.1)
+      )))
+
+(defun smt/nasa-overlay ()
+  (let (( width (es-mt/window-width))
+        ( height (frame-char-height)))
+    `((\defs
+       (linearGradient
+        :id "grad2" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
+        (stop :offset "0%" :style "stop-color:#fff;stop-opacity:0.3")
+        (stop :offset "100%" :style "stop-color:#000;stop-opacity:0.5")
+        ))
+      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad2)" )
       )))
 
 (defun smt/mode-indicators ()
@@ -155,7 +158,7 @@
       (funcall thing)
       thing))
 
-(defun es-mt/grey-default-style ()
+(defun smt/diesel-default-style ()
   (smt/+
    (es-mt/text-style)
    `(:filter
@@ -166,17 +169,22 @@
 (defun es-mt/grey-title-style ()
   (smt/+
    (es-mt/grey-default-style)
-   `(:filter
-     "url(#inset)"
-     :fill ,(if (and (eq (frame-selected-window (selected-frame))
+   `(:fill ,(if (and (eq (frame-selected-window (selected-frame))
                          (selected-window)))
                 "#D4A535"
                 "#4C5055")
-     ;; :font-family "Georgia, Serif"
-     ;; :font-style "italic"
-     :y nil
-     :font-weight "bold"
-     )))
+           ;; :font-family "Georgia, Serif"
+           ;; :font-style "italic"
+           :font-weight "bold"
+           )))
+
+(defun smt/nasa-title-style ()
+  (smt/+ (es-mt/text-style)
+         (list :font-weight "bold"
+               :fill (if (and (eq (frame-selected-window (selected-frame))
+                                  (selected-window)))
+                         "#4A68D4"
+                         "#70767D"))))
 
 (defun es-mt/text-left ()
   (let (( project-name
@@ -200,14 +208,26 @@
          "*"))))
 
 (defun smt/diesel-major-mode-style ()
-  (smt/+
-   (es-mt/text-style)
-   `(:fill
-     "#ccc"
-     :font-family "Georgia, Serif"
-     :font-style "italic"
-     :font-weight "bold"
-     )))
+  `(:fill
+    "#ccc"
+    :font-family "Georgia, Serif"
+    :font-style "italic"
+    :filter nil
+    :font-weight "bold"
+    ))
+
+(defun smt/nasa-major-mode-style ()
+  (smt/+ (smt/diesel-major-mode-style)
+         (list :fill "#B62208")))
+
+(defun smt/get-style (theme style)
+  (smt/+ (smt/maybe-funcall
+          (smt/theme-base-style theme))
+         (smt/maybe-funcall
+          (funcall
+           (intern (concat "smt/theme-"
+                           (substring (symbol-name style) 1)))
+           theme))))
 
 (defun es-mt/default-xml-coverter (theme)
   (assert (smt/theme-p theme))
@@ -233,19 +253,19 @@
              :text-anchor "end"
              ;; Major-mode
              (tspan
-              ,@(smt/maybe-funcall (smt/theme-major-mode-style theme))
+              ,@(smt/get-style theme :major-mode-style)
               ,(format-mode-line " %m"))
              ;; Version Control
              (tspan
-              ,@(smt/maybe-funcall (smt/theme-default-style theme))
+              ,@(smt/get-style theme :vc-style)
               ,(bound-and-true-p vc-mode)
               " ")
              ;; Minor Modes
              (tspan
-              ,@(smt/maybe-funcall (smt/theme-minor-mode-style theme))
+              ,@(smt/get-style theme :minor-mode-style)
               ,(smt/maybe-funcall (smt/theme-minor-mode-text theme))))
        ;; Position Info
-       (text ,@(smt/maybe-funcall (smt/theme-default-style theme))
+       (text ,@(smt/get-style theme :position-style)
              :y ,text-base-line
              :x ,(- width horizontal-pixel-margin)
              :text-anchor "end"
@@ -256,22 +276,28 @@
         :y ,text-base-line
         :text-anchor "start"
         (tspan
-         ,@(smt/maybe-funcall (smt/theme-title-style theme))
+         ,@(smt/get-style theme :title-style)
          ,(smt/maybe-funcall (smt/theme-buffer-name-text theme))))
-       ,@(es-mt/bg-grey1-top)))))
+       ,@(smt/maybe-funcall (smt/theme-overlay theme))))))
 
 (defstruct smt/theme
   name
-  (background (lambda () '(null)))
-  (defs (lambda () '(null)))
+  background
+  overlay
+  defs
   (margin 2)
-  (title-style 'es-mt/text-style)
-  (minor-mode-style 'es-mt/text-style)
+
+  (base-style 'es-mt/text-style)
+  title-style
+  vc-style
+  position-style
+  minor-mode-style
+  major-mode-style
+
   (minor-mode-text 'smt/mode-indicators)
-  (default-style 'es-mt/text-style)
-  (major-mode-style 'es-mt/text-style)
   (buffer-name-text 'es-mt/text-left)
-  (xml-converter 'es-mt/default-xml-coverter))
+  (xml-converter 'es-mt/default-xml-coverter)
+  )
 
 (defun es-svg-modeline-format ()
   (let* (( image
@@ -296,7 +322,9 @@
             (push `(setf (,(intern
                             (concat
                              "smt/theme-"
-                             (symbol-name (pop pairs))))
+                             (substring
+                              (symbol-name (pop pairs))
+                              1)))
                            theme)
                          ,(pop pairs))
                   result))
