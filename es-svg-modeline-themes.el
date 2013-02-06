@@ -1,3 +1,4 @@
+(defvar es-mt/themes nil)
 (defvar es-mt/current-theme nil)
 (defun es-mt/window-width ()
   (let (( window-edges (window-pixel-edges)))
@@ -203,21 +204,21 @@
      )))
 
 (defun es-mt/default-xml-coverter (style)
-  (assert (es-mt/style-p style))
+  (assert (st/theme-p style))
   (let* (( width (es-mt/window-width))
          ( height (frame-char-height))
          ( text-base-line
            (es-mt/text-base-line))
          ( horizontal-pixel-margin
-           (* (es-mt/style-margin style)
+           (* (st/theme-margin style)
               (frame-char-width))))
     (xmlgen
      `(svg
        :xmlns "http://www.w3.org/2000/svg"
        :width ,width
        :height ,height
-       ,@(funcall (es-mt/style-defs style))
-       ,@(funcall (es-mt/style-background style))
+       ,@(funcall (st/theme-defs style))
+       ,@(funcall (st/theme-background style))
        ;; Mode info
        (text :x ,(- width
                     horizontal-pixel-margin
@@ -226,19 +227,19 @@
              :text-anchor "end"
              ;; Major-mode
              (tspan
-              ,@(funcall (es-mt/style-major-mode-style style))
+              ,@(funcall (st/theme-major-mode-style style))
               ,(format-mode-line " %m"))
              ;; Version Control
              (tspan
-              ,@(funcall (es-mt/style-default-style style))
+              ,@(funcall (st/theme-default-style style))
               ,(bound-and-true-p vc-mode)
               " ")
              ;; Minor Modes
              (tspan
-              ,@(funcall (es-mt/style-title-style style))
+              ,@(funcall (st/theme-minor-mode-style style))
               ,(es-mt/mode-indicators)))
        ;; Position Info
-       (text ,@(funcall (es-mt/style-default-style style))
+       (text ,@(funcall (st/theme-default-style style))
              :y ,text-base-line
              :x ,(- width horizontal-pixel-margin)
              :text-anchor "end"
@@ -248,13 +249,14 @@
         :x ,horizontal-pixel-margin
         :y ,text-base-line
         :text-anchor "start"
-         (tspan
-          ,@(funcall (es-mt/style-title-style style))
-          ,(es-mt/text-left)))
+        (tspan
+         ,@(funcall (st/theme-title-style style))
+         ,(es-mt/text-left)))
        ,@(es-mt/bg-grey1-top)))))
 
-(defstruct es-mt/style
+(defstruct st/theme
   (name "Untitled")
+  symbol
   (background (lambda () '(null)))
   (defs (lambda () '(null)))
   (margin 2)
@@ -264,27 +266,11 @@
   (major-mode-style 'es-mt/text-style)
   (xml-converter 'es-mt/default-xml-coverter))
 
-(defun es-mt/get-current-theme-xml ()
-  (funcall (es-mt/style-xml-converter es-mt/current-theme)
-           es-mt/current-theme))
-
-(defun es-svg-modeline-gray-theme ()
-  (let ((style (make-es-mt/style)))
-    (setf
-
-     (es-mt/style-defs style) (lambda () (es-mt/fr-inset 0.5 0.5))
-     ;; (es-mt/style-background style) 'es-mt/bg-black-crystal
-     (es-mt/style-background style) 'es-mt/bg-grey1
-     (es-mt/style-default-style style) 'es-mt/grey-default-style
-     (es-mt/style-title-style style) 'es-mt/grey-title-style
-     ;; (es-mt/style-title-style style) 'es-mt/grey-title-style
-     )
-    (es-mt/position-theme style)))
-
 (defun es-svg-modeline-format ()
   (let* (( image
            (create-image
-            (es-svg-modeline-gray-theme)
+            (funcall (st/theme-xml-converter es-mt/current-theme)
+                     es-mt/current-theme)
             'svg t)))
     (propertize
      "."
@@ -299,5 +285,6 @@
   (setq-default header-line-format
                 '(:eval (es-svg-modeline-format))))
 
+(require 'es-svg-modeline-themes-themes)
 (provide 'es-svg-modeline-themes)
 ;; es-svg-modeline-themes.el ends here
