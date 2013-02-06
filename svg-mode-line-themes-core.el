@@ -1,5 +1,5 @@
-(defvar es-mt/themes nil)
-(defvar es-mt/current-theme nil)
+(defvar smt/themes nil)
+(defvar smt/current-theme nil)
 (defun es-mt/window-width ()
   (let (( window-edges (window-pixel-edges)))
     (- (nth 2 window-edges) (nth 0 window-edges))))
@@ -148,6 +148,13 @@
           (setf (getf plistC key) val)))
     plistC))
 
+(defun smt/maybe-funcall (thing)
+  (if (or (functionp thing)
+          (and (symbolp thing)
+               (fboundp thing)))
+      (funcall thing)
+      thing))
+
 (defun es-mt/grey-default-style ()
   (es-mt/+
    (es-mt/text-style)
@@ -203,22 +210,22 @@
      :font-weight "bold"
      )))
 
-(defun es-mt/default-xml-coverter (style)
-  (assert (st/theme-p style))
+(defun es-mt/default-xml-coverter (theme)
+  (assert (smt/theme-p theme))
   (let* (( width (es-mt/window-width))
          ( height (frame-char-height))
          ( text-base-line
            (es-mt/text-base-line))
          ( horizontal-pixel-margin
-           (* (st/theme-margin style)
+           (* (smt/theme-margin theme)
               (frame-char-width))))
     (xmlgen
      `(svg
        :xmlns "http://www.w3.org/2000/svg"
        :width ,width
        :height ,height
-       ,@(funcall (st/theme-defs style))
-       ,@(funcall (st/theme-background style))
+       ,@(smt/maybe-funcall (smt/theme-defs theme))
+       ,@(smt/maybe-funcall (smt/theme-background theme))
        ;; Mode info
        (text :x ,(- width
                     horizontal-pixel-margin
@@ -227,19 +234,19 @@
              :text-anchor "end"
              ;; Major-mode
              (tspan
-              ,@(funcall (st/theme-major-mode-style style))
+              ,@(smt/maybe-funcall (smt/theme-major-mode-style theme))
               ,(format-mode-line " %m"))
              ;; Version Control
              (tspan
-              ,@(funcall (st/theme-default-style style))
+              ,@(smt/maybe-funcall (smt/theme-default-style theme))
               ,(bound-and-true-p vc-mode)
               " ")
              ;; Minor Modes
              (tspan
-              ,@(funcall (st/theme-minor-mode-style style))
+              ,@(smt/maybe-funcall (smt/theme-minor-mode-style theme))
               ,(es-mt/mode-indicators)))
        ;; Position Info
-       (text ,@(funcall (st/theme-default-style style))
+       (text ,@(smt/maybe-funcall (smt/theme-default-style theme))
              :y ,text-base-line
              :x ,(- width horizontal-pixel-margin)
              :text-anchor "end"
@@ -250,11 +257,11 @@
         :y ,text-base-line
         :text-anchor "start"
         (tspan
-         ,@(funcall (st/theme-title-style style))
+         ,@(smt/maybe-funcall (smt/theme-title-style theme))
          ,(es-mt/text-left)))
        ,@(es-mt/bg-grey1-top)))))
 
-(defstruct st/theme
+(defstruct smt/theme
   (name "Untitled")
   symbol
   (background (lambda () '(null)))
@@ -269,8 +276,8 @@
 (defun es-svg-modeline-format ()
   (let* (( image
            (create-image
-            (funcall (st/theme-xml-converter es-mt/current-theme)
-                     es-mt/current-theme)
+            (funcall (smt/theme-xml-converter smt/current-theme)
+                     smt/current-theme)
             'svg t)))
     (propertize
      "."
@@ -280,11 +287,5 @@
          (ignore-errors
            (dired-current-directory))))))
 
-(defun es-svg-modeline-set ()
-  (interactive)
-  (setq-default header-line-format
-                '(:eval (es-svg-modeline-format))))
-
-(require 'es-svg-modeline-themes-themes)
-(provide 'es-svg-modeline-themes)
-;; es-svg-modeline-themes.el ends here
+(provide 'svg-mode-line-themes-core)
+;; svg-mode-line-themes-core.el ends here
