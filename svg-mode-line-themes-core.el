@@ -231,7 +231,26 @@
   (major-mode-text (lambda () (format-mode-line "%m")))
   (minor-mode-text 'smt/minor-mode-indicators)
   (buffer-name-text 'smt/default-buffer-name-text)
-  (buffer-indicators-text 'smt/default-buffer-indicators-text))
+  (buffer-indicators-text 'smt/default-buffer-indicators-text)
+  (rows (list )))
+
+(defstruct
+    (smt/widget
+      (:conc-name smt/w-))
+  name
+  style
+  on-click
+  text
+  width)
+
+(defstruct
+    (smt/row
+      (:conc-name smt/r-))
+  ;; name
+  alignment
+  width
+  margin
+  widgets)
 
 (defun smt/modeline-format ()
   (let* (( theme (smt/get-current-theme))
@@ -253,26 +272,13 @@
   (cdr (assoc smt/current-theme smt/themes)))
 
 (defmacro smt/deftheme (name &rest pairs)
-  `(let ((theme (make-smt/theme)))
-     (setf (smt/theme-name theme) ',name)
-     ,@(progn
-        (let (result)
-          (while pairs
-            (push `(setf (,(intern
-                            (concat
-                             "smt/theme-"
-                             (substring
-                              (symbol-name (pop pairs))
-                              1)))
-                           theme)
-                         ,(pop pairs))
-                  result))
-          (nreverse result)))
-     (setq smt/themes
-           (cl-delete ',name smt/themes :key 'car))
-     (setq smt/themes
-           (acons ',name theme smt/themes))
-     (setq smt/current-theme ',name)))
+  `(let (( theme
+           (make-smt/theme
+            ,@(append (list :name name)
+                      pairs))))
+     (setq smt/themes (cl-delete ',name smt/themes :key 'car)
+           smt/themes (acons ',name theme smt/themes)
+           smt/current-theme ',name)))
 (put 'smt/deftheme 'common-lisp-indent-function
      '(1 &body))
 
