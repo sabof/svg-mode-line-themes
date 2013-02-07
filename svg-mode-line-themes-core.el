@@ -96,54 +96,54 @@
 
 (defun smt/get-style (theme style)
   (smt/+ (smt/maybe-funcall
-          (smt/theme-base-style theme))
+          (smt/t-base-style theme))
          (smt/maybe-funcall
           (funcall
-           (intern (concat "smt/theme-"
+           (intern (concat "smt/t-"
                            (substring (symbol-name style) 1)))
            theme))))
 
 (defun smt/left-text-width (theme)
-  (+ (smt/theme-margin theme)
+  (+ (smt/t-margin theme)
      (length
       (concat
        (smt/maybe-funcall
-        (smt/theme-buffer-name-text theme))
+        (smt/t-buffer-name-text theme))
        (smt/maybe-funcall
-        (smt/theme-buffer-indicators-text theme))))))
+        (smt/t-buffer-indicators-text theme))))))
 
 (defun smt/right-text-width (theme)
-  (+ (smt/theme-margin theme)
-     (smt/theme-position-width theme)
+  (+ (smt/t-margin theme)
+     (smt/t-position-width theme)
      (length
       (concat
        (smt/maybe-funcall
-        (smt/theme-major-mode-text theme))
+        (smt/t-major-mode-text theme))
        (smt/maybe-funcall
-        (smt/theme-minor-mode-text theme))
+        (smt/t-minor-mode-text theme))
        (smt/maybe-funcall
-        (smt/theme-vc-text theme))))
+        (smt/t-vc-text theme))))
      ;; Variable-width text safety-margin
      6))
 
 (defun smt/default-xml-coverter (theme)
-  (assert (smt/theme-p theme))
+  (assert (smt/t-p theme))
   (let* (( width (smt/window-width))
          ( height (frame-char-height))
          ( text-base-line
            (smt/text-base-line))
          ( horizontal-pixel-margin
-           (* (smt/theme-margin theme)
+           (* (smt/t-margin theme)
               (frame-char-width)))
          ( left-width
-           (funcall (smt/theme-left-text-width theme)
+           (funcall (smt/t-left-text-width theme)
                     theme))
          ( right-width
-           (funcall (smt/theme-right-text-width theme)
+           (funcall (smt/t-right-text-width theme)
                     theme))
          ( position-width
            (smt/maybe-funcall
-            (smt/theme-position-width theme)))
+            (smt/t-position-width theme)))
          ( char-width
            (let ((edges (window-edges)))
              (- (nth 2 edges) (nth 0 edges))))
@@ -160,8 +160,8 @@
        :xmlns "http://www.w3.org/2000/svg"
        :width ,width
        :height ,height
-       ,@(smt/maybe-funcall (smt/theme-defs theme))
-       ,@(smt/maybe-funcall (smt/theme-background theme))
+       ,@(smt/maybe-funcall (smt/t-defs theme))
+       ,@(smt/maybe-funcall (smt/t-background theme))
        ;; Mode info
        ,@(when
           (> width-mode 2)
@@ -176,16 +176,16 @@
                   (tspan
                    ,@(smt/get-style theme :major-mode-style)
                    " "
-                   ,(smt/maybe-funcall (smt/theme-major-mode-text theme)))
+                   ,(smt/maybe-funcall (smt/t-major-mode-text theme)))
                   ;; Version Control
                   (tspan
                    ,@(smt/get-style theme :vc-style)
-                   ,(smt/maybe-funcall (smt/theme-vc-text theme))
+                   ,(smt/maybe-funcall (smt/t-vc-text theme))
                    " ")
                   ;; Minor Modes
                   (tspan
                    ,@(smt/get-style theme :minor-mode-style)
-                   ,(smt/maybe-funcall (smt/theme-minor-mode-text theme))))))
+                   ,(smt/maybe-funcall (smt/t-minor-mode-text theme))))))
        ;; Position Info
        ,@(when
           (> width-mode 1)
@@ -201,20 +201,70 @@
         :text-anchor "start"
         (tspan
          ,@(smt/get-style theme :buffer-indicators-style)
-         ,(smt/maybe-funcall (smt/theme-buffer-indicators-text theme)))
+         ,(smt/maybe-funcall (smt/t-buffer-indicators-text theme)))
         (tspan
          ,@(smt/get-style theme :buffer-name-style)
-         ,(smt/maybe-funcall (smt/theme-buffer-name-text theme))))
-       ,@(smt/maybe-funcall (smt/theme-overlay theme))))))
+         ,(smt/maybe-funcall (smt/t-buffer-name-text theme))))
+       ,@(smt/maybe-funcall (smt/t-overlay theme))))))
 
-(defstruct smt/theme
+(defun smt/t-export-default (theme)
+  (let (( width (smt/window-width))
+        ( height (frame-char-height))
+        ( rows (smt/t-rows theme)))
+    (xmlgen
+     `(svg
+       :xmlns "http://www.w3.org/2000/svg"
+       :width ,width
+       :height ,height
+       ,@(smt/maybe-funcall (smt/t-defs theme))
+       ,@(smt/maybe-funcall (smt/t-background theme))
+       ,@(mapcar 'smt/r-export
+                 (smt/t-rows theme))))))
+
+(defun smt/r-export-default (row)
+  `(text
+    :text-anchor ,(case
+                   (smt/r-alignment row)
+                   (left "start")
+                   (right "end")
+                   (center "middle"))
+    :x ,(case
+         (smt/r-alignment row)
+         (left (* (smt/r-margin row)
+                  (frame-char-width)))
+         (right (- (frame-pixel-width)
+                   (* (smt/r-margin row)
+                      (frame-char-width)))))
+    :y ,(smt/text-base-line)
+    ,@(mapcar 'smt/w-export
+              (smt/r-widgets row))))
+
+(defun smt/w-width-default (widget)
+  (length (smt/w-text widget)))
+
+(defun smt/w-export-default (widget)
+  `(tspan
+    ,@(smt/w-style widget)
+    ,(smt/w-text widget)))
+
+(defun smt/t-export (theme)
+  (funcall (smt/t-export-func theme) theme))
+
+(defun smt/r-export (row)
+  (funcall (smt/r-export-func row) row))
+
+(defun smt/w-export (widget)
+  (funcall (smt/w-export-func widget) widget))
+
+(defstruct
+    (smt/theme
+      (:conc-name smt/t-))
   name
   background
   overlay
   defs
-  (margin 2)
   (position-width 12)
-  (xml-converter 'smt/default-xml-coverter)
+  (export-func 'smt/t-export-default)
   (setup-hook 'ignore)
 
   (base-style 'smt/default-base-style)
@@ -232,7 +282,7 @@
   (minor-mode-text 'smt/minor-mode-indicators)
   (buffer-name-text 'smt/default-buffer-name-text)
   (buffer-indicators-text 'smt/default-buffer-indicators-text)
-  (rows (list )))
+  rows)
 
 (defstruct
     (smt/widget
@@ -241,22 +291,25 @@
   style
   on-click
   text
-  width)
+  (width-func 'smt/w-width-default)
+  (export-func 'smt/w-export-default))
 
 (defstruct
     (smt/row
       (:conc-name smt/r-))
-  ;; name
+  name
   alignment
-  width
+  (priority 0)
+  (width-func 'smt/r-width-default)
   margin
-  widgets)
+  widgets
+  (export-func 'smt/r-export-default))
 
 (defun smt/modeline-format ()
   (let* (( theme (smt/get-current-theme))
          ( image
            (create-image
-            (funcall (smt/theme-xml-converter
+            (funcall (smt/t-xml-converter
                       theme)
                      theme)
             'svg t)))
