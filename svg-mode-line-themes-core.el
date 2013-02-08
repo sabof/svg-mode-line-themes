@@ -92,7 +92,12 @@
      (if (and (or (buffer-file-name)
                   buffer-offer-save)
               (buffer-modified-p))
-         "*"))))
+         "*")
+     (when (bound-and-true-p which-func-mode)
+       (let ((text (format-mode-line which-func-current)))
+         (when (and (> (length text) 0)
+                    (not (equal text "???")))
+           (concat " :: " text)))))))
 
 (defun smt/get-style (theme style)
   (smt/+ (smt/maybe-funcall
