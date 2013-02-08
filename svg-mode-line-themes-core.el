@@ -3,6 +3,8 @@
     (require 'xmlgen "xml-gen"))
 
 (defvar smt/themes nil)
+(defvar smt/widgets nil)
+(defvar smt/rows nil)
 (defvar smt/current-theme nil)
 (defun smt/window-width ()
   (let (( window-edges (window-pixel-edges)))
@@ -79,20 +81,6 @@
     (if (> (length indicators) 1)
         indicators
         "")))
-
-(defun smt/default-buffer-name-text ()
-  (let (( project-name
-          (esprj-project-name
-           (esprj-file-project
-            (or (buffer-file-name)
-                (ignore-errors (dired-current-directory)))))))
-    (concat
-     (when project-name (concat project-name " => "))
-     (format-mode-line "%b")
-     (if (and (or (buffer-file-name)
-                  buffer-offer-save)
-              (buffer-modified-p))
-         "*"))))
 
 (defun smt/get-style (theme style)
   (smt/+ (smt/maybe-funcall
@@ -237,7 +225,9 @@
                       (frame-char-width)))))
     :y ,(smt/text-base-line)
     ,@(mapcar 'smt/w-export
-              (smt/r-widgets row))))
+              (mapcar (lambda (widget-name)
+                        (car (assoc widget-name smt/widgets)))
+                      (smt/r-widgets row)))))
 
 (defun smt/w-width-default (widget)
   (length (smt/w-text widget)))
@@ -288,9 +278,9 @@
     (smt/widget
       (:conc-name smt/w-))
   name
-  style
-  on-click
-  text
+  (style 'smt/default-base-style)
+  (on-click 'ignore)
+  (text "")
   (width-func 'smt/w-width-default)
   (export-func 'smt/w-export-default))
 
@@ -298,10 +288,10 @@
     (smt/row
       (:conc-name smt/r-))
   name
-  alignment
+  (alignment 'left)
   (priority 0)
   (width-func 'smt/r-width-default)
-  margin
+  (margin 2)
   widgets
   (export-func 'smt/r-export-default))
 

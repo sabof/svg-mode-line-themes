@@ -43,6 +43,9 @@
   :major-mode-style 'smt/diesel-major-mode-style
   :overlay 'smt/black-crystal-overlay)
 
+(smt/deftheme widget-test
+  )
+
 (defun smt/next-theme ()
   (interactive)
   (let* (( position (position smt/current-theme smt/themes :key 'car))
