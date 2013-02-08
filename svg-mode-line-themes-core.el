@@ -272,35 +272,19 @@
 (defstruct
     (smt/theme
       (:conc-name smt/t-))
-  name
   background
   overlay
   defs
   (position-width 12)
   (export-func 'smt/t-export-default)
   (setup-hook 'ignore)
-
   (base-style 'smt/default-base-style)
-  buffer-name-style
-  buffer-indicators-style
-  vc-style
-  position-style
-  (left-text-width 'smt/left-text-width)
-  (right-text-width 'smt/right-text-width)
-  minor-mode-style
-  major-mode-style
-
-  (vc-text (lambda () (bound-and-true-p vc-mode)))
-  (major-mode-text (lambda () (format-mode-line "%m")))
-  (minor-mode-text 'smt/minor-mode-indicators)
-  (buffer-name-text 'smt/default-buffer-name-text)
-  (buffer-indicators-text 'smt/default-buffer-indicators-text)
+  local-widgets
   rows)
 
 (defstruct
     (smt/widget
       (:conc-name smt/w-))
-  name
   (style 'smt/default-base-style)
   (on-click 'ignore)
   (text "")
@@ -310,7 +294,6 @@
 (defstruct
     (smt/row
       (:conc-name smt/r-))
-  name
   (alignment 'left)
   (priority 0)
   (width-func 'smt/r-width-default)
