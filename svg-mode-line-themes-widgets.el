@@ -26,5 +26,5 @@
               :widgets (list 'buffer-name))
              smt/rows))
 
-(provide 'svg-mode-line-widgets)
-;; svg-mode-line-widgets.el ends here
+(provide 'svg-mode-line-themes-widgets)
+;; svg-mode-line-themes-widgets.el ends here

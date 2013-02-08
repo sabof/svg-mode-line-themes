@@ -1,6 +1,7 @@
 (require 'cl)
 (require 'svg-mode-line-themes-core)
 (require 'svg-mode-line-themes-styles)
+(require 'svg-mode-line-themes-widgets)
 (defvar smt/line-format 'mode-line-format)
 
 (smt/deftheme nasa
