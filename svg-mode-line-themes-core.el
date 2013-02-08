@@ -196,18 +196,31 @@
        ,@(smt/maybe-funcall (smt/t-overlay theme))))))
 
 (defun smt/t-export-default (theme)
-  (let (( width (smt/window-width))
-        ( height (frame-char-height))
-        ( rows (smt/t-rows theme)))
-    (xmlgen
-     `(svg
-       :xmlns "http://www.w3.org/2000/svg"
-       :width ,width
-       :height ,height
-       ,@(smt/maybe-funcall (smt/t-defs theme))
-       ,@(smt/maybe-funcall (smt/t-background theme))
-       ,@(mapcar 'smt/r-export
-                 (smt/t-rows theme))))))
+  (let* (( width (smt/window-width))
+         ( height (frame-char-height))
+         ( rows (smt/t-rows theme))
+         xml image)
+    (setq
+     xml
+     (xmlgen
+      `(svg
+        :xmlns "http://www.w3.org/2000/svg"
+        :width ,width
+        :height ,height
+        ,@(smt/maybe-funcall (smt/t-defs theme))
+        ,@(smt/maybe-funcall (smt/t-background theme))
+        ,@(mapcar 'smt/r-export
+                  (smt/t-rows theme)))))
+    (setq
+     image
+     (create-image xml 'svg t))
+    (propertize
+     "."
+     'display image
+     'help-echo
+     (or (buffer-file-name)
+         (ignore-errors
+           (dired-current-directory))))))
 
 (defun smt/r-export-default (row)
   `(text
@@ -298,20 +311,7 @@
   (export-func 'smt/r-export-default))
 
 (defun smt/modeline-format ()
-  (let* (( theme (smt/get-current-theme))
-         ( image
-           (create-image
-            (funcall (smt/t-xml-converter
-                      theme)
-                     theme)
-            'svg t)))
-    (propertize
-     "."
-     'display image
-     'help-echo
-     (or (buffer-file-name)
-         (ignore-errors
-           (dired-current-directory))))))
+  (smt/t-export (smt/get-current-theme)))
 
 (defun smt/get-current-theme ()
   (cdr (assoc smt/current-theme smt/themes)))
