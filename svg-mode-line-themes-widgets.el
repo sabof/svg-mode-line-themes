@@ -20,10 +20,26 @@
               :text 'smt/default-buffer-name-text)
              smt/widgets))
 
+(setq smt/widgets
+      (acons 'position-info
+             (make-smt/widget
+              :on-click (lambda (e)
+                          (interactive "e"))
+              :text (lambda ()
+                      (format-mode-line "%l:%p")))
+             smt/widgets))
+
 (setq smt/rows
       (acons 'default-left
              (make-smt/row
               :widgets (list 'buffer-name))
+             smt/rows))
+
+(setq smt/rows
+      (acons 'default-right
+             (make-smt/row
+              :widgets (list 'position-info)
+              :alignment 'right)
              smt/rows))
 
 (provide 'svg-mode-line-themes-widgets)

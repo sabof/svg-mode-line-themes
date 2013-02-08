@@ -209,8 +209,16 @@
         :height ,height
         ,@(smt/maybe-funcall (smt/t-defs theme))
         ,@(smt/maybe-funcall (smt/t-background theme))
-        ,@(mapcar 'smt/r-export
-                  (smt/t-rows theme)))))
+        ,@(mapcar (lambda (row-or-name)
+                    (smt/r-export
+                     (cond ( (smt/row-p row-or-name)
+                             row-or-name)
+                           ( (smt/row-p (cdr (assoc row-or-name smt/rows)))
+                             (cdr (assoc row-or-name smt/rows)))
+                           ( t (error "Row has wrong type: %s" row-or-name)))))
+                  (smt/t-rows theme))
+        ,@(smt/maybe-funcall (smt/t-overlay theme))
+        )))
     (setq
      image
      (create-image xml 'svg t))
@@ -237,20 +245,20 @@
                    (* (smt/r-margin row)
                       (frame-char-width)))))
     :y ,(smt/text-base-line)
-    ,@(mapcar 'smt/w-export
-              (mapcar (lambda (widget-or-name)
-                        (if (smt/widget-p widget-or-name)
-                            widget-or-name
-                            (car (assoc widget-or-name smt/widgets))))
-                      (smt/r-widgets row)))))
+    ,@(mapcar (lambda (widget-or-name)
+                (smt/w-export
+                 (if (smt/widget-p widget-or-name)
+                     widget-or-name
+                     (cdr (assoc widget-or-name smt/widgets)))))
+              (smt/r-widgets row))))
 
 (defun smt/w-width-default (widget)
   (length (smt/w-text widget)))
 
 (defun smt/w-export-default (widget)
   `(tspan
-    ,@(smt/w-style widget)
-    ,(smt/w-text widget)))
+    ,@(smt/maybe-funcall (smt/w-style widget))
+    ,(smt/maybe-funcall (smt/w-text widget))))
 
 (defun smt/t-export (theme)
   (funcall (smt/t-export-func theme) theme))
@@ -327,7 +335,7 @@
 (defmacro smt/deftheme (name &rest pairs)
   `(let (( theme
            (make-smt/theme
-            ,@(append (list :name name)
+            ,@(append (list :name `(quote ,name))
                       pairs))))
      (setq smt/themes (cl-delete ',name smt/themes :key 'car)
            smt/themes (acons ',name theme smt/themes)
