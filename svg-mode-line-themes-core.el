@@ -311,7 +311,15 @@
   (export-func 'smt/r-export-default))
 
 (defun smt/modeline-format ()
-  (smt/t-export (smt/get-current-theme)))
+  (let ((theme (smt/get-current-theme)))
+    (cond ( (smt/theme-p theme)
+            (smt/t-export theme))
+          ( (or (functionp theme)
+                (symbolp theme))
+            (funcall theme))
+          ( (stringp theme)
+            theme)
+          ( t (error "Current theme has wrong type" theme)))))
 
 (defun smt/get-current-theme ()
   (cdr (assoc smt/current-theme smt/themes)))
