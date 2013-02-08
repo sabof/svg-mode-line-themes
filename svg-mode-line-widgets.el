@@ -23,8 +23,7 @@
 (setq smt/rows
       (acons 'default-left
              (make-smt/row
-              :widgets (list 'buffer-name)
-              )
+              :widgets (list 'buffer-name))
              smt/rows))
 
 (provide 'svg-mode-line-widgets)

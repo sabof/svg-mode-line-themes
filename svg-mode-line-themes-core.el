@@ -225,8 +225,10 @@
                       (frame-char-width)))))
     :y ,(smt/text-base-line)
     ,@(mapcar 'smt/w-export
-              (mapcar (lambda (widget-name)
-                        (car (assoc widget-name smt/widgets)))
+              (mapcar (lambda (widget-or-name)
+                        (if (smt/widget-p widget-or-name)
+                            widget-or-name
+                            (car (assoc widget-or-name smt/widgets))))
                       (smt/r-widgets row)))))
 
 (defun smt/w-width-default (widget)
