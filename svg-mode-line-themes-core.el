@@ -65,13 +65,8 @@
        ,@(mapcar
           (lambda (row-or-name)
             (smt/r-export
-             (cond ( (smt/row-p row-or-name)
-                     row-or-name)
-                   ( (smt/row-p
-                      (cdr (assoc row-or-name smt/rows)))
-                     (cdr (assoc row-or-name smt/rows)))
-                   ( t (error "Row has wrong type: %s"
-                              row-or-name)))
+             (smt/t-normalize-row
+              theme row-or-name)
              theme))
           (smt/t-rows theme))
        ,@(smt/maybe-funcall (smt/t-overlay theme))
@@ -92,7 +87,14 @@
   (if (smt/widget-p widget-or-name)
       widget-or-name
       (or (cdr (assoc widget-or-name (smt/t-local-widgets theme)))
-          (cdr (assoc widget-or-name smt/widgets)))))
+          (cdr (assoc widget-or-name smt/widgets))
+          (error "Can't process widget: %s" widget-or-name))))
+
+(defun smt/t-normalize-row (theme row-or-name)
+  (if (smt/row-p row-or-name)
+      row-or-name
+      (or (cdr (assoc row-or-name smt/rows))
+          (error "Can't process row: %s" row-or-name))))
 
 (defun smt/r-export-default (row theme)
   `(text
