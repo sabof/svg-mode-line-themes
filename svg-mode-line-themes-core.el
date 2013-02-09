@@ -42,6 +42,15 @@
 ;;; Structs EOF
 ;;; Methods
 
+(defun smt/t-export (theme)
+  (funcall (smt/t-export-func theme) theme))
+
+(defun smt/r-export (row theme)
+  (funcall (smt/r-export-func row) row theme))
+
+(defun smt/w-export (widget row theme)
+  (funcall (smt/w-export-func widget) widget row theme))
+
 (defun smt/t-export-default (theme)
   (let* (( width (smt/window-width))
          ( height (frame-char-height))
@@ -78,9 +87,6 @@
          (ignore-errors
            (dired-current-directory))))))
 
-(defun smt/t-export (theme)
-  (funcall (smt/t-export-func theme) theme))
-
 (defun smt/t-normalize-widget (theme widget-or-name)
   (if (smt/widget-p widget-or-name)
       widget-or-name
@@ -111,9 +117,6 @@
                  row theme))
               (smt/r-widgets row))))
 
-(defun smt/r-export (row theme)
-  (funcall (smt/r-export-func row) row theme))
-
 (defun smt/w-export-default (widget row theme)
   `(tspan
     ,@(smt/+ (smt/maybe-funcall (smt/t-base-style theme))
@@ -121,112 +124,8 @@
              (smt/maybe-funcall (smt/w-style widget)))
     ,(smt/maybe-funcall (smt/w-text widget))))
 
-(defun smt/w-export (widget row theme)
-  (funcall (smt/w-export-func widget) widget row theme))
-
 (defun smt/w-width-default (widget)
   (length (smt/maybe-funcall (smt/w-text widget))))
-
-;;; Methods EOF
-;;; Legacy
-
-(defun smt/default-xml-coverter (theme)
-  (assert (smt/t-p theme))
-  (let* (( width (smt/window-width))
-         ( height (frame-char-height))
-         ( text-base-line
-           (smt/text-base-line))
-         ( horizontal-pixel-margin
-           (* (smt/t-margin theme)
-              (frame-char-width)))
-         ( left-width
-           (funcall (smt/t-left-text-width theme)
-                    theme))
-         ( right-width
-           (funcall (smt/t-right-text-width theme)
-                    theme))
-         ( position-width
-           (smt/maybe-funcall
-            (smt/t-position-width theme)))
-         ( char-width
-           (let ((edges (window-edges)))
-             (- (nth 2 edges) (nth 0 edges))))
-         ( width-mode
-           (cond ( (>= char-width
-                       (+ left-width right-width))
-                   3)
-                 ( (>= char-width
-                       (+ left-width position-width))
-                   2)
-                 (t 1))))
-    (xmlgen
-     `(svg
-       :xmlns "http://www.w3.org/2000/svg"
-       :width ,width
-       :height ,height
-       ,@(smt/maybe-funcall (smt/t-defs theme))
-       ,@(smt/maybe-funcall (smt/t-background theme))
-       ;; Mode info
-       ,@(when
-          (> width-mode 2)
-          `((text :x ,(- width
-                         horizontal-pixel-margin
-                         (* (frame-char-width)
-                            position-width)
-                         0.5)
-                  :y ,text-base-line
-                  :text-anchor "end"
-                  ;; Major-mode
-                  (tspan
-                   ,@(smt/get-style theme :major-mode-style)
-                   " "
-                   ,(smt/maybe-funcall (smt/t-major-mode-text theme)))
-                  ;; Version Control
-                  (tspan
-                   ,@(smt/get-style theme :vc-style)
-                   ,(smt/maybe-funcall (smt/t-vc-text theme))
-                   " ")
-                  ;; Minor Modes
-                  (tspan
-                   ,@(smt/get-style theme :minor-mode-style)
-                   ,(smt/maybe-funcall (smt/t-minor-mode-text theme))))))
-       ;; Position Info
-       ,@(when
-          (> width-mode 1)
-          `((text ,@(smt/get-style theme :position-style)
-                  :x ,(- width horizontal-pixel-margin)
-                  :y ,text-base-line
-                  :text-anchor "end"
-                  ,(format-mode-line "%l:%p"))))
-       ;; Left
-       (text
-        :x ,horizontal-pixel-margin
-        :y ,text-base-line
-        :text-anchor "start"
-        (tspan
-         ,@(smt/get-style theme :buffer-indicators-style)
-         ,(smt/maybe-funcall (smt/t-buffer-indicators-text theme)))
-        (tspan
-         ,@(smt/get-style theme :buffer-name-style)
-         ,(smt/maybe-funcall (smt/t-buffer-name-text theme))))
-       ,@(smt/maybe-funcall (smt/t-overlay theme))))))
-
-;;; Legacy EOF
-
-(defun smt/window-width ()
-  (let (( window-edges (window-pixel-edges)))
-    (- (nth 2 window-edges) (nth 0 window-edges))))
-
-(defun smt/copy-struct (struct)
-   (funcall
-    (intern
-     (concat
-      "copy-"
-      (substring
-       (symbol-name
-        (aref 0 struct))
-       10)))
-    struct))
 
 (defmacro smt/define-struct-copy-modifier (function-name accessor-prefix)
   `(defmacro ,function-name (struct &rest properties)
@@ -253,6 +152,23 @@
 (smt/define-struct-copy-modifier smt/t-copy-and-modify "smt/t-")
 (smt/define-struct-copy-modifier smt/w-copy-and-modify "smt/w-")
 (smt/define-struct-copy-modifier smt/r-copy-and-modify "smt/r-")
+
+;;; Methods EOF
+
+(defun smt/window-width ()
+  (let (( window-edges (window-pixel-edges)))
+    (- (nth 2 window-edges) (nth 0 window-edges))))
+
+(defun smt/copy-struct (struct)
+   (funcall
+    (intern
+     (concat
+      "copy-"
+      (substring
+       (symbol-name
+        (aref 0 struct))
+       10)))
+    struct))
 
 (defun smt/points-to-pixels (points)
   ;; points = pixels * 72 / 96
