@@ -127,8 +127,8 @@
 (defun smt/w-width-default (widget)
   (length (smt/maybe-funcall (smt/w-text widget))))
 
-(defmacro smt/define-struct-copy-modifier (function-name accessor-prefix)
-  `(defmacro ,function-name (struct &rest properties)
+(defmacro smt/define-struct-copy-modifier (accessor-prefix)
+  `(defmacro ,(intern (concat accessor-prefix "copy-and-modify")) (struct &rest properties)
      (let ((new-struct (gensym "new-struct-"))
            result)
        `(let (( ,new-struct (smt/copy-struct ,struct)))
@@ -149,9 +149,9 @@
              (nreverse result))
           ,new-struct))))
 
-(smt/define-struct-copy-modifier smt/t-copy-and-modify "smt/t-")
-(smt/define-struct-copy-modifier smt/w-copy-and-modify "smt/w-")
-(smt/define-struct-copy-modifier smt/r-copy-and-modify "smt/r-")
+(smt/define-struct-copy-modifier "smt/t-")
+(smt/define-struct-copy-modifier "smt/w-")
+(smt/define-struct-copy-modifier "smt/r-")
 
 ;;; Methods EOF
 
