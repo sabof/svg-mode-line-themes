@@ -12,6 +12,29 @@
               (buffer-modified-p))
          "*"))))
 
+(defun smt/default-buffer-indicators-text ()
+  (let ((indicators
+         (concat
+          (unless (or (eq system-type 'windows-nt) (daemonp))
+            "S")
+          (when (window-dedicated-p) "D")
+          (when buffer-read-only "R")
+          (when (mfile-remote-p) " REMOTE")
+          " ")))
+    (if (< 1 (length indicators))
+        indicators
+        "")))
+
+(defun smt/minor-mode-indicators ()
+  (concat
+   (when (bound-and-true-p es-aai-mode) "I")
+   (when (or (bound-and-true-p evil-local-mode)
+             (bound-and-true-p evil-mode)) "E")
+   (when truncate-lines "T")
+   (when dired-omit-mode "O")
+   (when (bound-and-true-p save-auto-hook) "A")
+   (when (bound-and-true-p wmi) "M")))
+
 (setq smt/widgets
       (acons 'buffer-name
              (make-smt/widget

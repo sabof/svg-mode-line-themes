@@ -10,19 +10,8 @@
   (let (( window-edges (window-pixel-edges)))
     (- (nth 2 window-edges) (nth 0 window-edges))))
 
-(defun smt/minor-mode-indicators ()
-  (concat
-   (when (bound-and-true-p es-aai-mode) "I")
-   (when (or (bound-and-true-p evil-local-mode)
-             (bound-and-true-p evil-mode)) "E")
-   (when truncate-lines "T")
-   (when dired-omit-mode "O")
-   (when (bound-and-true-p save-auto-hook) "A")
-   (when (bound-and-true-p wmi) "M")))
-
 (defun smt/points-to-pixels (points)
   ;; points = pixels * 72 / 96
-  ;;  = pixels * 72
   (/ (* 96 points) 72))
 
 (defun smt/font-pixel-size ()
@@ -76,19 +65,6 @@
                (fboundp thing)))
       (funcall thing)
       thing))
-
-(defun smt/default-buffer-indicators-text ()
-  (let ((indicators
-         (concat
-          (unless (or (eq system-type 'windows-nt) (daemonp))
-            "S")
-          (when (window-dedicated-p) "D")
-          (when buffer-read-only "R")
-          (when (mfile-remote-p) " REMOTE")
-          " ")))
-    (if (> (length indicators) 1)
-        indicators
-        "")))
 
 (defun smt/get-style (theme style)
   (smt/+ (smt/maybe-funcall
@@ -268,7 +244,9 @@
 
 (defun smt/w-export-default (widget row theme)
   `(tspan
-    ,@(smt/maybe-funcall (smt/w-style widget))
+    ,@(smt/+ (smt/maybe-funcall (smt/t-base-style theme))
+             (smt/maybe-funcall (smt/r-base-style row))
+             (smt/maybe-funcall (smt/w-style widget)))
     ,(smt/maybe-funcall (smt/w-text widget))))
 
 (defun smt/t-export (theme)
@@ -310,6 +288,7 @@
   (width-func 'smt/r-width-default)
   (margin 2)
   widgets
+  base-style
   (export-func 'smt/r-export-default))
 
 (defun smt/modeline-format ()
@@ -327,10 +306,7 @@
   (cdr (assoc smt/current-theme smt/themes)))
 
 (defmacro smt/deftheme (name &rest pairs)
-  `(let (( theme
-           (make-smt/theme
-            ,@(append (list :name `(quote ,name))
-                      pairs))))
+  `(let (( theme (make-smt/theme ,@pairs)))
      (setq smt/themes (cl-delete ',name smt/themes :key 'car)
            smt/themes (acons ',name theme smt/themes)
            smt/current-theme ',name)))

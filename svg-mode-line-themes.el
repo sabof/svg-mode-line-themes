@@ -13,9 +13,9 @@
                  `(:filter
                    "url(#inset)"
                    :fill "#404448")))
-  :buffer-name-style 'smt/nasa-title-style
-  :minor-mode-style 'smt/nasa-title-style
-  :major-mode-style 'smt/nasa-major-mode-style
+  ;; :buffer-name-style 'smt/nasa-title-style
+  ;; :minor-mode-style 'smt/nasa-title-style
+  ;; :major-mode-style 'smt/nasa-major-mode-style
   :overlay 'smt/nasa-overlay)
 
 (smt/deftheme diesel
@@ -27,9 +27,9 @@
                  `(:filter
                    "url(#inset)"
                    :fill "#b7c3cd")))
-  :buffer-name-style 'smt/grey-title-style
-  :minor-mode-style 'smt/grey-title-style
-  :major-mode-style 'smt/diesel-major-mode-style
+  ;; :buffer-name-style 'smt/grey-title-style
+  ;; :minor-mode-style 'smt/grey-title-style
+  ;; :major-mode-style 'smt/diesel-major-mode-style
   :overlay 'smt/bg-grey1-top)
 
 (smt/deftheme black-crystal
@@ -39,9 +39,9 @@
                 (smt/+
                  (smt/default-base-style)
                  `(:fill "#7E868D")))
-  :buffer-name-style 'smt/black-crystal-title-style
-  :minor-mode-style 'smt/black-crystal-title-style
-  :major-mode-style 'smt/diesel-major-mode-style
+  ;; :buffer-name-style 'smt/black-crystal-title-style
+  ;; :minor-mode-style 'smt/black-crystal-title-style
+  ;; :major-mode-style 'smt/diesel-major-mode-style
   :overlay 'smt/black-crystal-overlay)
 
 (defun smt/next-theme ()
