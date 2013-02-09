@@ -227,7 +227,8 @@
             (funcall theme))
           ( (stringp theme)
             theme)
-          ( t (error "Current theme has wrong type" theme)))))
+          ( t (error "Current theme has wrong type"
+                     theme)))))
 
 (defun smt/get-current-theme ()
   (cdr (assoc smt/current-theme smt/themes)))
