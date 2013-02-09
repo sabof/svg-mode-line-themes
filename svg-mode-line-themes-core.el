@@ -72,16 +72,28 @@
        ,@(smt/maybe-funcall (smt/t-overlay theme))
        ))))
 
-(defun smt/t-export-default (theme)
+(defun* smt/t-export-default (theme)
+  ;; (return-from smt/t-export-default)
   (let* ((xml (smt/t-export-default-xml theme))
          (image (create-image xml 'svg t)))
     (propertize
      "."
      'display image
-     'help-echo
-     (or (buffer-file-name)
-         (ignore-errors
-           (dired-current-directory))))))
+     'keymap (let (( map (make-sparse-keymap)))
+               (es-define-keys map
+                 (kbd "<mouse-1>")
+                 'smt/receive-click
+                 (kbd "<nil> <header-line> <mouse-1>")
+                 'smt/receive-click)
+               (kbd "<nil> <mode-line> <mouse-1>")
+               'smt/receive-click)
+     map)
+    'help-echo "he"
+    ;; 'help-echo
+    ;; (or (buffer-file-name)
+    ;;     (ignore-errors
+    ;;       (dired-current-directory)))
+    )))
 
 (defun smt/t-normalize-widget (theme widget-or-name)
   (if (smt/widget-p widget-or-name)
@@ -133,16 +145,29 @@
   )
 
 (defun smt/r-receive-click (row theme event)
+  (assert (smt/row-p row))
   (let* (( widgets (smt/r-widgets row))
          ( align (smt/r-align row))
-         ( offset (smt/maybe-funcall (smt/r-margin row))))
-
-    ))
+         ( offset (smt/maybe-funcall (smt/r-margin row)))
+         current-widget-width)
+    (dolist (widget widgets)
+      (setq current-widget-width (smt/w-width widget))
+      (when (and (smt/w-on-click widget)
+                 ;;
+                 )
+        (funcall (smt/w-on-click widget))))))
 
 (defun smt/t-receive-click (theme event)
   (let (( rows (smt/t-rows theme)))
-    (mapcar )
-    (dolist (row ))))
+    (dolist (row rows)
+      (smt/r-receive-click
+       row theme event))))
+
+(defun smt/receive-click (event)
+  (interactive "e")
+  (smt/t-receive-click
+   (smt/get-current-theme)
+   event))
 
 (defmacro smt/define-struct-copy-modifier (accessor-prefix)
   `(defmacro ,(intern (concat accessor-prefix "copy-and-modify"))
@@ -192,13 +217,19 @@
   (/ (* 96 points) 72))
 
 (defun smt/font-pixel-size ()
-  (round
+  (ceiling
    (smt/points-to-pixels
     (/ (face-attribute 'default :height) 10))))
 
 (defun smt/text-base-line ()
+  ;; Should be this one, but empirically it doesn't work as well
   ;; (smt/font-pixel-size)
-  )
+  (let ((font-size (* 0.7 (smt/font-pixel-size))))
+    (floor
+     (+ font-size
+        (/ (- (frame-char-height)
+              font-size)
+           2)))))
 
 (defun smt/default-base-style ()
   `(:font-family
@@ -285,6 +316,8 @@
       (unload-feature 'svg-mode-line-themes t))
     (ignore-errors
       (unload-feature 'svg-mode-line-themes-styles t))
+    (ignore-errors
+      (unload-feature 'svg-mode-line-themes-widgets t))
     (ignore-errors
       (unload-feature 'svg-mode-line-themes-core t))
     (require (quote svg-mode-line-themes))
