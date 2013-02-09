@@ -13,5 +13,23 @@
               :alignment 'center)
              smt/rows))
 
+(ert-deftest test-smt/+ ()
+  (should (null (smt/+)))
+  (should (null (smt/+ '(:a 45) '(:a nil))))
+  (should (equal '(:a 45) (smt/+ '(:a 45))))
+  (let (( result (smt/+ '(:a 1) '(:b 2))))
+    (should (equal (getf result :a) 1))
+    (should (equal (getf result :b) 2))
+    (should (equal (length result) 4)))
+  (let (( result (smt/+ '(:a 1) '(:a 2))))
+    (should (equal (getf result :a) 2))
+    (should (equal (length result) 2)))
+  (let (( result (smt/+ '(:a 1) '(:b 2) '(:c 3))))
+    (should (equal (getf result :a) 1))
+    (should (equal (getf result :b) 2))
+    (should (equal (getf result :c) 3))
+    (should (equal (length result) 6)))
+  )
+
 (provide 'svg-mode-line-themes-tests)
 ;; svg-mode-line-themes-tests.el ends here

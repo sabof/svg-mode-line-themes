@@ -41,15 +41,23 @@
               font-size)
            2)))))
 
-(defun smt/default-base-style ()
-  `(:font-family
-    ,(face-attribute 'default :family)
-    :font-size
-    ,(concat (int-to-string
-              (round
-               (/ (face-attribute 'default :height)
-                  10.0)))
-             "pt")))
+(defun smt/+ (&rest plists)
+  (cond
+    ( (= 1 (length plists))
+      (car plists))
+    ( (null plists)
+      nil)
+    ( t (let ((plistC (copy-list (car plists)))
+              (plistB (cadr plists))
+              key val)
+          (dotimes (iter (/ (length plistB) 2))
+            (setq key (nth (* 2 iter) plistB)
+                  val (nth (1+ (* 2 iter)) plistB))
+            (if (null val)
+                (remf plistC key)
+                (setf (getf plistC key) val)))
+          (apply 'smt/+ plistC (cddr plists))
+          ))))
 
 (defun smt/+ (plistA plistB)
   (let ((plistC (copy-list plistA))
