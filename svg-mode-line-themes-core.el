@@ -261,13 +261,19 @@
 
 (defun smt/reset ()
   (interactive)
-  (ignore-errors
-    (unload-feature 'svg-mode-line-themes t))
-  (ignore-errors
-    (unload-feature 'svg-mode-line-themes-styles t))
-  (ignore-errors
-    (unload-feature 'svg-mode-line-themes-core t))
-  (require (quote svg-mode-line-themes)))
+  (let (( tests-where-loaded
+          (featurep 'svg-mode-line-themes-tests)))
+    (ignore-errors
+      (unload-feature 'svg-mode-line-themes t))
+    (ignore-errors
+      (unload-feature 'svg-mode-line-themes-styles t))
+    (ignore-errors
+      (unload-feature 'svg-mode-line-themes-core t))
+    (require (quote svg-mode-line-themes))
+    (when tests-where-loaded
+      (ignore-errors
+        (unload-feature 'svg-mode-line-themes-tests t))
+      (require (quote svg-mode-line-themes-tests)))))
 
 (provide 'svg-mode-line-themes-core)
 ;; svg-mode-line-themes-core.el ends here
