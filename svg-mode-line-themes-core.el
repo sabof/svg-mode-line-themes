@@ -23,7 +23,7 @@
 
 (defstruct (smt/row
              (:conc-name smt/r-))
-  (alignment 'left)
+  (align 'left)
   (priority 0)
   (width-func 'smt/r-width-default)
   (margin 2)
@@ -96,12 +96,12 @@
 (defun smt/r-export-default (row theme)
   `(text
     :text-anchor ,(case
-                   (smt/r-alignment row)
+                   (smt/r-align row)
                    (left "start")
                    (right "end")
                    (center "middle"))
     :x ,(case
-         (smt/r-alignment row)
+         (smt/r-align row)
          (left (* (smt/r-margin row)
                   (frame-char-width)))
          (right (- (frame-pixel-width)

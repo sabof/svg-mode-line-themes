@@ -4,7 +4,7 @@
       (acons 'test-center
              (make-smt/row
               :widgets (list 'buffer-name)
-              :alignment 'center
+              :align 'center
               :base-style (lambda ()
                             (smt/+
                              (smt/default-base-style)

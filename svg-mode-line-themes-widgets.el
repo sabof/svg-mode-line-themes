@@ -51,7 +51,7 @@
 
 (smt/defrow default-right
   :widgets '(position-info)
-  :alignment 'right)
+  :align 'right)
 
 (provide 'svg-mode-line-themes-widgets)
 ;; svg-mode-line-themes-widgets.el ends here
