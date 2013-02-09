@@ -174,11 +174,6 @@
   ;; points = pixels * 72 / 96
   (/ (* 96 points) 72))
 
-(defun smt/points-to-pixels (points)
-  ;; points = pixels * 72 / 96
-  ;;  = pixels * 72
-  (/ (* 96 points) 72))
-
 (defun smt/font-pixel-size ()
   (round
    (smt/points-to-pixels
