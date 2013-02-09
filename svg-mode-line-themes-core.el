@@ -244,7 +244,8 @@
                   (frame-char-width)))
          (right (- (frame-pixel-width)
                    (* (smt/r-margin row)
-                      (frame-char-width)))))
+                      (frame-char-width))))
+         (center (/ (frame-pixel-width) 2)))
     :y ,(smt/text-base-line)
     ,@(mapcar (lambda (widget-or-name)
                 (smt/w-export
