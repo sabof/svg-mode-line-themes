@@ -253,6 +253,20 @@
         (/ (- (frame-char-height)
               font-size)
            2)))))
+(defun smt/points-to-pixels (points)
+  ;; points = pixels * 72 / 96
+  ;;  = pixels * 72
+  (/ (* 96 points) 72))
+
+(defun smt/default-base-style ()
+  `(:font-family
+    ,(face-attribute 'default :family)
+    :font-size
+    ,(concat (int-to-string
+              (round
+               (/ (face-attribute 'default :height)
+                  10.0)))
+             "pt")))
 
 (defun smt/+ (&rest plists)
   (cond
