@@ -129,6 +129,21 @@
 (defun smt/w-width-default (widget)
   (length (smt/maybe-funcall (smt/w-text widget))))
 
+(defun smt/w-receive-click (widget row theme event)
+  )
+
+(defun smt/r-receive-click (row theme event)
+  (let* (( widgets (smt/r-widgets row))
+         ( align (smt/r-align row))
+         ( offset (smt/maybe-funcall (smt/r-margin row))))
+
+    ))
+
+(defun smt/t-receive-click (theme event)
+  (let (( rows (smt/t-rows theme)))
+    (mapcar )
+    (dolist (row ))))
+
 (defmacro smt/define-struct-copy-modifier (accessor-prefix)
   `(defmacro ,(intern (concat accessor-prefix "copy-and-modify"))
        (struct &rest properties)
@@ -181,7 +196,9 @@
    (smt/points-to-pixels
     (/ (face-attribute 'default :height) 10))))
 
-(defalias 'smt/text-base-line 'smt/font-pixel-size)
+(defun smt/text-base-line ()
+  ;; (smt/font-pixel-size)
+  )
 
 (defun smt/default-base-style ()
   `(:font-family
