@@ -63,15 +63,18 @@
        :height ,height
        ,@(smt/maybe-funcall (smt/t-defs theme))
        ,@(smt/maybe-funcall (smt/t-background theme))
-       ,@(mapcar (lambda (row-or-name)
-                   (smt/r-export
-                    (cond ( (smt/row-p row-or-name)
-                            row-or-name)
-                          ( (smt/row-p (cdr (assoc row-or-name smt/rows)))
-                            (cdr (assoc row-or-name smt/rows)))
-                          ( t (error "Row has wrong type: %s" row-or-name)))
-                    theme))
-                 (smt/t-rows theme))
+       ,@(mapcar
+          (lambda (row-or-name)
+            (smt/r-export
+             (cond ( (smt/row-p row-or-name)
+                     row-or-name)
+                   ( (smt/row-p
+                      (cdr (assoc row-or-name smt/rows)))
+                     (cdr (assoc row-or-name smt/rows)))
+                   ( t (error "Row has wrong type: %s"
+                              row-or-name)))
+             theme))
+          (smt/t-rows theme))
        ,@(smt/maybe-funcall (smt/t-overlay theme))
        ))))
 
