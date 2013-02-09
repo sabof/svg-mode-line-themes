@@ -40,7 +40,7 @@
   (export-func 'smt/w-export-default))
 
 ;;; Structs EOF
-;;; Method
+;;; Methods
 
 (defun smt/t-export-default (theme)
   (let* (( width (smt/window-width))
@@ -81,6 +81,12 @@
 (defun smt/t-export (theme)
   (funcall (smt/t-export-func theme) theme))
 
+(defun smt/t-normalize-widget (theme widget-or-name)
+  (if (smt/widget-p widget-or-name)
+      widget-or-name
+      (or (cdr (assoc widget-or-name (smt/t-local-widgets theme)))
+          (cdr (assoc widget-or-name smt/widgets)))))
+
 (defun smt/r-export-default (row theme)
   `(text
     :text-anchor ,(case
@@ -119,33 +125,10 @@
   (funcall (smt/w-export-func widget) widget row theme))
 
 (defun smt/w-width-default (widget)
-  (length (smt/w-text widget)))
+  (length (smt/maybe-funcall (smt/w-text widget))))
 
-;;; Method EOF
+;;; Methods EOF
 ;;; Legacy
-
-(defun smt/left-text-width (theme)
-  (+ (smt/t-margin theme)
-     (length
-      (concat
-       (smt/maybe-funcall
-        (smt/t-buffer-name-text theme))
-       (smt/maybe-funcall
-        (smt/t-buffer-indicators-text theme))))))
-
-(defun smt/right-text-width (theme)
-  (+ (smt/t-margin theme)
-     (smt/t-position-width theme)
-     (length
-      (concat
-       (smt/maybe-funcall
-        (smt/t-major-mode-text theme))
-       (smt/maybe-funcall
-        (smt/t-minor-mode-text theme))
-       (smt/maybe-funcall
-        (smt/t-vc-text theme))))
-     ;; Variable-width text safety-margin
-     6))
 
 (defun smt/default-xml-coverter (theme)
   (assert (smt/t-p theme))
@@ -234,29 +217,56 @@
   (let (( window-edges (window-pixel-edges)))
     (- (nth 2 window-edges) (nth 0 window-edges))))
 
+(defun smt/copy-struct (struct)
+   (funcall
+    (intern
+     (concat
+      "copy-"
+      (substring
+       (symbol-name
+        (aref 0 struct))
+       10)))
+    struct))
+
+(defmacro smt/w-copy-and-modify (struct &rest properties)
+  (let ((new-struct (gensym "new-struct-"))
+        result)
+    `(let (( ,new-struct (smt/copy-struct ,struct)))
+       ,@(progn
+          (while properties
+            (push (list 'setf
+                        (list
+                         (intern
+                          (concat
+                           "smt/w-"
+                           (substring
+                            (symbol-name
+                             (pop properties))
+                            1)))
+                         new-struct)
+                        (pop properties))
+                  result))
+          (nreverse result))
+       ,new-struct)))
+
+(defmacro smt/define-copy-modifier (function-name accessor-prefix)
+  )
+
 (defun smt/points-to-pixels (points)
   ;; points = pixels * 72 / 96
+  (/ (* 96 points) 72))
+
+(defun smt/points-to-pixels (points)
+  ;; points = pixels * 72 / 96
+  ;;  = pixels * 72
   (/ (* 96 points) 72))
 
 (defun smt/font-pixel-size ()
   (round
    (smt/points-to-pixels
-    (/ (face-attribute 'default :height) 10)))
-  ;; (- (frame-char-height) 4)
-  )
+    (/ (face-attribute 'default :height) 10))))
 
-(defun smt/text-base-line ()
-  ;; Sucky
-  (let ((font-size (* 0.7 (smt/font-pixel-size))))
-    (floor
-     (+ font-size
-        (/ (- (frame-char-height)
-              font-size)
-           2)))))
-(defun smt/points-to-pixels (points)
-  ;; points = pixels * 72 / 96
-  ;;  = pixels * 72
-  (/ (* 96 points) 72))
+(defalias 'smt/text-base-line 'smt/font-pixel-size)
 
 (defun smt/default-base-style ()
   `(:font-family
