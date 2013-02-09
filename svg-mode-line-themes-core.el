@@ -51,34 +51,33 @@
 (defun smt/w-export (widget row theme)
   (funcall (smt/w-export-func widget) widget row theme))
 
-(defun smt/t-export-default (theme)
+
+(defun smt/t-export-default-xml (theme)
   (let* (( width (smt/window-width))
          ( height (frame-char-height))
-         ( rows (smt/t-rows theme))
-         xml image)
-    (setq
-     xml
-     (xmlgen
-      `(svg
-        :xmlns "http://www.w3.org/2000/svg"
-        :width ,width
-        :height ,height
-        ,@(smt/maybe-funcall (smt/t-defs theme))
-        ,@(smt/maybe-funcall (smt/t-background theme))
-        ,@(mapcar (lambda (row-or-name)
-                    (smt/r-export
-                     (cond ( (smt/row-p row-or-name)
-                             row-or-name)
-                           ( (smt/row-p (cdr (assoc row-or-name smt/rows)))
-                             (cdr (assoc row-or-name smt/rows)))
-                           ( t (error "Row has wrong type: %s" row-or-name)))
-                     theme))
-                  (smt/t-rows theme))
-        ,@(smt/maybe-funcall (smt/t-overlay theme))
-        )))
-    (setq
-     image
-     (create-image xml 'svg t))
+         ( rows (smt/t-rows theme)))
+    (xmlgen
+     `(svg
+       :xmlns "http://www.w3.org/2000/svg"
+       :width ,width
+       :height ,height
+       ,@(smt/maybe-funcall (smt/t-defs theme))
+       ,@(smt/maybe-funcall (smt/t-background theme))
+       ,@(mapcar (lambda (row-or-name)
+                   (smt/r-export
+                    (cond ( (smt/row-p row-or-name)
+                            row-or-name)
+                          ( (smt/row-p (cdr (assoc row-or-name smt/rows)))
+                            (cdr (assoc row-or-name smt/rows)))
+                          ( t (error "Row has wrong type: %s" row-or-name)))
+                    theme))
+                 (smt/t-rows theme))
+       ,@(smt/maybe-funcall (smt/t-overlay theme))
+       ))))
+
+(defun smt/t-export-default (theme)
+  (let* ((xml (smt/t-export-default-xml theme))
+         (image (create-image xml 'svg t)))
     (propertize
      "."
      'display image
