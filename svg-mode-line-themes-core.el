@@ -40,6 +40,88 @@
   (export-func 'smt/w-export-default))
 
 ;;; Structs EOF
+;;; Method
+
+(defun smt/t-export-default (theme)
+  (let* (( width (smt/window-width))
+         ( height (frame-char-height))
+         ( rows (smt/t-rows theme))
+         xml image)
+    (setq
+     xml
+     (xmlgen
+      `(svg
+        :xmlns "http://www.w3.org/2000/svg"
+        :width ,width
+        :height ,height
+        ,@(smt/maybe-funcall (smt/t-defs theme))
+        ,@(smt/maybe-funcall (smt/t-background theme))
+        ,@(mapcar (lambda (row-or-name)
+                    (smt/r-export
+                     (cond ( (smt/row-p row-or-name)
+                             row-or-name)
+                           ( (smt/row-p (cdr (assoc row-or-name smt/rows)))
+                             (cdr (assoc row-or-name smt/rows)))
+                           ( t (error "Row has wrong type: %s" row-or-name)))
+                     theme))
+                  (smt/t-rows theme))
+        ,@(smt/maybe-funcall (smt/t-overlay theme))
+        )))
+    (setq
+     image
+     (create-image xml 'svg t))
+    (propertize
+     "."
+     'display image
+     'help-echo
+     (or (buffer-file-name)
+         (ignore-errors
+           (dired-current-directory))))))
+
+(defun smt/t-export (theme)
+  (funcall (smt/t-export-func theme) theme))
+
+(defun smt/r-export-default (row theme)
+  `(text
+    :text-anchor ,(case
+                   (smt/r-alignment row)
+                   (left "start")
+                   (right "end")
+                   (center "middle"))
+    :x ,(case
+         (smt/r-alignment row)
+         (left (* (smt/r-margin row)
+                  (frame-char-width)))
+         (right (- (frame-pixel-width)
+                   (* (smt/r-margin row)
+                      (frame-char-width))))
+         (center (/ (frame-pixel-width) 2)))
+    :y ,(smt/text-base-line)
+    ,@(mapcar (lambda (widget-or-name)
+                (smt/w-export
+                 (if (smt/widget-p widget-or-name)
+                     widget-or-name
+                     (cdr (assoc widget-or-name smt/widgets)))
+                 row theme))
+              (smt/r-widgets row))))
+
+(defun smt/r-export (row theme)
+  (funcall (smt/r-export-func row) row theme))
+
+(defun smt/w-export-default (widget row theme)
+  `(tspan
+    ,@(smt/+ (smt/maybe-funcall (smt/t-base-style theme))
+             (smt/maybe-funcall (smt/r-base-style row))
+             (smt/maybe-funcall (smt/w-style widget)))
+    ,(smt/maybe-funcall (smt/w-text widget))))
+
+(defun smt/w-export (widget row theme)
+  (funcall (smt/w-export-func widget) widget row theme))
+
+(defun smt/w-width-default (widget)
+  (length (smt/w-text widget)))
+
+;;; Method EOF
 ;;; Legacy
 
 (defun smt/left-text-width (theme)
@@ -205,85 +287,6 @@
            (intern (concat "smt/t-"
                            (substring (symbol-name style) 1)))
            theme))))
-
-(defun smt/t-export-default (theme)
-  (let* (( width (smt/window-width))
-         ( height (frame-char-height))
-         ( rows (smt/t-rows theme))
-         xml image)
-    (setq
-     xml
-     (xmlgen
-      `(svg
-        :xmlns "http://www.w3.org/2000/svg"
-        :width ,width
-        :height ,height
-        ,@(smt/maybe-funcall (smt/t-defs theme))
-        ,@(smt/maybe-funcall (smt/t-background theme))
-        ,@(mapcar (lambda (row-or-name)
-                    (smt/r-export
-                     (cond ( (smt/row-p row-or-name)
-                             row-or-name)
-                           ( (smt/row-p (cdr (assoc row-or-name smt/rows)))
-                             (cdr (assoc row-or-name smt/rows)))
-                           ( t (error "Row has wrong type: %s" row-or-name)))
-                     theme))
-                  (smt/t-rows theme))
-        ,@(smt/maybe-funcall (smt/t-overlay theme))
-        )))
-    (setq
-     image
-     (create-image xml 'svg t))
-    (propertize
-     "."
-     'display image
-     'help-echo
-     (or (buffer-file-name)
-         (ignore-errors
-           (dired-current-directory))))))
-
-(defun smt/t-export (theme)
-  (funcall (smt/t-export-func theme) theme))
-
-(defun smt/r-export-default (row theme)
-  `(text
-    :text-anchor ,(case
-                   (smt/r-alignment row)
-                   (left "start")
-                   (right "end")
-                   (center "middle"))
-    :x ,(case
-         (smt/r-alignment row)
-         (left (* (smt/r-margin row)
-                  (frame-char-width)))
-         (right (- (frame-pixel-width)
-                   (* (smt/r-margin row)
-                      (frame-char-width))))
-         (center (/ (frame-pixel-width) 2)))
-    :y ,(smt/text-base-line)
-    ,@(mapcar (lambda (widget-or-name)
-                (smt/w-export
-                 (if (smt/widget-p widget-or-name)
-                     widget-or-name
-                     (cdr (assoc widget-or-name smt/widgets)))
-                 row theme))
-              (smt/r-widgets row))))
-
-(defun smt/r-export (row theme)
-  (funcall (smt/r-export-func row) row theme))
-
-(defun smt/w-export-default (widget row theme)
-  `(tspan
-    ,@(smt/+ (smt/maybe-funcall (smt/t-base-style theme))
-             (smt/maybe-funcall (smt/r-base-style row))
-             (smt/maybe-funcall (smt/w-style widget)))
-    ,(smt/maybe-funcall (smt/w-text widget))))
-
-(defun smt/w-export (widget row theme)
-  (funcall (smt/w-export-func widget) widget row theme))
-
-(defun smt/w-width-default (widget)
-  (length (smt/w-text widget)))
 
 (defun smt/modeline-format ()
   (let ((theme (smt/get-current-theme)))

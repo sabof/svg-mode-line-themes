@@ -51,7 +51,7 @@
            (or (car (nth (1+ position) smt/themes))
                (car (nth 0 smt/themes)))))
     (setq smt/current-theme next-theme)
-    (funcall (smt/theme-setup-hook (smt/get-current-theme)))
+    ;; (funcall (smt/theme-setup-hook (smt/get-current-theme)))
     (force-mode-line-update)
     (message "Current mode-line theme: %s" next-theme)))
 
@@ -61,7 +61,7 @@
                   "Set mode-line theme to: "
                   (mapcar 'symbol-name (mapcar 'car smt/themes)) nil t))))
   (setq smt/current-theme theme)
-  (funcall (smt/theme-setup-hook (smt/get-current-theme)))
+  ;; (funcall (smt/theme-setup-hook (smt/get-current-theme)))
   (force-mode-line-update))
 
 (defun smt/enable (&optional use-header-line)
@@ -69,7 +69,7 @@
                    'header-line-format
                    'mode-line-format)
                '(:eval (smt/modeline-format)))
-  (funcall (smt/theme-setup-hook (smt/get-current-theme)))
+  ;; (funcall (smt/theme-setup-hook (smt/get-current-theme)))
   (force-mode-line-update))
 
 (provide 'svg-mode-line-themes)
