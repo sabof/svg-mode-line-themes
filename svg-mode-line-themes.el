@@ -44,13 +44,6 @@
   :major-mode-style 'smt/diesel-major-mode-style
   :overlay 'smt/black-crystal-overlay)
 
-(smt/deftheme widget-test
-  :defs (smt/filter-inset 0.5 0.3)
-  :background 'smt/bg-grey1
-  :rows (list 'default-left 'default-right)
-  :overlay 'smt/bg-grey1-top
-  :local-widgets `((wig1 . ,(make-smt/widget :text "wig1"))))
-
 (defun smt/next-theme ()
   (interactive)
   (let* (( position (position smt/current-theme smt/themes :key 'car))
