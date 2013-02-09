@@ -127,7 +127,8 @@
   (length (smt/maybe-funcall (smt/w-text widget))))
 
 (defmacro smt/define-struct-copy-modifier (accessor-prefix)
-  `(defmacro ,(intern (concat accessor-prefix "copy-and-modify")) (struct &rest properties)
+  `(defmacro ,(intern (concat accessor-prefix "copy-and-modify"))
+       (struct &rest properties)
      (let ((new-struct (gensym "new-struct-"))
            result)
        `(let (( ,new-struct (smt/copy-struct ,struct)))
