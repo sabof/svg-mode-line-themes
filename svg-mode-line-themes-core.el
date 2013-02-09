@@ -99,18 +99,18 @@
 (defun smt/r-export-default (row theme)
   `(text
     :text-anchor ,(case
-                   (smt/r-align row)
-                   (left "start")
-                   (right "end")
-                   (center "middle"))
+                   ( smt/r-align row)
+                   ( left "start")
+                   ( right "end")
+                   ( center "middle"))
     :x ,(case
-         (smt/r-align row)
-         (left (* (smt/r-margin row)
-                  (frame-char-width)))
-         (right (- (frame-pixel-width)
-                   (* (smt/r-margin row)
-                      (frame-char-width))))
-         (center (/ (frame-pixel-width) 2)))
+         ( smt/r-align row)
+         ( left (* (smt/r-margin row)
+                   (frame-char-width)))
+         ( right (- (frame-pixel-width)
+                    (* (smt/r-margin row)
+                       (frame-char-width))))
+         ( center (/ (frame-pixel-width) 2)))
     :y ,(smt/text-base-line)
     ,@(mapcar (lambda (widget-or-name)
                 (smt/w-export
@@ -132,22 +132,21 @@
 (defmacro smt/define-struct-copy-modifier (accessor-prefix)
   `(defmacro ,(intern (concat accessor-prefix "copy-and-modify"))
        (struct &rest properties)
-     (let ((new-struct (gensym "new-struct-"))
+     (let (( new-struct (gensym "new-struct-"))
            result)
        `(let (( ,new-struct (smt/copy-struct ,struct)))
           ,@(progn
              (while properties
-               (push (list 'setf
-                           (list
-                            (intern
-                             (concat
-                              ,accessor-prefix
-                              (substring
-                               (symbol-name
-                                (pop properties))
-                               1)))
-                            new-struct)
-                           (pop properties))
+               (push `(setf
+                       (,(intern
+                          (concat
+                           ,accessor-prefix
+                           (substring
+                            (symbol-name
+                             (pop properties))
+                            1)))
+                         ,new-struct)
+                       (pop properties))
                      result))
              (nreverse result))
           ,new-struct))))
@@ -163,7 +162,7 @@
     (- (nth 2 window-edges) (nth 0 window-edges))))
 
 (defun smt/copy-struct (struct)
-   (funcall
+  (funcall
     (intern
      (concat
       "copy-"
@@ -200,8 +199,8 @@
       (car plists))
     ( (null plists)
       nil)
-    ( t (let ((plistC (copy-list (car plists)))
-              (plistB (cadr plists))
+    ( t (let (( plistC (copy-list (car plists)))
+              ( plistB (cadr plists))
               key val)
           (dotimes (iter (/ (length plistB) 2))
             (setq key (nth (* 2 iter) plistB)
@@ -228,7 +227,7 @@
             (funcall theme))
           ( (stringp theme)
             theme)
-          ( t (error "Current theme has wrong type"
+          ( t (error "Can't process current theme: %s"
                      theme)))))
 
 (defun smt/get-current-theme ()
