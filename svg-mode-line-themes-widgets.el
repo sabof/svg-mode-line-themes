@@ -35,35 +35,23 @@
    (when (bound-and-true-p save-auto-hook) "A")
    (when (bound-and-true-p wmi) "M")))
 
-(setq smt/widgets
-      (acons 'buffer-name
-             (make-smt/widget
-              :on-click (lambda (e)
-                          (interactive "e"))
-              :text 'smt/default-buffer-name-text)
-             smt/widgets))
+(smt/defwidget buffer-name
+  :on-click (lambda (e)
+              (interactive "e"))
+  :text 'smt/default-buffer-name-text)
 
-(setq smt/widgets
-      (acons 'position-info
-             (make-smt/widget
-              :on-click (lambda (e)
-                          (interactive "e"))
-              :text (lambda ()
-                      (format-mode-line "%l:%p")))
-             smt/widgets))
+(smt/defwidget position-info
+  :on-click (lambda (e)
+              (interactive "e"))
+  :text (lambda ()
+          (format-mode-line "%l:%p")))
 
-(setq smt/rows
-      (acons 'default-left
-             (make-smt/row
-              :widgets (list 'buffer-name))
-             smt/rows))
+(smt/defrow default-left
+  :widgets '(buffer-name))
 
-(setq smt/rows
-      (acons 'default-right
-             (make-smt/row
-              :widgets (list 'position-info)
-              :alignment 'right)
-             smt/rows))
+(smt/defrow default-right
+  :widgets '(position-info)
+  :alignment 'right)
 
 (provide 'svg-mode-line-themes-widgets)
 ;; svg-mode-line-themes-widgets.el ends here

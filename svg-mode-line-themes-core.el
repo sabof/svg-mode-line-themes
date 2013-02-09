@@ -252,6 +252,22 @@
 (put 'smt/deftheme 'common-lisp-indent-function
      '(1 &body))
 
+(defmacro smt/defwidget (name &rest pairs)
+  `(let (( widget (make-smt/widget ,@pairs)))
+     (setq smt/widgets (cl-delete ',name smt/widgets :key 'car)
+           smt/widgets (acons ',name widget smt/widgets)
+           smt/current-widget ',name)))
+(put 'smt/defwidget 'common-lisp-indent-function
+     '(1 &body))
+
+(defmacro smt/defrow (name &rest pairs)
+  `(let (( row (make-smt/row ,@pairs)))
+     (setq smt/rows (cl-delete ',name smt/rows :key 'car)
+           smt/rows (acons ',name row smt/rows)
+           smt/current-row ',name)))
+(put 'smt/defrow 'common-lisp-indent-function
+     '(1 &body))
+
 (defun smt/reset ()
   (interactive)
   (ignore-errors
