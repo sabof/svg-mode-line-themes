@@ -51,7 +51,6 @@
 (defun smt/w-export (widget row theme)
   (funcall (smt/w-export-func widget) widget row theme))
 
-
 (defun smt/t-export-default-xml (theme)
   (let* (( width (smt/window-width))
          ( height (frame-char-height))
@@ -219,15 +218,6 @@
       (funcall thing)
       thing))
 
-(defun smt/get-style (theme style)
-  (smt/+ (smt/maybe-funcall
-          (smt/t-base-style theme))
-         (smt/maybe-funcall
-          (funcall
-           (intern (concat "smt/t-"
-                           (substring (symbol-name style) 1)))
-           theme))))
-
 (defun smt/modeline-format ()
   (let ((theme (smt/get-current-theme)))
     (cond ( (smt/theme-p theme)
@@ -241,6 +231,9 @@
 
 (defun smt/get-current-theme ()
   (cdr (assoc smt/current-theme smt/themes)))
+
+(defun smt/get-widget-by-name (name)
+  (cdr (assoc name smt/widgets)))
 
 (defmacro smt/deftheme (name &rest pairs)
   `(let (( theme (make-smt/theme ,@pairs)))
