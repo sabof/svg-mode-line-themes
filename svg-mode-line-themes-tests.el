@@ -1,18 +1,14 @@
 (require 'ert)
 
-(setq smt/rows
-      (acons 'test-center
-             (make-smt/row
-              :widgets (list 'buffer-name)
-              :align 'center
-              :base-style (lambda ()
-                            (smt/+
-                             (smt/default-base-style)
-                             `(:filter
-                               "url(#inset)"
-                               :fill "#ff0000")))
-              )
-             smt/rows))
+(smt/defrow test-center
+  :widgets (list 'buffer-name)
+  :align 'center
+  :base-style (lambda ()
+                (smt/+
+                 (smt/default-base-style)
+                 `(:filter
+                   "url(#inset)"
+                   :fill "#ff0000"))))
 
 (smt/deftheme widget-test
   :defs (smt/filter-inset 0.5 0.3)

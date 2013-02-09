@@ -84,16 +84,15 @@
                  (kbd "<mouse-1>")
                  'smt/receive-click
                  (kbd "<nil> <header-line> <mouse-1>")
+                 'smt/receive-click
+                 (kbd "<nil> <mode-line> <mouse-1>")
                  'smt/receive-click)
-               (kbd "<nil> <mode-line> <mouse-1>")
-               'smt/receive-click)
-     map)
-    'help-echo "he"
+               map))
     ;; 'help-echo
     ;; (or (buffer-file-name)
     ;;     (ignore-errors
     ;;       (dired-current-directory)))
-    )))
+    ))
 
 (defun smt/t-normalize-widget (theme widget-or-name)
   (if (smt/widget-p widget-or-name)
