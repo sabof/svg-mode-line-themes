@@ -228,29 +228,31 @@
        10)))
     struct))
 
-(defmacro smt/w-copy-and-modify (struct &rest properties)
-  (let ((new-struct (gensym "new-struct-"))
-        result)
-    `(let (( ,new-struct (smt/copy-struct ,struct)))
-       ,@(progn
-          (while properties
-            (push (list 'setf
-                        (list
-                         (intern
-                          (concat
-                           "smt/w-"
-                           (substring
-                            (symbol-name
-                             (pop properties))
-                            1)))
-                         new-struct)
-                        (pop properties))
-                  result))
-          (nreverse result))
-       ,new-struct)))
+(defmacro smt/define-struct-copy-modifier (function-name accessor-prefix)
+  `(defmacro ,function-name (struct &rest properties)
+     (let ((new-struct (gensym "new-struct-"))
+           result)
+       `(let (( ,new-struct (smt/copy-struct ,struct)))
+          ,@(progn
+             (while properties
+               (push (list 'setf
+                           (list
+                            (intern
+                             (concat
+                              ,accessor-prefix
+                              (substring
+                               (symbol-name
+                                (pop properties))
+                               1)))
+                            new-struct)
+                           (pop properties))
+                     result))
+             (nreverse result))
+          ,new-struct))))
 
-(defmacro smt/define-copy-modifier (function-name accessor-prefix)
-  )
+(smt/define-struct-copy-modifier smt/t-copy-and-modify "smt/t-")
+(smt/define-struct-copy-modifier smt/w-copy-and-modify "smt/w-")
+(smt/define-struct-copy-modifier smt/r-copy-and-modify "smt/r-")
 
 (defun smt/points-to-pixels (points)
   ;; points = pixels * 72 / 96
