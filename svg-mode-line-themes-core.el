@@ -6,74 +6,8 @@
 (defvar smt/widgets nil)
 (defvar smt/rows nil)
 (defvar smt/current-theme nil)
-(defun smt/window-width ()
-  (let (( window-edges (window-pixel-edges)))
-    (- (nth 2 window-edges) (nth 0 window-edges))))
 
-(defun smt/points-to-pixels (points)
-  ;; points = pixels * 72 / 96
-  (/ (* 96 points) 72))
-
-(defun smt/font-pixel-size ()
-  (round
-   (smt/points-to-pixels
-    (/ (face-attribute 'default :height) 10)))
-  ;; (- (frame-char-height) 4)
-  )
-
-(defun smt/text-base-line ()
-  ;; Sucky
-  (let ((font-size (* 0.7 (smt/font-pixel-size))))
-    (floor
-     (+ font-size
-        (/ (- (frame-char-height)
-              font-size)
-           2)))))
-
-(defun smt/+ (&rest plists)
-  (cond
-    ( (= 1 (length plists))
-      (car plists))
-    ( (null plists)
-      nil)
-    ( t (let ((plistC (copy-list (car plists)))
-              (plistB (cadr plists))
-              key val)
-          (dotimes (iter (/ (length plistB) 2))
-            (setq key (nth (* 2 iter) plistB)
-                  val (nth (1+ (* 2 iter)) plistB))
-            (if (null val)
-                (remf plistC key)
-                (setf (getf plistC key) val)))
-          (apply 'smt/+ plistC (cddr plists))
-          ))))
-
-(defun smt/+ (plistA plistB)
-  (let ((plistC (copy-list plistA))
-        key val)
-    (dotimes (iter (/ (length plistB) 2))
-      (setq key (nth (* 2 iter) plistB)
-            val (nth (1+ (* 2 iter)) plistB))
-      (if (null val)
-          (remf plistC key)
-          (setf (getf plistC key) val)))
-    plistC))
-
-(defun smt/maybe-funcall (thing)
-  (if (or (functionp thing)
-          (and (symbolp thing)
-               (fboundp thing)))
-      (funcall thing)
-      thing))
-
-(defun smt/get-style (theme style)
-  (smt/+ (smt/maybe-funcall
-          (smt/t-base-style theme))
-         (smt/maybe-funcall
-          (funcall
-           (intern (concat "smt/t-"
-                           (substring (symbol-name style) 1)))
-           theme))))
+;;; Legacy
 
 (defun smt/left-text-width (theme)
   (+ (smt/t-margin theme)
@@ -179,6 +113,78 @@
          ,(smt/maybe-funcall (smt/t-buffer-name-text theme))))
        ,@(smt/maybe-funcall (smt/t-overlay theme))))))
 
+;;; Legacy EOF
+
+(defun smt/window-width ()
+  (let (( window-edges (window-pixel-edges)))
+    (- (nth 2 window-edges) (nth 0 window-edges))))
+
+(defun smt/points-to-pixels (points)
+  ;; points = pixels * 72 / 96
+  (/ (* 96 points) 72))
+
+(defun smt/font-pixel-size ()
+  (round
+   (smt/points-to-pixels
+    (/ (face-attribute 'default :height) 10)))
+  ;; (- (frame-char-height) 4)
+  )
+
+(defun smt/text-base-line ()
+  ;; Sucky
+  (let ((font-size (* 0.7 (smt/font-pixel-size))))
+    (floor
+     (+ font-size
+        (/ (- (frame-char-height)
+              font-size)
+           2)))))
+
+(defun smt/+ (&rest plists)
+  (cond
+    ( (= 1 (length plists))
+      (car plists))
+    ( (null plists)
+      nil)
+    ( t (let ((plistC (copy-list (car plists)))
+              (plistB (cadr plists))
+              key val)
+          (dotimes (iter (/ (length plistB) 2))
+            (setq key (nth (* 2 iter) plistB)
+                  val (nth (1+ (* 2 iter)) plistB))
+            (if (null val)
+                (remf plistC key)
+                (setf (getf plistC key) val)))
+          (apply 'smt/+ plistC (cddr plists))
+          ))))
+
+(defun smt/maybe-funcall (thing)
+  (if (or (functionp thing)
+          (and (symbolp thing)
+               (fboundp thing)))
+      (funcall thing)
+      thing))
+
+(defun smt/get-style (theme style)
+  (smt/+ (smt/maybe-funcall
+          (smt/t-base-style theme))
+         (smt/maybe-funcall
+          (funcall
+           (intern (concat "smt/t-"
+                           (substring (symbol-name style) 1)))
+           theme))))
+
+(defstruct (smt/theme
+             (:conc-name smt/t-))
+  background
+  overlay
+  defs
+  (position-width 12)
+  (export-func 'smt/t-export-default)
+  (setup-hook 'ignore)
+  (base-style 'smt/default-base-style)
+  local-widgets
+  rows)
+
 (defun smt/t-export-default (theme)
   (let* (( width (smt/window-width))
          ( height (frame-char-height))
@@ -215,6 +221,19 @@
          (ignore-errors
            (dired-current-directory))))))
 
+(defun smt/t-export (theme)
+  (funcall (smt/t-export-func theme) theme))
+
+(defstruct (smt/row
+             (:conc-name smt/r-))
+  (alignment 'left)
+  (priority 0)
+  (width-func 'smt/r-width-default)
+  (margin 2)
+  widgets
+  base-style
+  (export-func 'smt/r-export-default))
+
 (defun smt/r-export-default (row theme)
   `(text
     :text-anchor ,(case
@@ -239,8 +258,16 @@
                  row theme))
               (smt/r-widgets row))))
 
-(defun smt/w-width-default (widget)
-  (length (smt/w-text widget)))
+(defun smt/r-export (row theme)
+  (funcall (smt/r-export-func row) row theme))
+
+(defstruct (smt/widget
+             (:conc-name smt/w-))
+  (style 'smt/default-base-style)
+  (on-click 'ignore)
+  (text "")
+  (width-func 'smt/w-width-default)
+  (export-func 'smt/w-export-default))
 
 (defun smt/w-export-default (widget row theme)
   `(tspan
@@ -249,47 +276,11 @@
              (smt/maybe-funcall (smt/w-style widget)))
     ,(smt/maybe-funcall (smt/w-text widget))))
 
-(defun smt/t-export (theme)
-  (funcall (smt/t-export-func theme) theme))
-
-(defun smt/r-export (row theme)
-  (funcall (smt/r-export-func row) row theme))
-
 (defun smt/w-export (widget row theme)
   (funcall (smt/w-export-func widget) widget row theme))
 
-(defstruct
-    (smt/theme
-      (:conc-name smt/t-))
-  background
-  overlay
-  defs
-  (position-width 12)
-  (export-func 'smt/t-export-default)
-  (setup-hook 'ignore)
-  (base-style 'smt/default-base-style)
-  local-widgets
-  rows)
-
-(defstruct
-    (smt/widget
-      (:conc-name smt/w-))
-  (style 'smt/default-base-style)
-  (on-click 'ignore)
-  (text "")
-  (width-func 'smt/w-width-default)
-  (export-func 'smt/w-export-default))
-
-(defstruct
-    (smt/row
-      (:conc-name smt/r-))
-  (alignment 'left)
-  (priority 0)
-  (width-func 'smt/r-width-default)
-  (margin 2)
-  widgets
-  base-style
-  (export-func 'smt/r-export-default))
+(defun smt/w-width-default (widget)
+  (length (smt/w-text widget)))
 
 (defun smt/modeline-format ()
   (let ((theme (smt/get-current-theme)))
