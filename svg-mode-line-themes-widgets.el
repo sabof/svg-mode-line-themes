@@ -41,13 +41,14 @@
   :text 'smt/default-buffer-name-text)
 
 (smt/defwidget which-function
-  :on-click (lambda (e)
-              (interactive "e"))
-  :text 'smt/default-buffer-name-text)
+  :text (lambda ()
+          (when (bound-and-true-p which-func-mode)
+            (let ((text (format-mode-line which-func-current)))
+              (when (and (> (length text) 0)
+                         (not (equal text "???")))
+                (concat " :: " text))))))
 
 (smt/defwidget position-info
-  :on-click (lambda (e)
-              (interactive "e"))
   :text (lambda ()
           (format-mode-line "%l:%p")))
 
