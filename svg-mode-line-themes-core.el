@@ -215,7 +215,8 @@
                              row-or-name)
                            ( (smt/row-p (cdr (assoc row-or-name smt/rows)))
                              (cdr (assoc row-or-name smt/rows)))
-                           ( t (error "Row has wrong type: %s" row-or-name)))))
+                           ( t (error "Row has wrong type: %s" row-or-name)))
+                     theme))
                   (smt/t-rows theme))
         ,@(smt/maybe-funcall (smt/t-overlay theme))
         )))
@@ -230,7 +231,7 @@
          (ignore-errors
            (dired-current-directory))))))
 
-(defun smt/r-export-default (row)
+(defun smt/r-export-default (row theme)
   `(text
     :text-anchor ,(case
                    (smt/r-alignment row)
@@ -249,13 +250,14 @@
                 (smt/w-export
                  (if (smt/widget-p widget-or-name)
                      widget-or-name
-                     (cdr (assoc widget-or-name smt/widgets)))))
+                     (cdr (assoc widget-or-name smt/widgets)))
+                 row theme))
               (smt/r-widgets row))))
 
 (defun smt/w-width-default (widget)
   (length (smt/w-text widget)))
 
-(defun smt/w-export-default (widget)
+(defun smt/w-export-default (widget row theme)
   `(tspan
     ,@(smt/maybe-funcall (smt/w-style widget))
     ,(smt/maybe-funcall (smt/w-text widget))))
@@ -263,11 +265,11 @@
 (defun smt/t-export (theme)
   (funcall (smt/t-export-func theme) theme))
 
-(defun smt/r-export (row)
-  (funcall (smt/r-export-func row) row))
+(defun smt/r-export (row theme)
+  (funcall (smt/r-export-func row) row theme))
 
-(defun smt/w-export (widget)
-  (funcall (smt/w-export-func widget) widget))
+(defun smt/w-export (widget row theme)
+  (funcall (smt/w-export-func widget) widget row theme))
 
 (defstruct
     (smt/theme
