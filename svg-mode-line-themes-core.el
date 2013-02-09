@@ -7,6 +7,39 @@
 (defvar smt/rows nil)
 (defvar smt/current-theme nil)
 
+;;; Structs
+
+(defstruct (smt/theme
+             (:conc-name smt/t-))
+  background
+  overlay
+  defs
+  (position-width 12)
+  (export-func 'smt/t-export-default)
+  (setup-hook 'ignore)
+  (base-style 'smt/default-base-style)
+  local-widgets
+  rows)
+
+(defstruct (smt/row
+             (:conc-name smt/r-))
+  (alignment 'left)
+  (priority 0)
+  (width-func 'smt/r-width-default)
+  (margin 2)
+  widgets
+  base-style
+  (export-func 'smt/r-export-default))
+
+(defstruct (smt/widget
+             (:conc-name smt/w-))
+  (style 'smt/default-base-style)
+  (on-click 'ignore)
+  (text "")
+  (width-func 'smt/w-width-default)
+  (export-func 'smt/w-export-default))
+
+;;; Structs EOF
 ;;; Legacy
 
 (defun smt/left-text-width (theme)
@@ -173,18 +206,6 @@
                            (substring (symbol-name style) 1)))
            theme))))
 
-(defstruct (smt/theme
-             (:conc-name smt/t-))
-  background
-  overlay
-  defs
-  (position-width 12)
-  (export-func 'smt/t-export-default)
-  (setup-hook 'ignore)
-  (base-style 'smt/default-base-style)
-  local-widgets
-  rows)
-
 (defun smt/t-export-default (theme)
   (let* (( width (smt/window-width))
          ( height (frame-char-height))
@@ -224,16 +245,6 @@
 (defun smt/t-export (theme)
   (funcall (smt/t-export-func theme) theme))
 
-(defstruct (smt/row
-             (:conc-name smt/r-))
-  (alignment 'left)
-  (priority 0)
-  (width-func 'smt/r-width-default)
-  (margin 2)
-  widgets
-  base-style
-  (export-func 'smt/r-export-default))
-
 (defun smt/r-export-default (row theme)
   `(text
     :text-anchor ,(case
@@ -260,14 +271,6 @@
 
 (defun smt/r-export (row theme)
   (funcall (smt/r-export-func row) row theme))
-
-(defstruct (smt/widget
-             (:conc-name smt/w-))
-  (style 'smt/default-base-style)
-  (on-click 'ignore)
-  (text "")
-  (width-func 'smt/w-width-default)
-  (export-func 'smt/w-export-default))
 
 (defun smt/w-export-default (widget row theme)
   `(tspan
