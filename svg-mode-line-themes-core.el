@@ -112,9 +112,8 @@
     :y ,(smt/text-base-line)
     ,@(mapcar (lambda (widget-or-name)
                 (smt/w-export
-                 (if (smt/widget-p widget-or-name)
-                     widget-or-name
-                     (cdr (assoc widget-or-name smt/widgets)))
+                 (smt/t-normalize-widget
+                  theme widget-or-name)
                  row theme))
               (smt/r-widgets row))))
 
