@@ -40,6 +40,11 @@
               (interactive "e"))
   :text 'smt/default-buffer-name-text)
 
+(smt/defwidget which-function
+  :on-click (lambda (e)
+              (interactive "e"))
+  :text 'smt/default-buffer-name-text)
+
 (smt/defwidget position-info
   :on-click (lambda (e)
               (interactive "e"))
