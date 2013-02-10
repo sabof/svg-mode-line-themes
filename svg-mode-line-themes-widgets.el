@@ -26,14 +26,31 @@
         "")))
 
 (defun smt/minor-mode-indicators ()
-  (concat
-   (when (bound-and-true-p es-aai-mode) "I")
-   (when (or (bound-and-true-p evil-local-mode)
-             (bound-and-true-p evil-mode)) "E")
-   (when truncate-lines "T")
-   (when dired-omit-mode "O")
-   (when (bound-and-true-p save-auto-hook) "A")
-   (when (bound-and-true-p wmi) "M")))
+  (let (( text
+          (concat
+           (when (bound-and-true-p es-aai-mode) "I")
+           (when (or (bound-and-true-p evil-local-mode)
+                     (bound-and-true-p evil-mode)) "E")
+           (when truncate-lines "T")
+           (when dired-omit-mode "O")
+           (when (bound-and-true-p save-auto-hook) "A")
+           (when (bound-and-true-p wmi) "M"))))
+    (if (plusp (length text))
+        (concat text " ")
+        "")))
+
+(smt/defwidget minor-modes
+  :text 'smt/minor-mode-indicators
+  :on-click (lambda (e)
+              (message
+               "%s" (format-mode-line
+                     mode-line-modes))))
+
+(smt/defwidget version-control
+  :text (lambda ()
+          (format-mode-line 'vc-mode))
+  :on-click (lambda (e)
+              (popup-menu vc-menu-map)))
 
 (smt/defwidget buffer-name
   :on-click (lambda (e)
@@ -59,10 +76,15 @@
               (message "Column: %s" (current-column))))
 
 (smt/defrow default-left
-  :widgets '(buffer-name)
+  :widgets '(minor-modes buffer-name)
   :margin 2)
 
 (smt/defrow default-right
+  :widgets '(version-control)
+  :align 'right
+  :margin 2)
+
+(smt/defrow default-position
   :widgets '(position-info)
   :align 'right
   :margin 2)
