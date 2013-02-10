@@ -3,7 +3,6 @@
     (require 'xmlgen "xml-gen"))
 
 (defvar smt/themes nil)
-(defvar smt/widgets nil)
 (defvar smt/rows nil)
 (defvar smt/current-theme nil)
 
@@ -31,39 +30,47 @@
   base-style
   (export-func 'smt/r-export-default))
 
+(defvar smt/widgets
+  '((archetype .
+     (:parent nil
+      :style smt/default-base-style
+      :on-click nil
+      :text ""
+      :width-func smt/w-width-default
+      :export-func smt/w-export-default))))
+
 (defmacro smt/defwidget (name &rest pairs)
-  `(let* ( (default-pairs
-               '(:style smt/default-base-style
-                 :on-click nil
-                 :text ""
-                 :width-func smt/w-width-default
-                 :export-func smt/w-export-default))
-           ( widget
-             (append
-              (list ,pairs)
-              default-pairs)
-             ;; (make-smt/widget ,@pairs)
-             ))
+  `(let* (( widget ,(cons 'list pairs)))
+     (unless (memq :parent widget)
+       (setf (getf widget :parent) 'archetype))
      (setq smt/widgets (cl-delete ',name smt/widgets :key 'car)
-           smt/widgets (acons ',name widget smt/widgets)
-           smt/current-widget ',name)))
+           smt/widgets (acons ',name widget smt/widgets))))
 (put 'smt/defwidget 'common-lisp-indent-function
      '(1 &body))
 
-(defun smt/w-width (widget)
-  (smt/maybe-funcall (getf widget :width)))
+(defmacro smt/standard-getter (prefix property)
+  (let (( function-name
+          (intern (concat (symbol-name prefix)
+                          (symbol-name property))))
+        ( property-name
+          (intern (concat ":" (symbol-name property)))))
+    `(defun ,function-name (thing)
+       (if (memq thing ,property-name)
+           (smt/maybe-funcall
+            (getf thing ,property-name))
+           (,function-name
+            (getf thing :parent))))))
 
-(defun smt/w-style (widget)
-  (smt/maybe-funcall
-   (or (getf widget :style)
-       (getf (getf widget :parent)
-             :style))))
-
-(defun smt/w-text (widget)
-  (smt/maybe-funcall (getf widget :text)))
+(smt/standard-getter  smt/w-  style)
+(smt/standard-getter  smt/w-  text)
 
 (defun smt/w-width (widget)
   (funcall (getf widget :width-func) widget))
+
+(defun smt/w-on-click (widget)
+  (or (getf widget :on-click)
+      (getf (getf widget :parent)
+            :on-click)))
 
 (defun smt/w-export (widget row theme)
   (funcall (getf widget :export-func) widget row theme))
@@ -140,12 +147,7 @@
                  (kbd "<nil> <mode-line> <mouse-1>") 'smt/receive-click
                  (kbd "<header-line> <mouse-1>") 'smt/receive-click
                  (kbd "<mode-line> <mouse-1>") 'smt/receive-click)
-               map))
-    ;; 'help-echo
-    ;; (or (buffer-file-name)
-    ;;     (ignore-errors
-    ;;       (dired-current-directory)))
-    ))
+               map))))
 
 (defun smt/r-width-default (row)
   (let (( widgets (smt/r-widgets row))
