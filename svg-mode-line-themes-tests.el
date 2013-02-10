@@ -1,30 +1,30 @@
 (require 'ert)
 
-(smt/defrow test-center
-  :widgets (list 'buffer-name
-                 (make-smt/widget
-                  :text " hello"))
-  :align 'center
-  :base-style (lambda ()
-                (smt/+
-                 (smt/default-base-style)
-                 `(:filter
-                   "url(#inset)"
-                   :fill "#ff0000"))))
+;; (smt/defrow test-center
+;;   :widgets (list 'buffer-name
+;;                  (make-smt/widget
+;;                   :text " hello"))
+;;   :align 'center
+;;   :base-style (lambda ()
+;;                 (smt/+
+;;                  (smt/default-base-style)
+;;                  `(:filter
+;;                    "url(#inset)"
+;;                    :fill "#ff0000"))))
 
-(smt/deftheme widget-test
-  :defs (smt/filter-inset 0.5 0.3)
-  :background 'smt/bg-grey1
-  :base-style (lambda ()
-                (smt/+
-                 (smt/default-base-style)
-                 `(:filter
-                   "url(#inset)"
-                   :fill "#404448")))
-  :rows (list 'default-left 'default-position 'default-right)
-  :overlay 'smt/bg-grey1-top
-  ;; :local-widgets `((wig1 . ,(make-smt/widget :text "wig1")))
-  )
+;; (smt/deftheme widget-test
+;;   :defs (smt/filter-inset 0.5 0.3)
+;;   :background 'smt/bg-grey1
+;;   :base-style (lambda ()
+;;                 (smt/+
+;;                  (smt/default-base-style)
+;;                  `(:filter
+;;                    "url(#inset)"
+;;                    :fill "#404448")))
+;;   :rows (list 'default-left 'default-position 'default-right)
+;;   :overlay 'smt/bg-grey1-top
+;;   ;; :local-widgets `((wig1 . ,(make-smt/widget :text "wig1")))
+;;   )
 
 (ert-deftest smt/+ ()
   (should (null (smt/+)))

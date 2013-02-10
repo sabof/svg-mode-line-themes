@@ -22,6 +22,18 @@
   ;; :major-mode-style 'smt/nasa-major-mode-style
   :overlay 'smt/nasa-overlay)
 
+(smt/deftheme black-crystal
+  :defs (smt/filter-inset 1 0.3)
+  :background 'smt/bg-black-crystal
+  :base-style (lambda ()
+                (smt/+
+                 (smt/default-base-style)
+                 `(:fill "#7E868D")))
+  ;; :buffer-name-style 'smt/black-crystal-title-style
+  ;; :minor-mode-style 'smt/black-crystal-title-style
+  ;; :major-mode-style 'smt/diesel-major-mode-style
+  :overlay 'smt/black-crystal-overlay)
+
 (smt/deftheme diesel
   :defs (smt/filter-inset 0.5 0.3)
   :background 'smt/bg-grey1
@@ -36,18 +48,6 @@
   ;; :major-mode-style 'smt/diesel-major-mode-style
   :rows (list 'default-left 'default-position 'default-right)
   :overlay 'smt/bg-grey1-top)
-
-(smt/deftheme black-crystal
-  :defs (smt/filter-inset 1 0.3)
-  :background 'smt/bg-black-crystal
-  :base-style (lambda ()
-                (smt/+
-                 (smt/default-base-style)
-                 `(:fill "#7E868D")))
-  ;; :buffer-name-style 'smt/black-crystal-title-style
-  ;; :minor-mode-style 'smt/black-crystal-title-style
-  ;; :major-mode-style 'smt/diesel-major-mode-style
-  :overlay 'smt/black-crystal-overlay)
 
 (defun smt/next-theme ()
   (interactive)

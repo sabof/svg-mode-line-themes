@@ -2,8 +2,9 @@
 (or (require 'xmlgen nil t)
     (require 'xmlgen "xml-gen"))
 
-(defvar smt/themes nil)
+(defvar smt/widgets nil)
 (defvar smt/rows nil)
+(defvar smt/themes nil)
 (defvar smt/current-theme nil)
 
 ;;; Structs
@@ -23,68 +24,61 @@
 (defstruct (smt/row
              (:conc-name smt/r-))
   (align 'left)
-  (priority 0)
   (width-func 'smt/r-width-default)
   (margin 0)
   widgets
   base-style
   (export-func 'smt/r-export-default))
 
-(defvar smt/widgets
-  '((archetype .
-     (:parent nil
-      :style smt/default-base-style
-      :on-click nil
-      :text ""
-      :width-func smt/w-width-default
-      :export-func smt/w-export-default))))
+(smt/defwidget archetype
+  :parent nil
+  :style 'smt/default-base-style
+  :on-click nil
+  :text ""
+  :width-func 'smt/w-width-default
+  :export-func 'smt/w-export-default)
+
+(defun make-smt/widget (&rest pairs)
+  (unless (memq :parent pairs)
+    (setf (getf pairs :parent) 'archetype))
+  pairs)
 
 (defmacro smt/defwidget (name &rest pairs)
-  `(let* (( widget ,(cons 'list pairs)))
-     (unless (memq :parent widget)
-       (setf (getf widget :parent) 'archetype))
+  `(let* (( widget (make-smt/widget ,@pairs)))
      (setq smt/widgets (cl-delete ',name smt/widgets :key 'car)
            smt/widgets (acons ',name widget smt/widgets))))
 (put 'smt/defwidget 'common-lisp-indent-function
      '(1 &body))
 
-(defmacro smt/standard-getter (prefix property)
-  (let (( function-name
-          (intern (concat (symbol-name prefix)
-                          (symbol-name property))))
-        ( property-name
-          (intern (concat ":" (symbol-name property)))))
-    `(defun ,function-name (thing)
-       (cond ( (memq ,property-name thing)
-               (smt/maybe-funcall
-                (getf thing ,property-name)))
-             ( (getf thing :parent)
-               (let (( parent (getf thing :parent)))
-                 (,function-name
-                  (if (symbolp parent)
-                      (cdr (assoc parent smt/widgets))
-                      parent))))))))
+(defun smt/get (object property &optional namespace)
+  (when (and object (symbolp object))
+    (setq object (cdr (assoc object namespace))))
+  (cond ( (memq property object)
+          (getf object property))
+        ( (getf object :parent)
+          (smt/get (getf object :parent)
+                   property namespace))))
 
-(smt/standard-getter  smt/w-  style)
-(smt/standard-getter  smt/w-  text)
+(defun smt/w-style (widget)
+  (smt/maybe-funcall
+   (smt/get widget :style smt/widgets)))
+
+(defun smt/w-text (widget)
+  (smt/maybe-funcall
+   (smt/get widget :text smt/widgets)))
 
 (defun smt/w-width (widget)
-  (cond ( (memq :width-func widget)
-          (funcall (getf widget :width-func) widget))
-        ( (getf widget :parent)
-          (let (( parent (getf widget :parent)))
-            (smt/w-width
-             (if (symbolp parent)
-                 (cdr (assoc parent smt/widgets))
-                 parent))))))
-
-(defun smt/w-on-click (widget)
-  (or (getf widget :on-click)
-      (getf (getf widget :parent)
-            :on-click)))
+  (smt/maybe-funcall
+   (smt/get widget :width-func smt/widgets)
+   widget))
 
 (defun smt/w-export (widget row theme)
-  (funcall (getf widget :export-func) widget row theme))
+  (smt/maybe-funcall
+   (smt/get widget :export-func smt/widgets)
+   widget row theme))
+
+(defun smt/w-on-click (widget)
+  (smt/get widget :on-click smt/widgets))
 
 ;;; Structs EOF
 ;;; Methods
@@ -173,7 +167,7 @@
   (funcall (smt/r-width-func row) row))
 
 (defun smt/t-normalize-widget (theme widget-or-name)
-  (if (smt/widget-p widget-or-name)
+  (if (listp widget-or-name)
       widget-or-name
       (or (cdr (assoc widget-or-name (smt/t-local-widgets theme)))
           (cdr (assoc widget-or-name smt/widgets))
@@ -259,32 +253,6 @@
     (if (eq 'left (smt/r-align row))
         margin
         (- (smt/window-width) (+ margin width)))))
-
-(defmacro smt/define-struct-copy-modifier (accessor-prefix)
-  `(defmacro ,(intern (concat accessor-prefix "copy-and-modify"))
-       (struct &rest properties)
-     (let (( new-struct (gensym "new-struct-"))
-           result)
-       `(let (( ,new-struct (smt/copy-struct ,struct)))
-          ,@(progn
-             (while properties
-               (push `(setf
-                       (,(intern
-                          (concat
-                           ,accessor-prefix
-                           (substring
-                            (symbol-name
-                             (pop properties))
-                            1)))
-                         ,new-struct)
-                       (pop properties))
-                     result))
-             (nreverse result))
-          ,new-struct))))
-
-(smt/define-struct-copy-modifier "smt/t-")
-(smt/define-struct-copy-modifier "smt/w-")
-(smt/define-struct-copy-modifier "smt/r-")
 
 ;;; Methods EOF
 
