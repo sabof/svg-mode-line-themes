@@ -21,7 +21,7 @@
                  `(:filter
                    "url(#inset)"
                    :fill "#404448")))
-  :rows (list 'default-left 'default-right 'test-center)
+  :rows (list 'test-center 'default-left 'default-right)
   :overlay 'smt/bg-grey1-top
   ;; :local-widgets `((wig1 . ,(make-smt/widget :text "wig1")))
   )
@@ -49,6 +49,7 @@
 (ert-deftest smt/ranges-overlap ()
   (should (smt/ranges-overlap '(0 . 10) '(5 . 6)))
   (should (smt/ranges-overlap '(0 . 10) '(9 . 20)))
+  (should (null (smt/ranges-overlap '(0 . 0) '(0 . 0))))
   (should (null (smt/ranges-overlap '(0 . 10) '(10 . 10))))
   (should (null (smt/ranges-overlap '(0 . 0) '(0 . 10))))
   (should (null (smt/ranges-overlap '(0 . 10) '(0 . 0))))
@@ -114,14 +115,15 @@
                   :widgets
                   (list
                    (make-smt/widget
-                    :text "123346")))
+                    :text "123456")))
                  (make-smt/row
                   :align 'right
                   :widgets
                   (list
                    (make-smt/widget
-                    :text "1233467")))))))
+                    :text "1234567")))))))
     (flet (( smt/window-width () 10))
+      (should (= 4 (smt/r-left (second (smt/t-rows theme)))))
       (should (= 1 (length (smt/t-non-overlapping-rows theme))))
       (should (equal (smt/w-text
                       (car (smt/r-widgets

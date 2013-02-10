@@ -53,7 +53,11 @@
 
 (defun smt/ranges-overlap (r1 r2)
   (multiple-value-bind (r1 r2) (cl-sort (list r1 r2) '< :key 'car)
-    (< (car r2) (cdr r1))
+    (and (< (car r2) (cdr r1))
+         (not (and (= (car r2)
+                      (car r2))
+                   (= (car r2)
+                      (car r1)))))
     ;; (cond ((<= (cdr r1) (car r2))
     ;;        nil)
     ;;       (t t))
@@ -227,7 +231,7 @@
         ( width (smt/maybe-funcall (smt/r-width row) row)))
     (if (eq 'left (smt/r-align row))
         margin
-        (- 1 (smt/window-width) (+ margin width)))))
+        (- (smt/window-width) (+ margin width)))))
 
 (defmacro smt/define-struct-copy-modifier (accessor-prefix)
   `(defmacro ,(intern (concat accessor-prefix "copy-and-modify"))
