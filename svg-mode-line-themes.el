@@ -11,7 +11,7 @@
 (smt/deftheme nasa
   :defs (smt/filter-inset 0 1)
   :background 'smt/bg-nasa
-  :base-style (lambda ()
+  :style (lambda ()
                 (smt/+
                  (smt/default-base-style)
                  `(:filter
@@ -26,7 +26,7 @@
 (smt/deftheme black-crystal
   :defs (smt/filter-inset 1 0.3)
   :background 'smt/bg-black-crystal
-  :base-style (lambda ()
+  :style (lambda ()
                 (smt/+
                  (smt/default-base-style)
                  `(:fill "#7E868D")))
@@ -39,7 +39,7 @@
 (smt/deftheme diesel
   :defs (smt/filter-inset 0.5 0.3)
   :background 'smt/bg-grey1
-  :base-style (lambda ()
+  :style (lambda ()
                 (smt/+
                  (smt/default-base-style)
                  `(:filter

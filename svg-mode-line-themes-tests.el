@@ -5,7 +5,7 @@
 ;;                  (smt/make-widget
 ;;                   :text " hello"))
 ;;   :align 'center
-;;   :base-style (lambda ()
+;;   :style (lambda ()
 ;;                 (smt/+
 ;;                  (smt/default-base-style)
 ;;                  `(:filter
@@ -15,7 +15,7 @@
 ;; (smt/deftheme widget-test
 ;;   :defs (smt/filter-inset 0.5 0.3)
 ;;   :background 'smt/bg-grey1
-;;   :base-style (lambda ()
+;;   :style (lambda ()
 ;;                 (smt/+
 ;;                  (smt/default-base-style)
 ;;                  `(:filter

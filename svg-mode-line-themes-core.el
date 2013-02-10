@@ -53,7 +53,7 @@
   :overlay nil
   :defs nil
   :export-func 'smt/t-export-default
-  :base-style 'smt/default-base-style
+  :style 'smt/default-base-style
   :local-widgets nil
   :rows nil)
 
@@ -74,9 +74,9 @@
    (smt/get theme :export-func smt/themes)
    theme))
 
-(defun smt/t-base-style (theme)
+(defun smt/t-style (theme)
   (smt/maybe-funcall
-   (smt/get theme :base-style smt/themes)))
+   (smt/get theme :style smt/themes)))
 
 (defun smt/t-local-widgets (theme)
   (smt/maybe-funcall
@@ -93,7 +93,7 @@
   :width-func 'smt/r-width-default
   :margin 0
   :widgets nil
-  :base-style nil
+  :style nil
   :export-func 'smt/r-export-default)
 
 (defun smt/r-align (row)
@@ -114,9 +114,9 @@
   (smt/maybe-funcall
    (smt/get row :widgets smt/rows)))
 
-(defun smt/r-base-style (row)
+(defun smt/r-style (row)
   (smt/maybe-funcall
-   (smt/get row :base-style smt/rows)))
+   (smt/get row :style smt/rows)))
 
 (defun smt/r-export (row theme)
   (smt/maybe-funcall
@@ -266,8 +266,8 @@
 
 (defun smt/w-export-default (widget row theme)
   `(tspan
-    ,@(smt/+ (smt/t-base-style theme)
-             (smt/r-base-style row)
+    ,@(smt/+ (smt/t-style theme)
+             (smt/r-style row)
              (smt/w-style widget))
     ,(smt/w-text widget)))
 
