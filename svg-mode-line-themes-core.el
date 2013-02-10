@@ -48,17 +48,43 @@
       (apply thing args)
       thing))
 
-(defstruct (smt/theme
-             (:conc-name smt/t-))
-  background
-  overlay
-  defs
-  (position-width 12)
-  (export-func 'smt/t-export-default)
-  (setup-hook 'ignore)
-  (base-style 'smt/default-base-style)
-  local-widgets
-  rows)
+(smt/deftree theme
+  :background nil
+  :overlay nil
+  :defs nil
+  :export-func 'smt/t-export-default
+  :base-style 'smt/default-base-style
+  :local-widgets nil
+  :rows nil)
+
+(defun smt/t-background (theme)
+  (smt/maybe-funcall
+   (smt/get theme :background smt/themes)))
+
+(defun smt/t-overlay (theme)
+  (smt/maybe-funcall
+   (smt/get theme :overlay smt/themes)))
+
+(defun smt/t-defs (theme)
+  (smt/maybe-funcall
+   (smt/get theme :defs smt/themes)))
+
+(defun smt/t-export (theme)
+  (smt/maybe-funcall
+   (smt/get theme :export-func smt/themes)
+   theme))
+
+(defun smt/t-base-style (theme)
+  (smt/maybe-funcall
+   (smt/get theme :base-style smt/themes)))
+
+(defun smt/t-local-widgets (theme)
+  (smt/maybe-funcall
+   (smt/get theme :local-widgets smt/themes)))
+
+(defun smt/t-rows (theme)
+  (smt/maybe-funcall
+   (smt/get theme :rows smt/themes)))
 
 ;;; Row
 
@@ -131,9 +157,6 @@
 ;;; Structs EOF
 ;;; Methods
 
-(defun smt/t-export (theme)
-  (funcall (smt/t-export-func theme) theme))
-
 (defun smt/ranges-overlap (r1 r2)
   (cond ( (<= (cdr r1) (car r2))
           nil)
@@ -174,12 +197,12 @@
        :xmlns "http://www.w3.org/2000/svg"
        :width ,width
        :height ,height
-       ,@(smt/maybe-funcall (smt/t-defs theme))
-       ,@(smt/maybe-funcall (smt/t-background theme))
+       ,@(smt/t-defs theme)
+       ,@(smt/t-background theme)
        ,@(mapcar
           (lambda (row) (smt/r-export row theme))
           rows)
-       ,@(smt/maybe-funcall (smt/t-overlay theme))
+       ,@(smt/t-overlay theme)
        ))))
 
 (defun* smt/t-export-default (theme)
@@ -243,7 +266,7 @@
 
 (defun smt/w-export-default (widget row theme)
   `(tspan
-    ,@(smt/+ (smt/maybe-funcall (smt/t-base-style theme))
+    ,@(smt/+ (smt/t-base-style theme)
              (smt/r-base-style row)
              (smt/w-style widget))
     ,(smt/w-text widget)))
@@ -361,11 +384,11 @@
 
 (defun smt/modeline-format ()
   (let ((theme (smt/get-current-theme)))
-    (cond ( (smt/theme-p theme)
-            (smt/t-export theme))
-          ( (or (functionp theme)
+    (cond ( (or (functionp theme)
                 (symbolp theme))
             (funcall theme))
+          ( (listp theme)
+            (smt/t-export theme))
           ( t theme))))
 
 (defun smt/get-current-theme ()
@@ -373,14 +396,6 @@
 
 (defun smt/get-widget-by-name (name)
   (cdr (assoc name smt/widgets)))
-
-(defmacro smt/deftheme (name &rest pairs)
-  `(let (( theme (make-smt/theme ,@pairs)))
-     (setq smt/themes (cl-delete ',name smt/themes :key 'car)
-           smt/themes (acons ',name theme smt/themes)
-           smt/current-theme ',name)))
-(put 'smt/deftheme 'common-lisp-indent-function
-     '(1 &body))
 
 (defun smt/reset ()
   (interactive)

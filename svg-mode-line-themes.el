@@ -48,6 +48,7 @@
   ;; :major-mode-style 'smt/diesel-major-mode-style
   :rows (list 'default-left 'default-position 'default-right)
   :overlay 'smt/bg-grey1-top)
+(setq smt/current-theme 'diesel)
 
 (defun smt/next-theme ()
   (interactive)
