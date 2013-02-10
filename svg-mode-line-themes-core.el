@@ -2,12 +2,51 @@
 (or (require 'xmlgen nil t)
     (require 'xmlgen "xml-gen"))
 
-(defvar smt/widgets nil)
-(defvar smt/rows nil)
+;; (defvar smt/widgets nil)
+;; (defvar smt/rows nil)
 (defvar smt/themes nil)
 (defvar smt/current-theme nil)
 
 ;;; Structs
+(defmacro smt/deftree (name &rest props)
+  (let (( maker-name
+          (intern (concat "smt/make-"
+                          (symbol-name name))))
+        ( \definer-name
+          (intern (concat "smt/def" (symbol-name name))))
+        ( namespace-name
+          (intern (concat "smt/" (symbol-name name) "s"))))
+    `(progn
+       (defvar ,namespace-name nil)
+       (defun ,maker-name (&rest pairs)
+         (unless (memq :parent pairs)
+           (setf (getf pairs :parent) 'archetype))
+         pairs)
+       (defmacro ,definer-name (name &rest pairs)
+         `(let* (( object (,',maker-name ,@pairs)))
+            (setq ,',namespace-name (cl-delete ',name ,',namespace-name :key 'car)
+                  ,',namespace-name (acons ',name object ,',namespace-name))))
+       (put (quote ,definer-name) 'common-lisp-indent-function
+            '(1 &body))
+       (,definer-name archetype ,@props))))
+(put 'smt/deftree 'common-lisp-indent-function
+     '(1 &body))
+
+(defun smt/get (object property &optional namespace)
+  (when (and object (symbolp object))
+    (setq object (cdr (assoc object namespace))))
+  (cond ( (memq property object)
+          (getf object property))
+        ( (getf object :parent)
+          (smt/get (getf object :parent)
+                   property namespace))))
+
+(defun smt/maybe-funcall (thing &rest args)
+  (if (or (functionp thing)
+          (and (symbolp thing)
+               (fboundp thing)))
+      (apply thing args)
+      thing))
 
 (defstruct (smt/theme
              (:conc-name smt/t-))
@@ -21,43 +60,52 @@
   local-widgets
   rows)
 
-(defstruct (smt/row
-             (:conc-name smt/r-))
-  (align 'left)
-  (width-func 'smt/r-width-default)
-  (margin 0)
-  widgets
-  base-style
-  (export-func 'smt/r-export-default))
+;;; Row
 
-(smt/defwidget archetype
+(smt/deftree row
+  :align 'left
+  :width-func 'smt/r-width-default
+  :margin 0
+  :widgets nil
+  :base-style nil
+  :export-func 'smt/r-export-default)
+
+(defun smt/r-align (row)
+  (smt/maybe-funcall
+   (smt/get row :align smt/rows)))
+
+(defun smt/r-width (row)
+  (smt/maybe-funcall
+   (smt/get row :width-func smt/rows)
+   row))
+
+(defun smt/r-margin (row)
+  (smt/maybe-funcall
+   (smt/get row :margin smt/rows)
+   row))
+
+(defun smt/r-widgets (row)
+  (smt/maybe-funcall
+   (smt/get row :widgets smt/rows)))
+
+(defun smt/r-base-style (row)
+  (smt/maybe-funcall
+   (smt/get row :base-style smt/rows)))
+
+(defun smt/r-export (row theme)
+  (smt/maybe-funcall
+   (smt/get row :export-func smt/rows)
+   row theme))
+
+;;; Widget
+
+(smt/deftree widget
   :parent nil
   :style 'smt/default-base-style
   :on-click nil
   :text ""
   :width-func 'smt/w-width-default
   :export-func 'smt/w-export-default)
-
-(defun smt/make-widget (&rest pairs)
-  (unless (memq :parent pairs)
-    (setf (getf pairs :parent) 'archetype))
-  pairs)
-
-(defmacro smt/defwidget (name &rest pairs)
-  `(let* (( widget (smt/make-widget ,@pairs)))
-     (setq smt/widgets (cl-delete ',name smt/widgets :key 'car)
-           smt/widgets (acons ',name widget smt/widgets))))
-(put 'smt/defwidget 'common-lisp-indent-function
-     '(1 &body))
-
-(defun smt/get (object property &optional namespace)
-  (when (and object (symbolp object))
-    (setq object (cdr (assoc object namespace))))
-  (cond ( (memq property object)
-          (getf object property))
-        ( (getf object :parent)
-          (smt/get (getf object :parent)
-                   property namespace))))
 
 (defun smt/w-style (widget)
   (smt/maybe-funcall
@@ -86,9 +134,6 @@
 (defun smt/t-export (theme)
   (funcall (smt/t-export-func theme) theme))
 
-(defun smt/r-export (row theme)
-  (funcall (smt/r-export-func row) row theme))
-
 (defun smt/ranges-overlap (r1 r2)
   (cond ( (<= (cdr r1) (car r2))
           nil)
@@ -97,7 +142,8 @@
         ( t t)))
 
 (defun smt/r-range (row)
-  (cons (smt/r-left row) (+ (smt/r-left row) (smt/r-width row))))
+  (let (( left (smt/r-left row)))
+    (cons left (+ left (smt/r-width row)))))
 
 (defun smt/t-visible-rows (theme)
   (let* (( rows (mapcar (apply-partially 'smt/t-normalize-row theme)
@@ -161,9 +207,6 @@
       (incf total-width (smt/w-width widget)))
     total-width))
 
-(defun smt/r-width (row)
-  (funcall (smt/r-width-func row) row))
-
 (defun smt/t-normalize-widget (theme widget-or-name)
   (if (listp widget-or-name)
       widget-or-name
@@ -172,7 +215,7 @@
           (error "Can't process widget: %s" widget-or-name))))
 
 (defun smt/t-normalize-row (theme row-or-name)
-  (if (smt/row-p row-or-name)
+  (if (listp row-or-name)
       row-or-name
       (or (cdr (assoc row-or-name smt/rows))
           (error "Can't process row: %s" row-or-name))))
@@ -180,19 +223,15 @@
 (defun smt/r-export-default (row theme)
   `(text
     :text-anchor ,(progn
-                   (case ( smt/r-align row)
+                   (case (smt/r-align row)
                      ( left "start")
                      ( right "end")))
     :x ,(progn
          (case ( smt/r-align row)
-           ( left (* (smt/maybe-funcall
-                      (smt/r-margin row)
-                      row)
+           ( left (* (smt/r-margin row)
                      (frame-char-width)))
            ( right (- (smt/window-pixel-width)
-                      (* (smt/maybe-funcall
-                          (smt/r-margin row)
-                          row)
+                      (* (smt/r-margin row)
                          (frame-char-width))))))
     :y ,(smt/text-base-line)
     ,@(mapcar (lambda (widget-or-name)
@@ -205,7 +244,7 @@
 (defun smt/w-export-default (widget row theme)
   `(tspan
     ,@(smt/+ (smt/maybe-funcall (smt/t-base-style theme))
-             (smt/maybe-funcall (smt/r-base-style row))
+             (smt/r-base-style row)
              (smt/w-style widget))
     ,(smt/w-text widget)))
 
@@ -246,8 +285,8 @@
    event))
 
 (defun smt/r-left (row)
-  (let (( margin (smt/maybe-funcall (smt/r-margin row) row))
-        ( width (smt/maybe-funcall (smt/r-width row) row)))
+  (let (( margin (smt/r-margin row))
+        ( width (smt/r-width row)))
     (if (eq 'left (smt/r-align row))
         margin
         (- (smt/window-width) (+ margin width)))))
@@ -320,13 +359,6 @@
           (apply 'smt/+ plistC (cddr plists))
           ))))
 
-(defun smt/maybe-funcall (thing &rest args)
-  (if (or (functionp thing)
-          (and (symbolp thing)
-               (fboundp thing)))
-      (apply thing args)
-      thing))
-
 (defun smt/modeline-format ()
   (let ((theme (smt/get-current-theme)))
     (cond ( (smt/theme-p theme)
@@ -348,22 +380,6 @@
            smt/themes (acons ',name theme smt/themes)
            smt/current-theme ',name)))
 (put 'smt/deftheme 'common-lisp-indent-function
-     '(1 &body))
-
-(defmacro smt/defrow (name &rest pairs)
-  (when (equal (getf pairs :align) (list 'quote 'center))
-    (setf (getf pairs :align) ''left)
-    (setf (getf pairs :margin)
-          (lambda (row)
-            (floor
-             (/ (- (smt/window-width)
-                   (smt/r-width row))
-                2)))))
-  `(let (( row (make-smt/row ,@pairs)))
-     (setq smt/rows (cl-delete ',name smt/rows :key 'car)
-           smt/rows (acons ',name row smt/rows)
-           smt/current-row ',name)))
-(put 'smt/defrow 'common-lisp-indent-function
      '(1 &body))
 
 (defun smt/reset ()
