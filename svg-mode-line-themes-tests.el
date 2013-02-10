@@ -46,5 +46,12 @@
     (should (= 3 (getf result :c)))
     (should (= 6 (length result)))))
 
+(ert-deftest test-smt/ranges-overlap ()
+  (should (smt/ranges-overlap '(0 . 10) '(5 . 6)))
+  (should (smt/ranges-overlap '(0 . 10) '(9 . 20)))
+  (should (null (smt/ranges-overlap '(0 . 10) '(9 . 20))))
+  (should (null (smt/ranges-overlap '(0 . 10) '(10 . 10))))
+  )
+
 (provide 'svg-mode-line-themes-tests)
 ;; svg-mode-line-themes-tests.el ends here

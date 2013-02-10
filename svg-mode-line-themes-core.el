@@ -51,10 +51,36 @@
 (defun smt/w-export (widget row theme)
   (funcall (smt/w-export-func widget) widget row theme))
 
+(defun smt/ranges-overlap (r1 r2)
+  (multiple-value-bind (r1 r2) (cl-sort (list r1 r2) '< :key 'car)
+    (< (car r2) (cdr r1))
+    ;; (cond ((<= (cdr r1) (car r2))
+    ;;        nil)
+    ;;       (t t))
+    ))
+
+(defun smt/r-range (row)
+  (cons (smt/r-left row) (+ (smt/r-left row) (smt/r-width row))))
+
+(defun smt/t-non-overlapping-rows (theme)
+  (let* (( rows (mapcar (apply-partially 'smt/t-normalize-row theme)
+                        (smt/t-rows theme))))
+    (dotimes (iter (length rows))
+      (when (nth iter rows)
+        (let (( current-row (nth iter rows))
+              ( following-rows (last rows (- (length rows) 1 iter))))
+          (dotimes (iter2 (length following-rows))
+            (and (nth iter2 following-rows)
+                 (smt/ranges-overlap
+                  (smt/r-range current-row)
+                  (smt/r-range (nth iter2 following-rows)))
+                 (setf (nth iter2 following-rows) nil))))))
+    (remove-if 'null rows)))
+
 (defun smt/t-export-default-xml (theme)
   (let* (( width (smt/window-pixel-width))
          ( height (frame-char-height))
-         ( rows (smt/t-rows theme)))
+         ( rows (smt/t-non-overlapping-rows theme)))
     (xmlgen
      `(svg
        :xmlns "http://www.w3.org/2000/svg"
@@ -63,12 +89,8 @@
        ,@(smt/maybe-funcall (smt/t-defs theme))
        ,@(smt/maybe-funcall (smt/t-background theme))
        ,@(mapcar
-          (lambda (row-or-name)
-            (smt/r-export
-             (smt/t-normalize-row
-              theme row-or-name)
-             theme))
-          (smt/t-rows theme))
+          (lambda (row) (smt/r-export row theme))
+          rows)
        ,@(smt/maybe-funcall (smt/t-overlay theme))
        ))))
 
@@ -199,7 +221,7 @@
    (smt/get-current-theme)
    event))
 
-(defun smt/r-left-distance (row)
+(defun smt/r-left (row)
   (let (( margin (smt/maybe-funcall (smt/r-margin row) row))
         ( width (smt/maybe-funcall (smt/r-width row) row)))
     (if (eq 'left (smt/r-align row))
@@ -244,14 +266,14 @@
 
 (defun smt/copy-struct (struct)
   (funcall
-    (intern
-     (concat
-      "copy-"
-      (substring
-       (symbol-name
-        (aref 0 struct))
-       10)))
-    struct))
+   (intern
+    (concat
+     "copy-"
+     (substring
+      (symbol-name
+       (aref 0 struct))
+      10)))
+   struct))
 
 (defun smt/points-to-pixels (points)
   ;; points = pixels * 72 / 96
