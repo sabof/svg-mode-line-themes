@@ -55,17 +55,28 @@
         ( property-name
           (intern (concat ":" (symbol-name property)))))
     `(defun ,function-name (thing)
-       (if (memq thing ,property-name)
-           (smt/maybe-funcall
-            (getf thing ,property-name))
-           (,function-name
-            (getf thing :parent))))))
+       (cond ( (memq ,property-name thing)
+               (smt/maybe-funcall
+                (getf thing ,property-name)))
+             ( (getf thing :parent)
+               (let (( parent (getf thing :parent)))
+                 (,function-name
+                  (if (symbolp parent)
+                      (cdr (assoc parent smt/widgets))
+                      parent))))))))
 
 (smt/standard-getter  smt/w-  style)
 (smt/standard-getter  smt/w-  text)
 
 (defun smt/w-width (widget)
-  (funcall (getf widget :width-func) widget))
+  (cond ( (memq :width-func widget)
+          (funcall (getf widget :width-func) widget))
+        ( (getf widget :parent)
+          (let (( parent (getf widget :parent)))
+            (smt/w-width
+             (if (symbolp parent)
+                 (cdr (assoc parent smt/widgets))
+                 parent))))))
 
 (defun smt/w-on-click (widget)
   (or (getf widget :on-click)
