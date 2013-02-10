@@ -37,7 +37,10 @@
 
 (smt/defwidget buffer-name
   :on-click (lambda (e)
-              (interactive "e"))
+              (interactive "e")
+              (message (or (buffer-file-name)
+                           (ignore-errors
+                             (dired-current-directory)))))
   :text 'smt/default-buffer-name-text)
 
 (smt/defwidget which-function

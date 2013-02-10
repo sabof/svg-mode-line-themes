@@ -143,24 +143,35 @@
 (defun smt/w-receive-click (widget row theme event)
   )
 
-(defun smt/r-receive-click (row theme event)
-  (assert (smt/row-p row))
-  (let* (( widgets (smt/r-widgets row))
+(defun smt/w-width (widget)
+  (funcall (smt/w-width-func widget) widget))
+
+(defun* smt/r-receive-click (row theme event)
+  (setq row (smt/t-normalize-row theme row))
+  (let* (( click-char-location (cadr (mouse-position)))
+         ( widgets (smt/r-widgets row))
          ( align (smt/r-align row))
          ( offset (smt/maybe-funcall (smt/r-margin row)))
          current-widget-width)
     (dolist (widget widgets)
+      (setq widget (smt/t-normalize-widget theme widget))
       (setq current-widget-width (smt/w-width widget))
-      (when (and (smt/w-on-click widget)
-                 ;;
-                 )
-        (funcall (smt/w-on-click widget))))))
+      (when (and
+             ;;
+             (<= offset click-char-location)
+             (<= click-char-location (+ offset current-widget-width)))
+        (if (smt/w-on-click widget)
+            (funcall (smt/w-on-click widget) event))
+        (return-from smt/r-receive-click t))
+      (setq offset (+ offset current-widget-width)))))
 
-(defun smt/t-receive-click (theme event)
+(defun* smt/t-receive-click (theme event)
   (let (( rows (smt/t-rows theme)))
     (dolist (row rows)
-      (smt/r-receive-click
-       row theme event))))
+      (setq row (smt/t-normalize-row theme row))
+      (when (smt/r-receive-click row theme event)
+        (return-from smt/t-receive-click t)))
+    (message "")))
 
 (defun smt/receive-click (event)
   (interactive "e")
