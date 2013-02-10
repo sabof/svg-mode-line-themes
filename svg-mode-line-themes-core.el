@@ -202,10 +202,11 @@
                 (and (<= offset click-char-location)
                      (< click-char-location
                         (+ offset current-widget-width))))
-        (if (smt/w-on-click widget)
-            (funcall (smt/w-on-click widget) event))
+        (when (smt/w-on-click widget)
+          (funcall (smt/w-on-click widget) event))
         (return-from smt/r-receive-click t))
-      (setq offset (+ offset current-widget-width)))))
+      (setq offset (+ offset current-widget-width)))
+    nil))
 
 (defun* smt/t-receive-click (theme event)
   (let (( rows (smt/t-rows theme)))

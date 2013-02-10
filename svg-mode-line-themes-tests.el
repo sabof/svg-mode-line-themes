@@ -50,6 +50,8 @@
   (should (smt/ranges-overlap '(0 . 10) '(5 . 6)))
   (should (smt/ranges-overlap '(0 . 10) '(9 . 20)))
   (should (null (smt/ranges-overlap '(0 . 10) '(10 . 10))))
+  (should (null (smt/ranges-overlap '(0 . 0) '(0 . 10))))
+  (should (null (smt/ranges-overlap '(0 . 10) '(0 . 0))))
   )
 
 (ert-deftest smt/row ()
@@ -98,7 +100,50 @@
                   (list
                    (make-smt/widget
                     :text "123346")))))))
-    (should (null (= 2 (length (smt/t-non-overlapping-rows theme)))))))
+    (should (= 1 (length (smt/t-non-overlapping-rows theme)))))
+  (let (( theme
+          (make-smt/theme
+           :rows
+           (list (make-smt/row
+                  :widgets
+                  (list
+                   (make-smt/widget
+                    :text "first")))
+                 (make-smt/row
+                  :align 'right
+                  :widgets
+                  (list
+                   (make-smt/widget
+                    :text "123346")))
+                 (make-smt/row
+                  :align 'right
+                  :widgets
+                  (list
+                   (make-smt/widget
+                    :text "1233467")))))))
+    (flet (( smt/window-width () 10))
+      (should (= 1 (length (smt/t-non-overlapping-rows theme))))
+      (should (equal (smt/w-text
+                      (car (smt/r-widgets
+                            (car (smt/t-non-overlapping-rows theme)))))
+                     "first"))
+      ))
+  (let (( theme
+          (make-smt/theme
+           :rows
+           (list (make-smt/row
+                  :widgets
+                  (list
+                   (make-smt/widget
+                    :text "12345")))
+                 (make-smt/row
+                  :align 'right
+                  :widgets
+                  (list
+                   (make-smt/widget
+                    :text "12345")))))))
+    (flet (( smt/window-width () 10))
+      (should (= 2 (length (smt/t-non-overlapping-rows theme)))))))
 
 (provide 'svg-mode-line-themes-tests)
 ;; svg-mode-line-themes-tests.el ends here
