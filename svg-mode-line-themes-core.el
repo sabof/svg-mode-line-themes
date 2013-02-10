@@ -26,7 +26,7 @@
   (align 'left)
   (priority 0)
   (width-func 'smt/r-width-default)
-  (margin 2)
+  (margin 0)
   widgets
   base-style
   (export-func 'smt/r-export-default))
@@ -80,7 +80,9 @@
 (defun smt/t-export-default-xml (theme)
   (let* (( width (smt/window-pixel-width))
          ( height (frame-char-height))
-         ( rows (smt/t-non-overlapping-rows theme)))
+         ( rows (or ;; (mapcar (apply-partially 'smt/t-normalize-row theme)
+                 ;;         (smt/t-rows theme))
+                 (smt/t-non-overlapping-rows theme))))
     (xmlgen
      `(svg
        :xmlns "http://www.w3.org/2000/svg"
@@ -142,23 +144,21 @@
 
 (defun smt/r-export-default (row theme)
   `(text
-    :text-anchor ,(case
-                   ( smt/r-align row)
-                   ( left "start")
-                   ( right "end")
-                   )
-    :x ,(case
-         ( smt/r-align row)
-         ( left (* (smt/maybe-funcall
-                    (smt/r-margin row)
-                    row)
-                   (frame-char-width)))
-         ( right (- (frame-pixel-width)
-                    (* (smt/maybe-funcall
-                        (smt/r-margin row)
-                        row)
-                       (frame-char-width))))
-         ( center (/ (frame-pixel-width) 2)))
+    :text-anchor ,(progn
+                   (case ( smt/r-align row)
+                     ( left "start")
+                     ( right "end")))
+    :x ,(progn
+         (case ( smt/r-align row)
+           ( left (* (smt/maybe-funcall
+                      (smt/r-margin row)
+                      row)
+                     (frame-char-width)))
+           ( right (- (smt/window-pixel-width)
+                      (* (smt/maybe-funcall
+                          (smt/r-margin row)
+                          row)
+                         (frame-char-width))))))
     :y ,(smt/text-base-line)
     ,@(mapcar (lambda (widget-or-name)
                 (smt/w-export
@@ -225,7 +225,7 @@
   (let (( margin (smt/maybe-funcall (smt/r-margin row) row))
         ( width (smt/maybe-funcall (smt/r-width row) row)))
     (if (eq 'left (smt/r-align row))
-        (+ margin width)
+        margin
         (- 1 (smt/window-width) (+ margin width)))))
 
 (defmacro smt/define-struct-copy-modifier (accessor-prefix)

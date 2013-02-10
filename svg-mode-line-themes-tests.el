@@ -26,7 +26,7 @@
   ;; :local-widgets `((wig1 . ,(make-smt/widget :text "wig1")))
   )
 
-(ert-deftest test-smt/+ ()
+(ert-deftest smt/+ ()
   (should (null (smt/+)))
   (should (null (smt/+ '(:a 45) '(:a nil))))
   (should (equal (smt/+ '(:a 45) nil)
@@ -46,12 +46,59 @@
     (should (= 3 (getf result :c)))
     (should (= 6 (length result)))))
 
-(ert-deftest test-smt/ranges-overlap ()
+(ert-deftest smt/ranges-overlap ()
   (should (smt/ranges-overlap '(0 . 10) '(5 . 6)))
   (should (smt/ranges-overlap '(0 . 10) '(9 . 20)))
-  (should (null (smt/ranges-overlap '(0 . 10) '(9 . 20))))
   (should (null (smt/ranges-overlap '(0 . 10) '(10 . 10))))
   )
+
+(ert-deftest smt/row ()
+  (let (( row (make-smt/row
+               :margin 2
+               :widgets (list
+                         (make-smt/widget
+                          :text "123")
+                         (make-smt/widget
+                          :text "456")))))
+    (should (= (smt/r-width row) 6))
+    (should (eq (smt/r-align row) 'left))
+    (should (= (smt/maybe-funcall (smt/r-margin row)) 2))
+    (should (= (smt/r-left row) 2))
+    (should (equal (smt/r-range row) '(2 . 8)))))
+
+(ert-deftest smt/theme ()
+  (let (( theme
+          (make-smt/theme
+           :rows
+           (list (make-smt/row
+                  :margin 2
+                  :widgets
+                  (list
+                   (make-smt/widget
+                    :text "123346")))
+                 (make-smt/row
+                  :margin 8
+                  :widgets
+                  (list
+                   (make-smt/widget
+                    :text "123346")))))))
+    (should (= 2 (length (smt/t-non-overlapping-rows theme)))))
+  (let (( theme
+          (make-smt/theme
+           :rows
+           (list (make-smt/row
+                  :margin 2
+                  :widgets
+                  (list
+                   (make-smt/widget
+                    :text "123346")))
+                 (make-smt/row
+                  :margin 7
+                  :widgets
+                  (list
+                   (make-smt/widget
+                    :text "123346")))))))
+    (should (null (= 2 (length (smt/t-non-overlapping-rows theme)))))))
 
 (provide 'svg-mode-line-themes-tests)
 ;; svg-mode-line-themes-tests.el ends here

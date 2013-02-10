@@ -59,11 +59,13 @@
               (message "Column: %s" (current-column))))
 
 (smt/defrow default-left
-  :widgets '(buffer-name))
+  :widgets '(buffer-name)
+  :margin 2)
 
 (smt/defrow default-right
   :widgets '(position-info)
-  :align 'right)
+  :align 'right
+  :margin 2)
 
 (provide 'svg-mode-line-themes-widgets)
 ;; svg-mode-line-themes-widgets.el ends here
