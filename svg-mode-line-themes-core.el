@@ -52,7 +52,7 @@
   (funcall (smt/w-export-func widget) widget row theme))
 
 (defun smt/t-export-default-xml (theme)
-  (let* (( width (smt/window-width))
+  (let* (( width (smt/window-pixel-width))
          ( height (frame-char-height))
          ( rows (smt/t-rows theme)))
     (xmlgen
@@ -81,12 +81,11 @@
      'display image
      'keymap (let (( map (make-sparse-keymap)))
                (es-define-keys map
-                 (kbd "<mouse-1>")
-                 'smt/receive-click
-                 (kbd "<nil> <header-line> <mouse-1>")
-                 'smt/receive-click
-                 (kbd "<nil> <mode-line> <mouse-1>")
-                 'smt/receive-click)
+                 (kbd "<mouse-1>") 'smt/receive-click
+                 (kbd "<nil> <header-line> <mouse-1>") 'smt/receive-click
+                 (kbd "<nil> <mode-line> <mouse-1>") 'smt/receive-click
+                 (kbd "<header-line> <mouse-1>") 'smt/receive-click
+                 (kbd "<mode-line> <mouse-1>") 'smt/receive-click)
                map))
     ;; 'help-echo
     ;; (or (buffer-file-name)
@@ -140,15 +139,13 @@
 (defun smt/w-width-default (widget)
   (length (smt/maybe-funcall (smt/w-text widget))))
 
-(defun smt/w-receive-click (widget row theme event)
-  )
-
 (defun smt/w-width (widget)
   (funcall (smt/w-width-func widget) widget))
 
 (defun* smt/r-receive-click (row theme event)
   (setq row (smt/t-normalize-row theme row))
   (let* (( click-char-location (cadr (mouse-position)))
+         ( window-width (smt/window-width))
          ( widgets (smt/r-widgets row))
          ( align (smt/r-align row))
          ( offset (smt/maybe-funcall (smt/r-margin row)))
@@ -156,10 +153,17 @@
     (dolist (widget widgets)
       (setq widget (smt/t-normalize-widget theme widget))
       (setq current-widget-width (smt/w-width widget))
-      (when (and
-             ;;
-             (<= offset click-char-location)
-             (<= click-char-location (+ offset current-widget-width)))
+      (when (if (eq align 'right)
+                (and
+                 (< click-char-location
+                    (- window-width offset))
+                 (<= (- window-width
+                        offset
+                        current-widget-width)
+                     click-char-location))
+                (and (<= offset click-char-location)
+                     (< click-char-location
+                        (+ offset current-widget-width))))
         (if (smt/w-on-click widget)
             (funcall (smt/w-on-click widget) event))
         (return-from smt/r-receive-click t))
@@ -207,8 +211,12 @@
 
 ;;; Methods EOF
 
-(defun smt/window-width ()
+(defun smt/window-pixel-width ()
   (let (( window-edges (window-pixel-edges)))
+    (- (nth 2 window-edges) (nth 0 window-edges))))
+
+(defun smt/window-width ()
+  (let (( window-edges (window-edges)))
     (- (nth 2 window-edges) (nth 0 window-edges))))
 
 (defun smt/copy-struct (struct)

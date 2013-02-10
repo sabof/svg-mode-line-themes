@@ -53,7 +53,10 @@
 
 (smt/defwidget position-info
   :text (lambda ()
-          (format-mode-line "%l:%p")))
+          (format-mode-line "%l:%p"))
+  :on-click (lambda (e)
+              (interactive "e")
+              (message "Column: %s" (current-column))))
 
 (smt/defrow default-left
   :widgets '(buffer-name))
