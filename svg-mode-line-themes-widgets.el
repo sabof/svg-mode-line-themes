@@ -39,6 +39,8 @@
         (concat " " text)
         "")))
 
+;;; Widgets
+
 (smt/defwidget minor-modes
   :text 'smt/minor-mode-indicators)
 
@@ -81,6 +83,8 @@
 
 (smt/defwidget buffer-info
   :text 'smt/default-buffer-indicators-text)
+
+;;; Rows
 
 (smt/defrow default-left
   :widgets '(buffer-info buffer-name)

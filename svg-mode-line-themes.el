@@ -34,6 +34,7 @@
   ;; :buffer-name-style 'smt/grey-title-style
   ;; :minor-mode-style 'smt/grey-title-style
   ;; :major-mode-style 'smt/diesel-major-mode-style
+  :rows (list 'default-left 'default-position 'default-right)
   :overlay 'smt/bg-grey1-top)
 
 (smt/deftheme black-crystal
