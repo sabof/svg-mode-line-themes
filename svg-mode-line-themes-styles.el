@@ -23,7 +23,7 @@
              "#4C5055")))
 
 (defun smt/bg-grey1 ()
-  (let (( width (smt/window-width))
+  (let (( width (smt/window-pixel-width))
         ( height (frame-char-height)))
     `((\defs
        (linearGradient
@@ -41,7 +41,7 @@
       )))
 
 (defun smt/bg-grey1-top ()
-  (let (( width (smt/window-width))
+  (let (( width (smt/window-pixel-width))
         ( height (frame-char-height)))
     `((rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
       (rect :width "100%" :height 1 :x 0 :y ,(- height 2) :fill "black" :fill-opacity 0.2)
@@ -52,7 +52,7 @@
   `((rect :width "100%" :height "100%" :x 0 :y 0 :fill "#000")))
 
 (defun smt/black-crystal-overlay ()
-  (let (( width (smt/window-width))
+  (let (( width (smt/window-pixel-width))
         ( height (frame-char-height)))
     `((\defs
        (linearGradient
@@ -103,7 +103,7 @@
       ))))
 
 (defun smt/bg-nasa ()
-  (let (( width (smt/window-width))
+  (let (( width (smt/window-pixel-width))
         ( height (frame-char-height)))
     `((\defs
        (filter
@@ -132,7 +132,7 @@
       )))
 
 (defun smt/nasa-overlay ()
-  (let (( width (smt/window-width))
+  (let (( width (smt/window-pixel-width))
         ( height (frame-char-height)))
     `((\defs
        (linearGradient
