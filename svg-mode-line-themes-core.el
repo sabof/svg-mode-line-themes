@@ -189,23 +189,14 @@
   (let* (( click-char-location (cadr (mouse-position)))
          ( window-width (smt/window-width))
          ( widgets (smt/r-widgets row))
-         ( align (smt/r-align row))
-         ( offset (smt/maybe-funcall (smt/r-margin row) row))
+         ( offset (smt/r-left row))
          current-widget-width)
     (dolist (widget widgets)
       (setq widget (smt/t-normalize-widget theme widget))
       (setq current-widget-width (smt/w-width widget))
-      (when (if (eq align 'right)
-                (and
+      (when (and (<= offset click-char-location)
                  (< click-char-location
-                    (- window-width offset))
-                 (<= (- window-width
-                        offset
-                        current-widget-width)
-                     click-char-location))
-                (and (<= offset click-char-location)
-                     (< click-char-location
-                        (+ offset current-widget-width))))
+                    (+ offset current-widget-width)))
         (when (smt/w-on-click widget)
           (funcall (smt/w-on-click widget) event))
         (return-from smt/r-receive-click t))
