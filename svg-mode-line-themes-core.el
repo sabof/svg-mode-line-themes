@@ -31,13 +31,42 @@
   base-style
   (export-func 'smt/r-export-default))
 
-(defstruct (smt/widget
-             (:conc-name smt/w-))
-  (style 'smt/default-base-style)
-  on-click
-  (text "")
-  (width-func 'smt/w-width-default)
-  (export-func 'smt/w-export-default))
+(defmacro smt/defwidget (name &rest pairs)
+  `(let* ( (default-pairs
+               '(:style smt/default-base-style
+                 :on-click nil
+                 :text ""
+                 :width-func smt/w-width-default
+                 :export-func smt/w-export-default))
+           ( widget
+             (append
+              (list ,pairs)
+              default-pairs)
+             ;; (make-smt/widget ,@pairs)
+             ))
+     (setq smt/widgets (cl-delete ',name smt/widgets :key 'car)
+           smt/widgets (acons ',name widget smt/widgets)
+           smt/current-widget ',name)))
+(put 'smt/defwidget 'common-lisp-indent-function
+     '(1 &body))
+
+(defun smt/w-width (widget)
+  (smt/maybe-funcall (getf widget :width)))
+
+(defun smt/w-style (widget)
+  (smt/maybe-funcall
+   (or (getf widget :style)
+       (getf (getf widget :parent)
+             :style))))
+
+(defun smt/w-text (widget)
+  (smt/maybe-funcall (getf widget :text)))
+
+(defun smt/w-width (widget)
+  (funcall (getf widget :width-func) widget))
+
+(defun smt/w-export (widget row theme)
+  (funcall (getf widget :export-func) widget row theme))
 
 ;;; Structs EOF
 ;;; Methods
@@ -47,9 +76,6 @@
 
 (defun smt/r-export (row theme)
   (funcall (smt/r-export-func row) row theme))
-
-(defun smt/w-export (widget row theme)
-  (funcall (smt/w-export-func widget) widget row theme))
 
 (defun smt/ranges-overlap (r1 r2)
   (multiple-value-bind (r1 r2) (cl-sort (list r1 r2) '< :key 'car)
@@ -175,14 +201,11 @@
   `(tspan
     ,@(smt/+ (smt/maybe-funcall (smt/t-base-style theme))
              (smt/maybe-funcall (smt/r-base-style row))
-             (smt/maybe-funcall (smt/w-style widget)))
-    ,(smt/maybe-funcall (smt/w-text widget))))
+             (smt/w-style widget))
+    ,(smt/w-text widget)))
 
 (defun smt/w-width-default (widget)
-  (length (smt/maybe-funcall (smt/w-text widget))))
-
-(defun smt/w-width (widget)
-  (funcall (smt/w-width-func widget) widget))
+  (length (smt/w-text widget)))
 
 (defun* smt/r-receive-click (row theme event)
   (setq row (smt/t-normalize-row theme row))
@@ -346,14 +369,6 @@
            smt/themes (acons ',name theme smt/themes)
            smt/current-theme ',name)))
 (put 'smt/deftheme 'common-lisp-indent-function
-     '(1 &body))
-
-(defmacro smt/defwidget (name &rest pairs)
-  `(let (( widget (make-smt/widget ,@pairs)))
-     (setq smt/widgets (cl-delete ',name smt/widgets :key 'car)
-           smt/widgets (acons ',name widget smt/widgets)
-           smt/current-widget ',name)))
-(put 'smt/defwidget 'common-lisp-indent-function
      '(1 &body))
 
 (defmacro smt/defrow (name &rest pairs)
