@@ -21,7 +21,7 @@
                  `(:filter
                    "url(#inset)"
                    :fill "#404448")))
-  :rows (list 'test-center 'default-left 'default-right)
+  :rows (list 'default-left 'default-position 'default-right)
   :overlay 'smt/bg-grey1-top
   ;; :local-widgets `((wig1 . ,(make-smt/widget :text "wig1")))
   )

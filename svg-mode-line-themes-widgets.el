@@ -36,11 +36,15 @@
            (when (bound-and-true-p save-auto-hook) "A")
            (when (bound-and-true-p wmi) "M"))))
     (if (plusp (length text))
-        (concat text " ")
+        (concat " " text)
         "")))
 
 (smt/defwidget minor-modes
-  :text 'smt/minor-mode-indicators
+  :text 'smt/minor-mode-indicators)
+
+(smt/defwidget major-mode
+  :text (lambda ()
+          (format-mode-line "%m"))
   :on-click (lambda (e)
               (message
                "%s" (format-mode-line
@@ -75,14 +79,17 @@
               (interactive "e")
               (message "Column: %s" (current-column))))
 
+(smt/defwidget buffer-info
+  :text 'smt/default-buffer-indicators-text)
+
 (smt/defrow default-left
-  :widgets '(minor-modes buffer-name)
+  :widgets '(buffer-info buffer-name)
   :margin 2)
 
 (smt/defrow default-right
-  :widgets '(version-control)
+  :widgets '(major-mode minor-modes version-control)
   :align 'right
-  :margin 2)
+  :margin 14)
 
 (smt/defrow default-position
   :widgets '(position-info)
