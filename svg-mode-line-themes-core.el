@@ -2,12 +2,8 @@
 (or (require 'xmlgen nil t)
     (require 'xmlgen "xml-gen"))
 
-;; (defvar smt/widgets nil)
-;; (defvar smt/rows nil)
-(defvar smt/themes nil)
 (defvar smt/current-theme nil)
 
-;;; Structs
 (defmacro smt/deftree (name &rest props)
   (let (( maker-name
           (intern (concat "smt/make-"
@@ -28,7 +24,7 @@
                   ,',namespace-name (acons ',name object ,',namespace-name))))
        (put (quote ,definer-name) 'common-lisp-indent-function
             '(1 &body))
-       (,definer-name archetype ,@props))))
+       (,definer-name archetype ,@(append (list :parent nil) props)))))
 (put 'smt/deftree 'common-lisp-indent-function
      '(1 &body))
 
@@ -47,6 +43,8 @@
                (fboundp thing)))
       (apply thing args)
       thing))
+
+;;; Theme
 
 (smt/deftree theme
   :background nil
@@ -126,7 +124,6 @@
 ;;; Widget
 
 (smt/deftree widget
-  :parent nil
   :style 'smt/default-base-style
   :on-click nil
   :text ""
