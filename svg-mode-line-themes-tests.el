@@ -49,10 +49,12 @@
 (ert-deftest smt/ranges-overlap ()
   (should (smt/ranges-overlap '(0 . 10) '(5 . 6)))
   (should (smt/ranges-overlap '(0 . 10) '(9 . 20)))
-  (should (null (smt/ranges-overlap '(0 . 0) '(0 . 0))))
-  (should (null (smt/ranges-overlap '(0 . 10) '(10 . 10))))
-  (should (null (smt/ranges-overlap '(0 . 0) '(0 . 10))))
-  (should (null (smt/ranges-overlap '(0 . 10) '(0 . 0))))
+  (should (smt/ranges-overlap '(3 . 10) '(3 . 5)))
+  (should (smt/ranges-overlap '(3 . 5) '(3 . 10)))
+  (should-not (smt/ranges-overlap '(0 . 0) '(0 . 0)))
+  (should-not (smt/ranges-overlap '(0 . 10) '(10 . 10)))
+  (should-not (smt/ranges-overlap '(0 . 0) '(0 . 10)))
+  (should-not (smt/ranges-overlap '(0 . 10) '(0 . 0)))
   )
 
 (ert-deftest smt/row ()
@@ -69,7 +71,7 @@
     (should (= (smt/r-left row) 2))
     (should (equal (smt/r-range row) '(2 . 8)))))
 
-(ert-deftest smt/theme ()
+(ert-deftest smt/theme-overlapping ()
   (let (( theme
           (make-smt/theme
            :rows
@@ -85,7 +87,7 @@
                   (list
                    (make-smt/widget
                     :text "123346")))))))
-    (should (= 2 (length (smt/t-non-overlapping-rows theme)))))
+    (should (= 2 (length (smt/t-visible-rows theme)))))
   (let (( theme
           (make-smt/theme
            :rows
@@ -101,7 +103,7 @@
                   (list
                    (make-smt/widget
                     :text "123346")))))))
-    (should (= 1 (length (smt/t-non-overlapping-rows theme)))))
+    (should (= 1 (length (smt/t-visible-rows theme)))))
   (let (( theme
           (make-smt/theme
            :rows
@@ -124,10 +126,10 @@
                     :text "1234567")))))))
     (flet (( smt/window-width () 10))
       (should (= 4 (smt/r-left (second (smt/t-rows theme)))))
-      (should (= 1 (length (smt/t-non-overlapping-rows theme))))
+      (should (= 1 (length (smt/t-visible-rows theme))))
       (should (equal (smt/w-text
                       (car (smt/r-widgets
-                            (car (smt/t-non-overlapping-rows theme)))))
+                            (car (smt/t-visible-rows theme)))))
                      "first"))
       ))
   (let (( theme
@@ -145,7 +147,10 @@
                    (make-smt/widget
                     :text "12345")))))))
     (flet (( smt/window-width () 10))
-      (should (= 2 (length (smt/t-non-overlapping-rows theme)))))))
+      (should (= 2 (length (smt/t-visible-rows theme)))))))
+
+(ert-deftest smt/objects ()
+  )
 
 (provide 'svg-mode-line-themes-tests)
 ;; svg-mode-line-themes-tests.el ends here

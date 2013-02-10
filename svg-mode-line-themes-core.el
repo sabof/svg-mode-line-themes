@@ -90,41 +90,39 @@
   (funcall (smt/r-export-func row) row theme))
 
 (defun smt/ranges-overlap (r1 r2)
-  (multiple-value-bind (r1 r2) (cl-sort (list r1 r2) '< :key 'car)
-    (and (< (car r2) (cdr r1))
-         (not (and (= (car r2)
-                      (car r2))
-                   (= (car r2)
-                      (car r1)))))
-    ;; (cond ((<= (cdr r1) (car r2))
-    ;;        nil)
-    ;;       (t t))
-    ))
+  (cond ( (<= (cdr r1) (car r2))
+          nil)
+        ( (<= (cdr r2) (car r1))
+          nil)
+        ( t t)))
 
 (defun smt/r-range (row)
   (cons (smt/r-left row) (+ (smt/r-left row) (smt/r-width row))))
 
-(defun smt/t-non-overlapping-rows (theme)
+(defun smt/t-visible-rows (theme)
   (let* (( rows (mapcar (apply-partially 'smt/t-normalize-row theme)
                         (smt/t-rows theme))))
     (dotimes (iter (length rows))
       (when (nth iter rows)
-        (let (( current-row (nth iter rows))
-              ( following-rows (last rows (- (length rows) 1 iter))))
+        (let* (( current-row (nth iter rows))
+               ( following-rows (last rows (- (length rows) 1 iter)))
+               ( current-row-range
+                 (smt/r-range current-row)))
           (dotimes (iter2 (length following-rows))
-            (and (nth iter2 following-rows)
-                 (smt/ranges-overlap
-                  (smt/r-range current-row)
-                  (smt/r-range (nth iter2 following-rows)))
-                 (setf (nth iter2 following-rows) nil))))))
+            (let (( following-row-range
+                    (smt/r-range (nth iter2 following-rows))))
+              (when (or (and (nth iter2 following-rows)
+                             (smt/ranges-overlap
+                              current-row-range
+                              following-row-range))
+                        (minusp (car following-row-range)))
+                (setf (nth iter2 following-rows) nil)))))))
     (remove-if 'null rows)))
 
 (defun smt/t-export-default-xml (theme)
   (let* (( width (smt/window-pixel-width))
          ( height (frame-char-height))
-         ( rows (or ;; (mapcar (apply-partially 'smt/t-normalize-row theme)
-                 ;;         (smt/t-rows theme))
-                 (smt/t-non-overlapping-rows theme))))
+         ( rows (smt/t-visible-rows theme)))
     (xmlgen
      `(svg
        :xmlns "http://www.w3.org/2000/svg"
