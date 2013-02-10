@@ -38,13 +38,13 @@
   :width-func 'smt/w-width-default
   :export-func 'smt/w-export-default)
 
-(defun make-smt/widget (&rest pairs)
+(defun smt/make-widget (&rest pairs)
   (unless (memq :parent pairs)
     (setf (getf pairs :parent) 'archetype))
   pairs)
 
 (defmacro smt/defwidget (name &rest pairs)
-  `(let* (( widget (make-smt/widget ,@pairs)))
+  `(let* (( widget (smt/make-widget ,@pairs)))
      (setq smt/widgets (cl-delete ',name smt/widgets :key 'car)
            smt/widgets (acons ',name widget smt/widgets))))
 (put 'smt/defwidget 'common-lisp-indent-function
