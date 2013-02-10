@@ -34,7 +34,7 @@
 (defstruct (smt/widget
              (:conc-name smt/w-))
   (style 'smt/default-base-style)
-  (on-click 'ignore)
+  on-click
   (text "")
   (width-func 'smt/w-width-default)
   (export-func 'smt/w-export-default))
@@ -199,6 +199,13 @@
    (smt/get-current-theme)
    event))
 
+(defun smt/r-left-distance (row)
+  (let (( margin (smt/maybe-funcall (smt/r-margin row) row))
+        ( width (smt/maybe-funcall (smt/r-width row) row)))
+    (if (eq 'left (smt/r-align row))
+        (+ margin width)
+        (- 1 (smt/window-width) (+ margin width)))))
+
 (defmacro smt/define-struct-copy-modifier (accessor-prefix)
   `(defmacro ,(intern (concat accessor-prefix "copy-and-modify"))
        (struct &rest properties)
@@ -332,20 +339,18 @@
      '(1 &body))
 
 (defmacro smt/defrow (name &rest pairs)
-  (progn
-    (when (eq (getf pairs :align) 'center)
-      (setf (getf pairs :align)
-            'left
-            (getf pairs :margin)
-            (lambda (row)
-              (floor
-               (/ (- (smt/window-width)
-                     (smt/r-width row))
-                  2)))))
-    `(let (( row (make-smt/row ,@pairs)))
-       (setq smt/rows (cl-delete ',name smt/rows :key 'car)
-             smt/rows (acons ',name row smt/rows)
-             smt/current-row ',name))))
+  (when (equal (getf pairs :align) (list 'quote 'center))
+    (setf (getf pairs :align) ''left)
+    (setf (getf pairs :margin)
+          (lambda (row)
+            (floor
+             (/ (- (smt/window-width)
+                   (smt/r-width row))
+                2)))))
+  `(let (( row (make-smt/row ,@pairs)))
+     (setq smt/rows (cl-delete ',name smt/rows :key 'car)
+           smt/rows (acons ',name row smt/rows)
+           smt/current-row ',name)))
 (put 'smt/defrow 'common-lisp-indent-function
      '(1 &body))
 

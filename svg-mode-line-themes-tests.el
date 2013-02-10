@@ -1,7 +1,9 @@
 (require 'ert)
 
 (smt/defrow test-center
-  :widgets (list 'buffer-name)
+  :widgets (list 'buffer-name
+                 (make-smt/widget
+                  :text " hello"))
   :align 'center
   :base-style (lambda ()
                 (smt/+
