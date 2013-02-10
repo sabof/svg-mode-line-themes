@@ -93,6 +93,18 @@
     ;;       (dired-current-directory)))
     ))
 
+(defun smt/r-width-default (row)
+  (let (( widgets (smt/r-widgets row))
+        ( total-width 0))
+    (dolist (widget widgets)
+      (setq widget (smt/t-normalize-widget
+                    (smt/get-current-theme) widget))
+      (incf total-width (smt/w-width widget)))
+    total-width))
+
+(defun smt/r-width (row)
+  (funcall (smt/r-width-func row) row))
+
 (defun smt/t-normalize-widget (theme widget-or-name)
   (if (smt/widget-p widget-or-name)
       widget-or-name
@@ -112,13 +124,17 @@
                    ( smt/r-align row)
                    ( left "start")
                    ( right "end")
-                   ( center "middle"))
+                   )
     :x ,(case
          ( smt/r-align row)
-         ( left (* (smt/r-margin row)
+         ( left (* (smt/maybe-funcall
+                    (smt/r-margin row)
+                    row)
                    (frame-char-width)))
          ( right (- (frame-pixel-width)
-                    (* (smt/r-margin row)
+                    (* (smt/maybe-funcall
+                        (smt/r-margin row)
+                        row)
                        (frame-char-width))))
          ( center (/ (frame-pixel-width) 2)))
     :y ,(smt/text-base-line)
@@ -148,7 +164,7 @@
          ( window-width (smt/window-width))
          ( widgets (smt/r-widgets row))
          ( align (smt/r-align row))
-         ( offset (smt/maybe-funcall (smt/r-margin row)))
+         ( offset (smt/maybe-funcall (smt/r-margin row) row))
          current-widget-width)
     (dolist (widget widgets)
       (setq widget (smt/t-normalize-widget theme widget))
@@ -277,11 +293,11 @@
           (apply 'smt/+ plistC (cddr plists))
           ))))
 
-(defun smt/maybe-funcall (thing)
+(defun smt/maybe-funcall (thing &rest args)
   (if (or (functionp thing)
           (and (symbolp thing)
                (fboundp thing)))
-      (funcall thing)
+      (apply thing args)
       thing))
 
 (defun smt/modeline-format ()
@@ -291,10 +307,7 @@
           ( (or (functionp theme)
                 (symbolp theme))
             (funcall theme))
-          ( (stringp theme)
-            theme)
-          ( t (error "Can't process current theme: %s"
-                     theme)))))
+          ( t theme))))
 
 (defun smt/get-current-theme ()
   (cdr (assoc smt/current-theme smt/themes)))
@@ -319,10 +332,20 @@
      '(1 &body))
 
 (defmacro smt/defrow (name &rest pairs)
-  `(let (( row (make-smt/row ,@pairs)))
-     (setq smt/rows (cl-delete ',name smt/rows :key 'car)
-           smt/rows (acons ',name row smt/rows)
-           smt/current-row ',name)))
+  (progn
+    (when (eq (getf pairs :align) 'center)
+      (setf (getf pairs :align)
+            'left
+            (getf pairs :margin)
+            (lambda (row)
+              (floor
+               (/ (- (smt/window-width)
+                     (smt/r-width row))
+                  2)))))
+    `(let (( row (make-smt/row ,@pairs)))
+       (setq smt/rows (cl-delete ',name smt/rows :key 'car)
+             smt/rows (acons ',name row smt/rows)
+             smt/current-row ',name))))
 (put 'smt/defrow 'common-lisp-indent-function
      '(1 &body))
 

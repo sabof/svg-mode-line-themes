@@ -4,6 +4,10 @@
 (require 'svg-mode-line-themes-widgets)
 (defvar smt/line-format 'mode-line-format)
 
+(setq smt/themes
+      (acons 'default (default-value 'mode-line-format)
+             smt/themes))
+
 (smt/deftheme nasa
   :defs (smt/filter-inset 0 1)
   :background 'smt/bg-nasa
