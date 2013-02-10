@@ -20,6 +20,7 @@
   ;; :buffer-name-style 'smt/nasa-title-style
   ;; :minor-mode-style 'smt/nasa-title-style
   ;; :major-mode-style 'smt/nasa-major-mode-style
+  :rows (list 'default-left 'default-position 'default-right)
   :overlay 'smt/nasa-overlay)
 
 (smt/deftheme black-crystal
@@ -32,6 +33,7 @@
   ;; :buffer-name-style 'smt/black-crystal-title-style
   ;; :minor-mode-style 'smt/black-crystal-title-style
   ;; :major-mode-style 'smt/diesel-major-mode-style
+  :rows (list 'default-left 'default-position 'default-right)
   :overlay 'smt/black-crystal-overlay)
 
 (smt/deftheme diesel
@@ -43,6 +45,11 @@
                  `(:filter
                    "url(#inset)"
                    :fill "#b7c3cd")))
+  :local-widgets
+  (list (cons 'major-mode
+              (smt/make-widget
+               :parent 'major-mode
+               :style 'smt/diesel-major-mode-style)))
   ;; :buffer-name-style 'smt/grey-title-style
   ;; :minor-mode-style 'smt/grey-title-style
   ;; :major-mode-style 'smt/diesel-major-mode-style
