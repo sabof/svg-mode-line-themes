@@ -36,13 +36,15 @@
 (require 'svg-mode-line-themes-nasa)
 (require 'svg-mode-line-themes-black-crystal)
 
-(when (default-value 'mode-line-format)
+(when (and (default-value 'mode-line-format)
+           (not (assoc 'default smt/themes)))
   (setq smt/themes
         (acons 'default (default-value 'mode-line-format)
                smt/themes)))
 
 (setq smt/current-theme 'diesel)
 
+;;;###autoload
 (defun* smt/next-theme ()
   (interactive)
   (assert (> (length smt/themes) 1))
@@ -54,25 +56,24 @@
     (when (eq 'archetype smt/current-theme)
       (smt/next-theme)
       (return-from smt/next-theme))
-    ;; (funcall (smt/theme-setup-hook (smt/get-current-theme)))
     (force-mode-line-update)
     (message "Current mode-line theme: %s" next-theme)))
 
+;;;###autoload
 (defun smt/set-theme (theme)
   (interactive
    (list (intern (completing-read
                   "Set mode-line theme to: "
                   (mapcar 'symbol-name (remove 'archetype (mapcar 'car smt/themes))) nil t))))
   (setq smt/current-theme theme)
-  ;; (funcall (smt/theme-setup-hook (smt/get-current-theme)))
   (force-mode-line-update))
 
+;;;###autoload
 (defun smt/enable (&optional use-header-line)
   (set-default (if use-header-line
                    'header-line-format
                    'mode-line-format)
                '(:eval (smt/modeline-format)))
-  ;; (funcall (smt/theme-setup-hook (smt/get-current-theme)))
   (force-mode-line-update))
 
 (provide 'svg-mode-line-themes)

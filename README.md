@@ -4,11 +4,15 @@
 ## Usage
 Add to your .emacs
 
+### Installation
 ```lisp
 (require 'svg-mode-line-themes)
 (smt/enable)
 (smt/set-theme 'black-crystal)
 ```
+### Cycle through available themes
+
+`M-x smt/next-theme`
 
 ## Currently available themes:
 
