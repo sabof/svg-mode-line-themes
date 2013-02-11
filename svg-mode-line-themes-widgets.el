@@ -1,18 +1,12 @@
 (require 'svg-mode-line-themes-core)
 
 (defun smt/default-buffer-name-text ()
-  (let (( project-name
-          (esprj-project-name
-           (esprj-file-project
-            (or (buffer-file-name)
-                (ignore-errors (dired-current-directory)))))))
-    (concat
-     (when project-name (concat project-name " => "))
-     (format-mode-line "%b")
-     (if (and (or (buffer-file-name)
-                  buffer-offer-save)
-              (buffer-modified-p))
-         "*"))))
+  (concat
+   (format-mode-line "%b")
+   (if (and (or (buffer-file-name)
+                buffer-offer-save)
+            (buffer-modified-p))
+       "*")))
 
 (defun smt/default-buffer-indicators-text ()
   (let ((indicators
@@ -21,7 +15,6 @@
             "S")
           (when (window-dedicated-p) "D")
           (when buffer-read-only "R")
-          (when (mfile-remote-p) " REMOTE")
           " ")))
     (if (< 1 (length indicators))
         indicators
@@ -34,7 +27,7 @@
            (when (or (bound-and-true-p evil-local-mode)
                      (bound-and-true-p evil-mode)) "E")
            (when truncate-lines "T")
-           (when dired-omit-mode "O")
+           (when (bound-and-true-p dired-omit-mode) "O")
            (when (bound-and-true-p save-auto-hook) "A")
            (when (bound-and-true-p wmi) "M"))))
     (if (plusp (length text))

@@ -1,13 +1,56 @@
 (require 'svg-mode-line-themes)
 (require 'ert)
 
+(smt/defwidget test-center-label
+  :text "center")
+
 (smt/defrow center-test
   :align 'center
-  :text "center")
+  :widgets '(test-center-label))
 
 (smt/deftheme test
   :parent 'diesel
-  :rows '(default-left center-test default-right))
+  :rows '(default-left
+          center-test
+          default-right
+          ))
+
+(defun smt-test/run-in-emacs-Q ()
+  (interactive)
+  (let* (( src `(progn
+                  (setq debug-on-error t)
+                  (defvar *memacs-folder* "/home/k/.emacs.d")
+                  (defun mmake-path (arg &optional add-slash)
+                    (save-match-data
+                      (when (string-match "^/" arg)
+                        (setq arg (substring arg 1))))
+                    (concat (directory-file-name (concat *memacs-folder* "/" arg))
+                            (if add-slash "/" "")))
+                  (require 'package)
+                  (setq package-user-dir (mmake-path "elpa"))
+                  (package-initialize)
+                  (setq package-archives
+                        '(("ELPA" . "http://tromey.com/elpa/")
+                          ("gnu" . "http://elpa.gnu.org/packages/")
+                          ("melpa" . "http://melpa.milkbox.net/packages/")
+                          ("marmalade" . "http://marmalade-repo.org/packages/")))
+                  (let ((default-directory (mmake-path "site-lisp")))
+                    (normal-top-level-add-subdirs-to-load-path)
+                    (normal-top-level-add-to-load-path
+                     (list (mmake-path "site-lisp") (mmake-path "")
+                           "ess/lisp" "emacspeak/lisp"
+                           "org-mode/lisp" "org-mode/contrib/lisp")))
+                  (let ((default-directory (mmake-path "site-lisp/my-scripts")))
+                    (normal-top-level-add-subdirs-to-load-path))
+                  (require 'svg-mode-line-themes)
+                  (smt/enable)
+                  (setq default-directory (mmake-path "site-lisp/my-scripts"))
+                  ))
+         ( string (shell-quote-argument
+                   (with-output-to-string
+                       (print src)))))
+    (async-shell-command (concat "emacs -Q --exec " string))))
+
 
 (ert-deftest smt/+ ()
   (should (null (smt/+)))

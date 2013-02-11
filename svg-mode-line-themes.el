@@ -3,11 +3,11 @@
 (require 'svg-mode-line-themes-diesel)
 (require 'svg-mode-line-themes-nasa)
 (require 'svg-mode-line-themes-black-crystal)
-(defvar smt/line-format 'mode-line-format)
 
-(setq smt/themes
-      (acons 'default (default-value 'mode-line-format)
-             smt/themes))
+(when (default-value 'mode-line-format)
+  (setq smt/themes
+        (acons 'default (default-value 'mode-line-format)
+               smt/themes)))
 
 (setq smt/current-theme 'diesel)
 
