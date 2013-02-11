@@ -1,3 +1,5 @@
+(require 'cl)
+(require 'svg-mode-line-themes)
 (require 'ert)
 
 ;; (smt/defrow test-center
@@ -14,7 +16,7 @@
 
 ;; (smt/deftheme widget-test
 ;;   :defs (smt/filter-inset 0.5 0.3)
-;;   :background 'smt/bg-grey1
+;;   :background 'smt/diesel-bg
 ;;   :style (lambda ()
 ;;                 (smt/+
 ;;                  (smt/default-base-style)
@@ -22,7 +24,7 @@
 ;;                    "url(#inset)"
 ;;                    :fill "#404448")))
 ;;   :rows (list 'default-left 'default-position 'default-right)
-;;   :overlay 'smt/bg-grey1-top
+;;   :overlay 'smt/diesel-overlay
 ;;   ;; :local-widgets `((wig1 . ,(smt/make-widget :text "wig1")))
 ;;   )
 

@@ -1,3 +1,6 @@
+(require 'cl)
+(require 'svg-mode-line-themes-core)
+
 (defun smt/default-buffer-name-text ()
   (let (( project-name
           (esprj-project-name

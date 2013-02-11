@@ -2,87 +2,15 @@
 (require 'svg-mode-line-themes-core)
 (require 'svg-mode-line-themes-styles)
 (require 'svg-mode-line-themes-widgets)
+(require 'svg-mode-line-themes-diesel)
+(require 'svg-mode-line-themes-nasa)
+(require 'svg-mode-line-themes-black-crystal)
 (defvar smt/line-format 'mode-line-format)
 
 (setq smt/themes
       (acons 'default (default-value 'mode-line-format)
              smt/themes))
 
-(smt/deftheme nasa
-  :defs (smt/filter-inset 0 1)
-  :background 'smt/bg-nasa
-  :style
-  (lambda ()
-    (smt/+
-     (smt/default-base-style)
-     `(:filter
-       "url(#inset)"
-       :fill "#404448")))
-  :local-widgets
-  (list (cons 'major-mode
-              (smt/make-widget
-               :parent 'major-mode
-               :style 'smt/nasa-major-mode-style))
-        (cons 'minor-modes
-              (smt/make-widget
-               :parent 'minor-modes
-               :style 'smt/nasa-title-style))
-        (cons 'buffer-name
-              (smt/make-widget
-               :parent 'buffer-name
-               :style 'smt/nasa-title-style)))
-  :rows (list 'default-left 'default-position 'default-right)
-  :overlay 'smt/nasa-overlay)
-
-(smt/deftheme black-crystal
-  :defs (smt/filter-inset 1 0.3)
-  :background 'smt/bg-black-crystal
-  :style
-  (lambda ()
-    (smt/+
-     (smt/default-base-style)
-     `(:fill "#7E868D")))
-  :local-widgets
-  (list (cons 'major-mode
-              (smt/make-widget
-               :parent 'major-mode
-               :style 'smt/diesel-major-mode-style))
-        (cons 'minor-modes
-              (smt/make-widget
-               :parent 'minor-modes
-               :style 'smt/black-crystal-title-style))
-        (cons 'buffer-name
-              (smt/make-widget
-               :parent 'buffer-name
-               :style 'smt/black-crystal-title-style)))
-  :rows (list 'default-left 'default-position 'default-right)
-  :overlay 'smt/black-crystal-overlay)
-
-(smt/deftheme diesel
-  :defs (smt/filter-inset 0.5 0.3)
-  :background 'smt/bg-grey1
-  :style
-  (lambda ()
-    (smt/+
-     (smt/default-base-style)
-     `(:filter
-       "url(#inset)"
-       :fill "#b7c3cd")))
-  :local-widgets
-  (list (cons 'major-mode
-              (smt/make-widget
-               :parent 'major-mode
-               :style 'smt/diesel-major-mode-style))
-        (cons 'minor-modes
-              (smt/make-widget
-               :parent 'minor-modes
-               :style 'smt/diesel-title-style))
-        (cons 'buffer-name
-              (smt/make-widget
-               :parent 'buffer-name
-               :style 'smt/diesel-title-style)))
-  :rows (list 'default-left 'default-position 'default-right)
-  :overlay 'smt/bg-grey1-top)
 (setq smt/current-theme 'diesel)
 
 (defun* smt/next-theme ()

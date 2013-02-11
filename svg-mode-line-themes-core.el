@@ -361,6 +361,41 @@
                   10.0)))
              "pt")))
 
+(defun* smt/filter-inset (&optional (dark-opacity 0.5) (light-opacity 0.5))
+  `((filter
+     :id "inset"
+     (feOffset :in "sourceGraphic" :dx -1 :dy -1 :result "o_dark")
+     (feOffset :in "sourceGraphic" :dx 2 :dy 2 :result "o_light")
+     ;; http://www.w3.org/TR/SVG/filters.html#feColorMatrixElement
+     ;; http://en.wikipedia.org/wiki/Matrix_multiplication#Illustration
+     (feColorMatrix
+      :type "matrix"
+      :in "o_light" :result "o_light"
+      :values ,(concat
+                "0  0  0  0  1 "
+                "0  0  0  0  1 "
+                "0  0  0  0  1 "
+                (format
+                 "0  0  0  %s  0 "
+                 light-opacity)
+                ))
+     (feColorMatrix
+      :type "matrix"
+      :in "o_dark" :result "o_dark"
+      :values ,(concat
+                "0  0  0  0  -1 "
+                "0  0  0  0  -1 "
+                "0  0  0  0  -1 "
+                (format
+                 "0  0  0  %s  0 "
+                 dark-opacity)
+                ))
+     (feMerge
+      (feMergeNode :in "o_dark")
+      (feMergeNode :in "o_light")
+      (feMergeNode :in "SourceGraphic")
+      ))))
+
 (defun smt/+ (&rest plists)
   (cond
     ( (= 1 (length plists))
