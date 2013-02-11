@@ -1,32 +1,6 @@
 (require 'svg-mode-line-themes)
 (require 'ert)
 
-;; (smt/defrow test-center
-;;   :widgets (list 'buffer-name
-;;                  (smt/make-widget
-;;                   :text " hello"))
-;;   :align 'center
-;;   :style (lambda ()
-;;                 (smt/+
-;;                  (smt/default-base-style)
-;;                  `(:filter
-;;                    "url(#inset)"
-;;                    :fill "#ff0000"))))
-
-;; (smt/deftheme widget-test
-;;   :defs (smt/filter-inset 0.5 0.3)
-;;   :background 'smt/diesel-bg
-;;   :style (lambda ()
-;;                 (smt/+
-;;                  (smt/default-base-style)
-;;                  `(:filter
-;;                    "url(#inset)"
-;;                    :fill "#404448")))
-;;   :rows (list 'default-left 'default-position 'default-right)
-;;   :overlay 'smt/diesel-overlay
-;;   ;; :local-widgets `((wig1 . ,(smt/make-widget :text "wig1")))
-;;   )
-
 (ert-deftest smt/+ ()
   (should (null (smt/+)))
   (should (null (smt/+ '(:a 45) '(:a nil))))
@@ -59,7 +33,7 @@
   )
 
 (ert-deftest smt/row ()
-  (let (( row (make-smt/row
+  (let (( row (smt/make-row
                :margin 2
                :widgets (list
                          (smt/make-widget
@@ -74,15 +48,15 @@
 
 (ert-deftest smt/theme-overlapping ()
   (let (( theme
-          (make-smt/theme
+          (smt/make-theme
            :rows
-           (list (make-smt/row
+           (list (smt/make-row
                   :margin 2
                   :widgets
                   (list
                    (smt/make-widget
                     :text "123346")))
-                 (make-smt/row
+                 (smt/make-row
                   :margin 8
                   :widgets
                   (list
@@ -90,15 +64,15 @@
                     :text "123346")))))))
     (should (= 2 (length (smt/t-visible-rows theme)))))
   (let (( theme
-          (make-smt/theme
+          (smt/make-theme
            :rows
-           (list (make-smt/row
+           (list (smt/make-row
                   :margin 2
                   :widgets
                   (list
                    (smt/make-widget
                     :text "123346")))
-                 (make-smt/row
+                 (smt/make-row
                   :margin 7
                   :widgets
                   (list
@@ -106,20 +80,20 @@
                     :text "123346")))))))
     (should (= 1 (length (smt/t-visible-rows theme)))))
   (let (( theme
-          (make-smt/theme
+          (smt/make-theme
            :rows
-           (list (make-smt/row
+           (list (smt/make-row
                   :widgets
                   (list
                    (smt/make-widget
                     :text "first")))
-                 (make-smt/row
+                 (smt/make-row
                   :align 'right
                   :widgets
                   (list
                    (smt/make-widget
                     :text "123456")))
-                 (make-smt/row
+                 (smt/make-row
                   :align 'right
                   :widgets
                   (list
@@ -134,14 +108,14 @@
                      "first"))
       ))
   (let (( theme
-          (make-smt/theme
+          (smt/make-theme
            :rows
-           (list (make-smt/row
+           (list (smt/make-row
                   :widgets
                   (list
                    (smt/make-widget
                     :text "12345")))
-                 (make-smt/row
+                 (smt/make-row
                   :align 'right
                   :widgets
                   (list

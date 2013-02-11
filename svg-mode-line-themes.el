@@ -30,7 +30,7 @@
   (interactive
    (list (intern (completing-read
                   "Set mode-line theme to: "
-                  (mapcar 'symbol-name (mapcar 'car smt/themes)) nil t))))
+                  (mapcar 'symbol-name (remove 'archetype (mapcar 'car smt/themes))) nil t))))
   (setq smt/current-theme theme)
   ;; (funcall (smt/theme-setup-hook (smt/get-current-theme)))
   (force-mode-line-update))
