@@ -101,6 +101,19 @@
   :style nil
   :export-func 'smt/r-export-default)
 
+(defun smt/make-row (&rest pairs)
+  (unless (memq :parent pairs)
+    (setf (getf pairs :parent) 'archetype))
+  (when (equal (getf pairs :align) (list 'quote 'center))
+    (setf (getf pairs :align) 'left)
+    (setf (getf pairs :margin)
+          (lambda (row)
+            (floor
+             (/ (- (smt/window-width)
+                   (smt/r-width row))
+                2)))))
+  pairs)
+
 (defun smt/r-align (row)
   (smt/maybe-funcall
    (smt/get row :align smt/rows)))
