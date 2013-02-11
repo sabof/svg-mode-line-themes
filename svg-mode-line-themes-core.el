@@ -5,6 +5,7 @@
 (defvar smt/current-theme nil)
 
 (defmacro smt/deftree (name &rest props)
+  (declare (indent 1))
   (let (( maker-name
           (intern (concat "smt/make-"
                           (symbol-name name))))
@@ -21,6 +22,7 @@
            (setf (getf pairs :parent) 'archetype))
          pairs)
        (defmacro ,definer-name (name &rest pairs)
+         (declare (indent 1))
          `(let* (( object (,',maker-name ,@pairs)))
             (setq ,',namespace-name (cl-delete ',name ,',namespace-name :key 'car)
                   ,',namespace-name (acons ',name object ,',namespace-name))))
@@ -242,12 +244,13 @@
      "."
      'display image
      'keymap (let (( map (make-sparse-keymap)))
-               (smt/define-keys map
-                 (kbd "<mouse-1>") 'smt/receive-click
-                 (kbd "<nil> <header-line> <mouse-1>") 'smt/receive-click
-                 (kbd "<nil> <mode-line> <mouse-1>") 'smt/receive-click
-                 (kbd "<header-line> <mouse-1>") 'smt/receive-click
-                 (kbd "<mode-line> <mouse-1>") 'smt/receive-click)
+               (smt/define-keys
+                map
+                (kbd "<mouse-1>") 'smt/receive-click
+                (kbd "<nil> <header-line> <mouse-1>") 'smt/receive-click
+                (kbd "<nil> <mode-line> <mouse-1>") 'smt/receive-click
+                (kbd "<header-line> <mouse-1>") 'smt/receive-click
+                (kbd "<mode-line> <mouse-1>") 'smt/receive-click)
                map))))
 
 (defun smt/r-width-default (row)
