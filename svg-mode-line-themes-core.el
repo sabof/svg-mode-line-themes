@@ -11,7 +11,9 @@
         ( \definer-name
           (intern (concat "smt/def" (symbol-name name))))
         ( namespace-name
-          (intern (concat "smt/" (symbol-name name) "s"))))
+          (intern (concat "smt/" (symbol-name name) "s")))
+        ( predicate-name
+          (intern (concat "smt/" (symbol-name name) "-p"))))
     `(progn
        (defvar ,namespace-name nil)
        (defun ,maker-name (&rest pairs)
@@ -24,7 +26,12 @@
                   ,',namespace-name (acons ',name object ,',namespace-name))))
        (put (quote ,definer-name) 'common-lisp-indent-function
             '(1 &body))
-       (,definer-name archetype ,@(append (list :parent nil) props)))))
+       (,definer-name archetype
+           ,@(append (list :parent nil :type ',name)
+                     props))
+       (defun ,predicate-name (object)
+         (eq ',name (smt/get object :type ,namespace-name)))
+       )))
 (put 'smt/deftree 'common-lisp-indent-function
      '(1 &body))
 
@@ -416,11 +423,11 @@
 
 (defun smt/modeline-format ()
   (let ((theme (smt/get-current-theme)))
-    (cond ( (or (functionp theme)
+    (cond ( (smt/theme-p theme)
+            (smt/t-export theme))
+          ( (or (functionp theme)
                 (symbolp theme))
             (funcall theme))
-          ( (listp theme)
-            (smt/t-export theme))
           ( t theme))))
 
 (defun smt/get-current-theme ()

@@ -1,6 +1,4 @@
-(require 'cl)
 (require 'svg-mode-line-themes-core)
-(require 'svg-mode-line-themes-styles)
 (require 'svg-mode-line-themes-widgets)
 (require 'svg-mode-line-themes-diesel)
 (require 'svg-mode-line-themes-nasa)

@@ -1,4 +1,3 @@
-(require 'cl)
 (require 'svg-mode-line-themes)
 (require 'ert)
 
