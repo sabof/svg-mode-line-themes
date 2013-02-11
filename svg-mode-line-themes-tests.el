@@ -176,10 +176,22 @@
       (should (= 2 (length (smt/t-visible-rows theme)))))))
 
 (ert-deftest smt/objects ()
-  (let ((namespace (list (cons 'archetype (list :type 'type1 :shadow 'shadow))))
-        (obj1 (list :parent 'archetype :prop1 1 :prop2 2 :prop3 3 :shadow nil)))
+  (let (( namespace
+          (list (cons 'archetype
+                      (list :type 'type1
+                            :shadow1 'shadow
+                            :shadow2 'light))))
+        ( obj1
+          (list :parent 'archetype
+                :prop1 1
+                :prop2 2
+                :prop3 3
+                :shadow1 nil
+                :shadow2 'shadow)))
     (should (eq 'type1 (smt/get obj1 :type namespace)))
-    (should (null (smt/get obj1 :shadow namespace)))))
+    (should (null (smt/get obj1 :shadow1 namespace)))
+    (should (eq 'shadow (smt/get obj1 :shadow2 namespace)))
+    ))
 
 (provide 'svg-mode-line-themes-tests)
 ;; svg-mode-line-themes-tests.el ends here
