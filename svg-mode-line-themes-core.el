@@ -104,7 +104,7 @@
 (defun smt/make-row (&rest pairs)
   (unless (memq :parent pairs)
     (setf (getf pairs :parent) 'archetype))
-  (when (equal (getf pairs :align) (list 'quote 'center))
+  (when (eq (getf pairs :align) 'center)
     (setf (getf pairs :align) 'left)
     (setf (getf pairs :margin)
           (lambda (row)

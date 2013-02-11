@@ -1,6 +1,14 @@
 (require 'svg-mode-line-themes)
 (require 'ert)
 
+(smt/defrow center-test
+  :align 'center
+  :text "center")
+
+(smt/deftheme test
+  :parent 'diesel
+  :rows '(default-left center-test default-right))
+
 (ert-deftest smt/+ ()
   (should (null (smt/+)))
   (should (null (smt/+ '(:a 45) '(:a nil))))
