@@ -197,14 +197,14 @@
                ( current-row-range
                  (smt/r-range current-row)))
           (dotimes (iter2 (length following-rows))
-            (let (( following-row-range
-                    (smt/r-range (nth iter2 following-rows))))
-              (when (or (and (nth iter2 following-rows)
-                             (smt/ranges-overlap
-                              current-row-range
-                              following-row-range))
-                        (minusp (car following-row-range)))
-                (setf (nth iter2 following-rows) nil)))))))
+            (when (nth iter2 following-rows)
+              (let (( following-row-range
+                      (smt/r-range (nth iter2 following-rows))))
+                (when (or (smt/ranges-overlap
+                           current-row-range
+                           following-row-range)
+                          (minusp (car following-row-range)))
+                  (setf (nth iter2 following-rows) nil))))))))
     (remove-if 'null rows)))
 
 (defun smt/t-export-default-xml (theme)
