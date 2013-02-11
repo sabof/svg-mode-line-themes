@@ -6,7 +6,8 @@ Add to your .emacs
 
 ```lisp
 (require 'svg-mode-line-themes)
-(smt/enable t)
+(smt/enable)
+(smt/set-theme 'black-crystal)
 ```
 
 ## Currently available themes:
