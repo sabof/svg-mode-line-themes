@@ -91,7 +91,7 @@
   :margin 2)
 
 (smt/defrow default-right
-  :widgets '(major-mode minor-modes version-control)
+  :widgets '(major-mode version-control minor-modes)
   :align 'right
   :margin 14)
 

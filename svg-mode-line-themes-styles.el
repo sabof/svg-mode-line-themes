@@ -1,6 +1,6 @@
 (require 'cl)
 
-(defun smt/grey-title-style ()
+(defun smt/diesel-title-style ()
   `(:fill ,(if (and (eq (frame-selected-window (selected-frame))
                         (selected-window)))
                "#D4A535"
