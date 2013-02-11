@@ -27,7 +27,7 @@
        (put (quote ,definer-name) 'common-lisp-indent-function
             '(1 &body))
        (,definer-name archetype
-           ,@(append (list :parent nil :type ',name)
+           ,@(append (list :parent nil :type (list 'quote name))
                      props))
        (defun ,predicate-name (object)
          (eq ',name (smt/get object :type ,namespace-name)))
@@ -209,6 +209,18 @@
        ,@(smt/t-overlay theme)
        ))))
 
+(defun* smt/define-keys (keymap &rest bindings)
+  "Syntax example:
+\(smt/define-keys fundamental-mode-map
+  (kbd \"h\") 'backward-char
+  (kbd \"l\") 'forward-char\)
+ Returns the keymap in the end."
+  (while bindings
+    (define-key keymap (pop bindings) (pop bindings)))
+  keymap)
+(put 'smt/define-keys 'common-lisp-indent-function
+     '(4 &body))
+
 (defun* smt/t-export-default (theme)
   ;; (return-from smt/t-export-default)
   (let* ((xml (smt/t-export-default-xml theme))
@@ -217,7 +229,7 @@
      "."
      'display image
      'keymap (let (( map (make-sparse-keymap)))
-               (es-define-keys map
+               (smt/define-keys map
                  (kbd "<mouse-1>") 'smt/receive-click
                  (kbd "<nil> <header-line> <mouse-1>") 'smt/receive-click
                  (kbd "<nil> <mode-line> <mouse-1>") 'smt/receive-click
@@ -443,11 +455,15 @@
     (ignore-errors
       (unload-feature 'svg-mode-line-themes t))
     (ignore-errors
-      (unload-feature 'svg-mode-line-themes-styles t))
-    (ignore-errors
       (unload-feature 'svg-mode-line-themes-widgets t))
     (ignore-errors
       (unload-feature 'svg-mode-line-themes-core t))
+    (ignore-errors
+      (unload-feature 'svg-mode-line-themes-nasa t))
+    (ignore-errors
+      (unload-feature 'svg-mode-line-themes-black-crystal t))
+    (ignore-errors
+      (unload-feature 'svg-mode-line-themes-diesel t))
     (require (quote svg-mode-line-themes))
     (when tests-where-loaded
       (ignore-errors
