@@ -20,7 +20,7 @@
         (stop :offset "0%" :style "stop-color:rgb(255,255,255);stop-opacity:0.0")
         (stop :offset "50%" :style "stop-color:rgb(255,255,255);stop-opacity:0.2")
         (stop :offset "100%" :style "stop-color:rgb(255,255,255);stop-opacity:0.0")))
-      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "#ccc" :fill-opacity 0.3)
+      (rect :width "100%" :height "100%" :x 0 :y 0 :fill "#666")
       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad1)")
       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad2)")
       )))
