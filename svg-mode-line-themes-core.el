@@ -313,17 +313,19 @@
                  (< click-char-location
                     (+ offset current-widget-width)))
         (when (smt/w-on-click widget)
-          (funcall (smt/w-on-click widget) event))
-        (return-from smt/r-receive-click t))
+          (funcall (smt/w-on-click widget) event)
+          (return-from smt/r-receive-click t))
+        (error "Widget has no on-click handler"))
       (setq offset (+ offset current-widget-width)))
     nil))
 
 (defun* smt/t-receive-click (theme event)
   (let (( rows (smt/t-rows theme)))
-    (dolist (row rows)
-      (setq row (smt/t-normalize-row theme row))
-      (when (smt/r-receive-click row theme event)
-        (return-from smt/t-receive-click t)))
+    (ignore-errors
+      (dolist (row rows)
+        (setq row (smt/t-normalize-row theme row))
+        (when (smt/r-receive-click row theme event)
+          (return-from smt/t-receive-click t))))
     (message "")))
 
 (defun smt/receive-click (event)
