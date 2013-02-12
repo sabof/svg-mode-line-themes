@@ -25,7 +25,8 @@
          (declare (indent 1))
          `(let* (( object (,',maker-name ,@pairs)))
             (setq ,',namespace-name (cl-delete ',name ,',namespace-name :key 'car)
-                  ,',namespace-name (acons ',name object ,',namespace-name))))
+                  ,',namespace-name (acons ',name object ,',namespace-name))
+            object))
        (put (quote ,definer-name) 'common-lisp-indent-function
             '(1 &body))
        (,definer-name archetype
