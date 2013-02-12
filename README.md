@@ -18,7 +18,7 @@ Add to your .emacs
 ```
 Font size calculation is imperfect, so it might require adjustments for your
 particular font/size combination. Should the font/size be different from the
-default, clicking and element auto-hiding will not work precisely. The
+emacs default, clicking and element auto-hiding will not work precisely. The
 following example shows how to explicitly set font parameters.
 
 ```lisp
