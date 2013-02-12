@@ -95,7 +95,7 @@
 (smt/deftree theme
   :background nil
   :overlay nil
-  :baseline 'smt/text-base-line
+  :baseline 'smt/text-base-line-default
   :defs nil
   :export 'smt/t-export-default
   :style 'smt/style-default
@@ -336,17 +336,6 @@
   (let (( window-edges (window-edges)))
     (- (nth 2 window-edges) (nth 0 window-edges))))
 
-(defun smt/copy-struct (struct)
-  (funcall
-   (intern
-    (concat
-     "copy-"
-     (substring
-      (symbol-name
-       (aref 0 struct))
-      10)))
-   struct))
-
 (defun smt/points-to-pixels (points)
   ;; points = pixels * 72 / 96
   (/ (* 96 points) 72))
@@ -356,7 +345,7 @@
    (smt/points-to-pixels
     (/ (face-attribute 'default :height) 10))))
 
-(defun smt/text-base-line (widget)
+(defun smt/text-base-line-default (widget)
   ;; Should be this one, but empirically it doesn't work as well
   ;; (smt/font-pixel-size)
   (let ((font-size (* 0.7 (smt/font-pixel-size))))
@@ -414,6 +403,7 @@
       ))))
 
 (defun smt/+ (&rest plists)
+  "Combine styles."
   (cond
     ( (= 1 (length plists))
       (car plists))
