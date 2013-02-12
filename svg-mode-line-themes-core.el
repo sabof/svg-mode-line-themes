@@ -162,7 +162,7 @@
 ;;; Structs EOF
 ;;; Methods
 
-(defun smt/ranges-overlap-p (r1 r2)
+(defun smt/ranges-overlapping-p (r1 r2)
   (cond ( (<= (cdr r1) (car r2))
           nil)
         ( (<= (cdr r2) (car r1))
@@ -186,7 +186,7 @@
             (when (nth iter2 following-rows)
               (let (( following-row-range
                       (smt/r-range (nth iter2 following-rows))))
-                (when (or (smt/ranges-overlap-p
+                (when (or (smt/ranges-overlapping-p
                            current-row-range
                            following-row-range)
                           (minusp (car following-row-range)))
