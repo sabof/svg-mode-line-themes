@@ -236,12 +236,12 @@
      'display image
      'keymap (let (( map (make-sparse-keymap)))
                (smt/define-keys
-                map
-                (kbd "<mouse-1>") 'smt/receive-click
-                (kbd "<nil> <header-line> <mouse-1>") 'smt/receive-click
-                (kbd "<nil> <mode-line> <mouse-1>") 'smt/receive-click
-                (kbd "<header-line> <mouse-1>") 'smt/receive-click
-                (kbd "<mode-line> <mouse-1>") 'smt/receive-click)
+                   map
+                 (kbd "<mouse-1>") 'smt/receive-click
+                 (kbd "<nil> <header-line> <mouse-1>") 'smt/receive-click
+                 (kbd "<nil> <mode-line> <mouse-1>") 'smt/receive-click
+                 (kbd "<header-line> <mouse-1>") 'smt/receive-click
+                 (kbd "<mode-line> <mouse-1>") 'smt/receive-click)
                map))))
 
 (defun smt/r-width-default (row)
@@ -301,7 +301,9 @@
 
 (defun* smt/r-receive-click (row theme event)
   (setq row (smt/t-normalize-row theme row))
-  (let* (( click-char-location (cadr (mouse-position)))
+  (let* (( click-char-location
+           (floor (/ (car (third (second event)))
+                     (frame-char-width))))
          ( window-width (smt/window-width))
          ( widgets (smt/r-widgets row))
          ( offset (smt/r-left row))
@@ -320,7 +322,7 @@
     nil))
 
 (defun* smt/t-receive-click (theme event)
-  (let (( rows (smt/t-rows theme)))
+  (let (( rows (smt/t-visible-rows theme)))
     (ignore-errors
       (dolist (row rows)
         (setq row (smt/t-normalize-row theme row))
