@@ -25,10 +25,7 @@
                            "get")))
          ( object-prototype
            (intern (concat getter-prefix
-                           "prototype")))
-         ( get-prototype-name
-           (intern (concat getter-prefix
-                           "get-prototype"))))
+                           "prototype"))))
     `(progn
        (defvar ,namespace-sym nil)
        (defun ,maker-sym (&rest pairs)
@@ -64,9 +61,6 @@
             result))
        (defun ,get-sym (object property)
          (smt/get object property ,namespace-sym))
-       (defun ,get-prototype-name (object property)
-         (let ((prototype (,get-sym object :prototype)))
-           (,get-sym prototype property)))
        (defun ,object-prototype (object)
          (,get-sym object :prototype))
        (defun ,predicate-sym (object)
