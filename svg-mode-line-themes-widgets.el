@@ -42,20 +42,18 @@
 (smt/defwidget major-mode
   :text (lambda (widget)
           (format-mode-line "%m"))
-  :on-click (lambda (e)
-              (message
-               "%s" (format-mode-line
-                     mode-line-modes))))
+  :on-click (lambda (widget event)
+              (message "%s" (format-mode-line
+                             mode-line-modes))))
 
 (smt/defwidget version-control
   :text (lambda (widget)
           (format-mode-line 'vc-mode))
-  :on-click (lambda (e)
+  :on-click (lambda (widget event)
               (popup-menu vc-menu-map)))
 
 (smt/defwidget buffer-name
-  :on-click (lambda (e)
-              (interactive "e")
+  :on-click (lambda (widget event)
               (message (or (buffer-file-name)
                            (ignore-errors
                              (dired-current-directory)))))
@@ -72,8 +70,7 @@
 (smt/defwidget position-info
   :text (lambda (widget)
           (format-mode-line "%l:%p"))
-  :on-click (lambda (e)
-              (interactive "e")
+  :on-click (lambda (widget event)
               (message "Column: %s" (current-column))))
 
 (smt/defwidget buffer-info

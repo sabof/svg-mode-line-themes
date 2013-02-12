@@ -313,7 +313,7 @@
                  (< click-char-location
                     (+ offset current-widget-width)))
         (when (smt/w-on-click widget)
-          (funcall (smt/w-on-click widget) event)
+          (funcall (smt/w-on-click widget) widget event)
           (return-from smt/r-receive-click t))
         (error "Widget has no on-click handler"))
       (setq offset (+ offset current-widget-width)))
