@@ -48,7 +48,7 @@ refference to an object, or a name of an object from the namespace. Ultimately
 each object of a certain type inherits from an "archetype" object contained
 within the corresponding namespace.
 
-By using a macro such as `deftheme`, one creates an object and adds it to the
+By using a macro such as `smt/deftheme`, one creates an object and adds it to the
 type's namespace. Should an object with the same name already exist, it will be
 replaced - which is an easy way to change the behaviour of existing themes.
 
