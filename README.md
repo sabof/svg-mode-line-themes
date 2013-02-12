@@ -89,16 +89,17 @@ globally defined widgets. This is an example of `diesel`, with blue titles.
 (smt/deftheme diesel-blue
   :prototype 'diesel
   :local-widgets
-  (list (cons 'major-mode
-              (smt/make-widget
-               :prototype 'major-mode
-               :style 'smt/diesel-major-mode-style))
-        (cons 'buffer-name
-              (smt/make-widget
-               :prototype 'buffer-name
-               :style 'smt/diesel-blue-title-style))
-        (cons 'minor-modes
-              (smt/make-widget
-               :prototype 'minor-modes
-               :style 'smt/diesel-blue-title-style))))
+  (lambda (widget)
+    (let (( parent-local-widgets
+            (smt/t-local-widgets
+             (smt/t-prototype widget))))
+      (append (list (cons 'buffer-name
+                          (smt/make-widget
+                           :prototype 'buffer-name
+                           :style 'smt/diesel-blue-title-style))
+                    (cons 'minor-modes
+                          (smt/make-widget
+                           :prototype 'minor-modes
+                           :style 'smt/diesel-blue-title-style)))
+              parent-local-widgets))))
 ```
