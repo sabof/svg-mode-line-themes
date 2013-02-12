@@ -33,7 +33,7 @@ following example shows how to explicitly set font parameters.
 
 You can cycle through available themes, using `M-x smt/next-theme`
 
-### Creating/modifying themes
+## Creating and modifying themes
 
 You might want to see how the included themes are implemented, but here is a
 short introduction.
