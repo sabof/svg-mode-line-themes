@@ -1,14 +1,12 @@
 # svg-mode-line-themes
 ![screenshot](https://github.com/sabof/svg-mode-line-themes/raw/master/screenshot.png)
 
-## Usage
-
-Add to your .emacs
-
-### Installation
+## Installation
 
 You need to obtain [xmlgen](https://github.com/philjackson/xmlgen). When
 installing through package.el, this should be done automatically.
+
+Add to your .emacs
 
 ```lisp
 (require 'svg-mode-line-themes)
@@ -19,18 +17,19 @@ installing through package.el, this should be done automatically.
    :box nil)
 ```
 
-### Usage
-## Cycle through available themes
+## Usage
+
+### Cycle through available themes
 
 `M-x smt/next-theme`
 
-## Currently available themes:
+### Currently available themes:
 
 * nasa
 * black-crystal
 * diesel
 
-### Customization
+## Customization
 
 Font size calculation is imperfect, so it might require adjustments for your
 paritcular font/size combination. Should the font/size be different from the
