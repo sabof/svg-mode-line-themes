@@ -1,7 +1,7 @@
 (require 'svg-mode-line-themes-core)
 
 (defun smt/black-crystal-title-style (widget)
-  (list ;; :font-weight "bold"
+  (list
    :fill (if (smt/window-active-p)
              "#EE0000"
              "#4C5055")))

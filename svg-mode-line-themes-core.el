@@ -151,9 +151,6 @@
   :width 'smt/w-width-default
   :export 'smt/w-export-default)
 
-;; (defun smt/w-style (widget)
-;;   (smt/maybe-funcall (smt/w-get widget :style) widget))
-
 (defun smt/w-export (widget row theme)
   (smt/maybe-funcall
    (smt/w-get widget :export)
