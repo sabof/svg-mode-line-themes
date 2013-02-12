@@ -46,14 +46,13 @@
      '(1 &body))
 
 (defun smt/get (object property &optional namespace)
-  ;; Probably shouldn't resolve symbols initially
-  (when (and object (symbolp object))
-    (setq object (cdr (assoc object namespace))))
   (cond ( (memq property object)
           (getf object property))
         ( (getf object :parent)
-          (smt/get (getf object :parent)
-                   property namespace))))
+          (let* (( parent (getf object :parent)))
+            (when (symbolp parent)
+              (setq parent (cdr (assoc parent namespace))))
+            (smt/get parent property namespace)))))
 
 (defun smt/maybe-funcall (thing &rest args)
   (if (or (functionp thing)
