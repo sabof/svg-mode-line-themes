@@ -103,13 +103,13 @@
   :overlay nil
   :baseline 'smt/text-base-line
   :defs nil
-  :export-func 'smt/t-export-default
+  :export 'smt/t-export-default
   :style 'smt/default-style
   :local-widgets nil
   :rows nil)
 
 (defun smt/t-export (theme)
-  (smt/maybe-funcall (smt/t-get theme :export-func) theme))
+  (smt/maybe-funcall (smt/t-get theme :export) theme))
 
 (defun smt/t-baseline (theme)
   (smt/maybe-funcall (smt/t-get theme :baseline)))
@@ -122,7 +122,7 @@
   :margin 0
   :widgets nil
   :style nil
-  :export-func 'smt/r-export-default)
+  :export 'smt/r-export-default)
 
 (defun smt/make-row (&rest pairs)
   (unless (memq :prototype pairs)
@@ -139,7 +139,7 @@
 
 (defun smt/r-export (row theme)
   (smt/maybe-funcall
-   (smt/r-get row :export-func)
+   (smt/r-get row :export)
    row theme))
 
 ;;; Widget
@@ -149,14 +149,14 @@
   :on-click nil
   :text ""
   :width 'smt/w-width-default
-  :export-func 'smt/w-export-default)
+  :export 'smt/w-export-default)
 
 ;; (defun smt/w-style (widget)
 ;;   (smt/maybe-funcall (smt/w-get widget :style) widget))
 
 (defun smt/w-export (widget row theme)
   (smt/maybe-funcall
-   (smt/w-get widget :export-func)
+   (smt/w-get widget :export)
    widget row theme))
 
 (defun smt/w-on-click (widget)
