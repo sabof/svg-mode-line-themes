@@ -315,6 +315,7 @@
 
 (defun smt/receive-click (event)
   (interactive "e")
+  (mouse-set-point event)
   (smt/t-receive-click
    (smt/get-current-theme)
    event))
