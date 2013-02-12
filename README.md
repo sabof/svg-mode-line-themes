@@ -58,7 +58,7 @@ value - the object itself, but there are exceptions. The corresponding getter
 value directly, or will return the result of evaluation of a function.
 
 Each theme has a `:rows` property, which is a list of rows. The order is
-important - should rows happened to overlap, rows appearing later on the list
+important - should rows happen to overlap, rows appearing later on the list
 will be hidden.
 
 Here is an example of creating a theme derived from `black-crystal`, but without
