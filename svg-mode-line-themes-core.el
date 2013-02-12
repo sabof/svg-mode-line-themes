@@ -102,12 +102,6 @@
   :local-widgets nil
   :rows nil)
 
-(defun smt/t-export (theme)
-  (smt/maybe-funcall (smt/t-get theme :export) theme))
-
-(defun smt/t-baseline (theme)
-  (smt/maybe-funcall (smt/t-get theme :baseline)))
-
 ;;; Row
 
 (smt/deftree row
@@ -362,7 +356,7 @@
    (smt/points-to-pixels
     (/ (face-attribute 'default :height) 10))))
 
-(defun smt/text-base-line ()
+(defun smt/text-base-line (widget)
   ;; Should be this one, but empirically it doesn't work as well
   ;; (smt/font-pixel-size)
   (let ((font-size (* 0.7 (smt/font-pixel-size))))
