@@ -98,7 +98,7 @@
   :baseline 'smt/text-base-line
   :defs nil
   :export 'smt/t-export-default
-  :style 'smt/default-style
+  :style 'smt/style-default
   :local-widgets nil
   :rows nil)
 
@@ -133,7 +133,7 @@
 ;;; Widget
 
 (smt/deftree widget
-  :style 'smt/default-style
+  :style 'smt/style-default
   :on-click nil
   :text ""
   :width 'smt/w-width-default
@@ -366,7 +366,7 @@
               font-size)
            2)))))
 
-(defun smt/default-style (theme)
+(defun smt/style-default (theme)
   `(:font-family
     ,(face-attribute 'default :family)
     :font-size
