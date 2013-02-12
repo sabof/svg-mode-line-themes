@@ -14,7 +14,11 @@
         ( namespace-name
           (intern (concat "smt/" (symbol-name name) "s")))
         ( predicate-name
-          (intern (concat "smt/" (symbol-name name) "-p"))))
+          (intern (concat "smt/" (symbol-name name) "-p")))
+        ( get-name (intern (concat "smt/"
+                                   (substring (symbol-name name)
+                                              0 1)
+                                   "-get"))))
     `(progn
        (defvar ,namespace-name nil)
        (defun ,maker-name (&rest pairs)
@@ -32,6 +36,8 @@
        (,definer-name archetype
            ,@(append (list :parent nil :type (list 'quote name))
                      props))
+       (defun ,get-name (object property)
+         (smt/get object property ,namespace-name))
        (defun ,predicate-name (object)
          (and (consp object)
               (eq ',name (smt/get object :type ,namespace-name))))
@@ -40,6 +46,7 @@
      '(1 &body))
 
 (defun smt/get (object property &optional namespace)
+  ;; Probably shouldn't resolve symbols initially
   (when (and object (symbolp object))
     (setq object (cdr (assoc object namespace))))
   (cond ( (memq property object)
@@ -67,33 +74,25 @@
   :rows nil)
 
 (defun smt/t-background (theme)
-  (smt/maybe-funcall
-   (smt/get theme :background smt/themes)))
+  (smt/maybe-funcall (smt/t-get theme :background)))
 
 (defun smt/t-overlay (theme)
-  (smt/maybe-funcall
-   (smt/get theme :overlay smt/themes)))
+  (smt/maybe-funcall (smt/t-get theme :overlay)))
 
 (defun smt/t-defs (theme)
-  (smt/maybe-funcall
-   (smt/get theme :defs smt/themes)))
+  (smt/maybe-funcall (smt/t-get theme :defs)))
 
 (defun smt/t-export (theme)
-  (smt/maybe-funcall
-   (smt/get theme :export-func smt/themes)
-   theme))
+  (smt/maybe-funcall (smt/t-get theme :export-func) theme))
 
 (defun smt/t-style (theme)
-  (smt/maybe-funcall
-   (smt/get theme :style smt/themes)))
+  (smt/maybe-funcall (smt/t-get theme :style)))
 
 (defun smt/t-local-widgets (theme)
-  (smt/maybe-funcall
-   (smt/get theme :local-widgets smt/themes)))
+  (smt/maybe-funcall (smt/t-get theme :local-widgets)))
 
 (defun smt/t-rows (theme)
-  (smt/maybe-funcall
-   (smt/get theme :rows smt/themes)))
+  (smt/maybe-funcall (smt/t-get theme :rows)))
 
 ;;; Row
 
@@ -119,30 +118,23 @@
   pairs)
 
 (defun smt/r-align (row)
-  (smt/maybe-funcall
-   (smt/get row :align smt/rows)))
+  (smt/maybe-funcall (smt/r-get row :align)))
 
 (defun smt/r-width (row)
-  (smt/maybe-funcall
-   (smt/get row :width-func smt/rows)
-   row))
+  (smt/maybe-funcall (smt/r-get row :width-func) row))
 
 (defun smt/r-margin (row)
-  (smt/maybe-funcall
-   (smt/get row :margin smt/rows)
-   row))
+  (smt/maybe-funcall (smt/r-get row :margin) row))
 
 (defun smt/r-widgets (row)
-  (smt/maybe-funcall
-   (smt/get row :widgets smt/rows)))
+  (smt/maybe-funcall (smt/r-get row :widgets)))
 
 (defun smt/r-style (row)
-  (smt/maybe-funcall
-   (smt/get row :style smt/rows)))
+  (smt/maybe-funcall (smt/r-get row :style)))
 
 (defun smt/r-export (row theme)
   (smt/maybe-funcall
-   (smt/get row :export-func smt/rows)
+   (smt/r-get row :export-func)
    row theme))
 
 ;;; Widget
@@ -155,25 +147,23 @@
   :export-func 'smt/w-export-default)
 
 (defun smt/w-style (widget)
-  (smt/maybe-funcall
-   (smt/get widget :style smt/widgets)))
+  (smt/maybe-funcall (smt/w-get widget :style)))
 
 (defun smt/w-text (widget)
-  (smt/maybe-funcall
-   (smt/get widget :text smt/widgets)))
+  (smt/maybe-funcall (smt/w-get widget :text)))
 
 (defun smt/w-width (widget)
   (smt/maybe-funcall
-   (smt/get widget :width-func smt/widgets)
+   (smt/w-get widget :width-func)
    widget))
 
 (defun smt/w-export (widget row theme)
   (smt/maybe-funcall
-   (smt/get widget :export-func smt/widgets)
+   (smt/w-get widget :export-func)
    widget row theme))
 
 (defun smt/w-on-click (widget)
-  (smt/get widget :on-click smt/widgets))
+  (smt/w-get widget :on-click))
 
 ;;; Structs EOF
 ;;; Methods
