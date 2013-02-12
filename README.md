@@ -32,8 +32,8 @@ Add to your .emacs
 ## Customization
 
 Font size calculation is imperfect, so it might require adjustments for your
-paritcular font/size combination. Should the font/size be different from the
-defualt, the clicking and element auto-hiding will not work precisely. The
+particular font/size combination. Should the font/size be different from the
+default, clicking and element auto-hiding will not work precisely. The
 following example shows how to explicitly set font parameters.
 
 ```lisp
