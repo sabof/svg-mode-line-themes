@@ -76,6 +76,10 @@
 (put 'smt/deftree 'common-lisp-indent-function
      '(1 &body))
 
+(defun smt/window-active-p ()
+  (and (eq (frame-selected-window (selected-frame))
+           (selected-window))))
+
 (defun smt/get (object property &optional namespace)
   (when (symbolp object)
     (setq object (cdr (assoc object namespace))))

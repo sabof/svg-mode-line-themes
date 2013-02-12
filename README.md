@@ -62,7 +62,7 @@ important - should rows happen to overlap, rows appearing later on the list
 will be hidden.
 
 Here is an example of creating a theme derived from `black-crystal`, but without
-the line-number information.
+the line-number information:
 
 ```lisp
 (smt/deftheme black-crystal-no-pager
@@ -72,4 +72,33 @@ the line-number information.
          (smt/make-row
           :prototype 'default-right
           :margin 2)))
+```
+
+Themes also have a property called `:local-widgets` - an alist which can shadow
+globally defined widgets. This is an example of `diesel`, with blue titles.
+
+```lisp
+(defun smt/diesel-blue-title-style (widget)
+  ;; smt+ combines styles
+  (smt/+ (smt/t-style (smt/t-prototype widget))
+         (list :fill (if (smt/window-active-p)
+                         "#21D0EE"
+                         "#4C5055")
+               :font-weight "bold")))
+
+(smt/deftheme diesel-blue
+  :prototype 'diesel
+  :local-widgets
+  (list (cons 'major-mode
+              (smt/make-widget
+               :prototype 'major-mode
+               :style 'smt/diesel-major-mode-style))
+        (cons 'buffer-name
+              (smt/make-widget
+               :prototype 'buffer-name
+               :style 'smt/diesel-blue-title-style))
+        (cons 'minor-modes
+              (smt/make-widget
+               :prototype 'minor-modes
+               :style 'smt/diesel-blue-title-style))))
 ```

@@ -2,8 +2,7 @@
 
 (defun smt/black-crystal-title-style (widget)
   (list ;; :font-weight "bold"
-   :fill (if (and (eq (frame-selected-window (selected-frame))
-                      (selected-window)))
+   :fill (if (smt/window-active-p)
              "#EE0000"
              "#4C5055")))
 

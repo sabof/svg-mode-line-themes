@@ -1,8 +1,7 @@
 (require 'svg-mode-line-themes-core)
 
 (defun smt/diesel-title-style (widget)
-  `(:fill ,(if (and (eq (frame-selected-window (selected-frame))
-                        (selected-window)))
+  `(:fill ,(if (smt/window-active-p)
                "#D4A535"
                "#4C5055")
           :font-weight "bold"))
