@@ -264,14 +264,14 @@
     total-width))
 
 (defun smt/t-normalize-widget (theme widget-or-name)
-  (if (listp widget-or-name)
+  (if (smt/widget-p widget-or-name)
       widget-or-name
       (or (cdr (assoc widget-or-name (smt/t-local-widgets theme)))
           (cdr (assoc widget-or-name smt/widgets))
           (error "Can't process widget: %s" widget-or-name))))
 
 (defun smt/t-normalize-row (theme row-or-name)
-  (if (listp row-or-name)
+  (if (smt/row-p row-or-name)
       row-or-name
       (or (cdr (assoc row-or-name smt/rows))
           (error "Can't process row: %s" row-or-name))))
