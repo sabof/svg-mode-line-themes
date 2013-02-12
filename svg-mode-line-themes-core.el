@@ -325,7 +325,7 @@
       (dolist (row rows)
         (setq row (smt/t-normalize-row theme row))
         (when (smt/r-receive-click row theme event)
-          (return-from smt/t-receive-click t))))
+          (return-from smt/t-receive-click))))
     (message "")))
 
 (defun smt/receive-click (event)
