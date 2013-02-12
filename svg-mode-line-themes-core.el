@@ -33,7 +33,8 @@
            ,@(append (list :parent nil :type (list 'quote name))
                      props))
        (defun ,predicate-name (object)
-         (eq ',name (smt/get object :type ,namespace-name)))
+         (and (consp object)
+              (eq ',name (smt/get object :type ,namespace-name))))
        )))
 (put 'smt/deftree 'common-lisp-indent-function
      '(1 &body))
@@ -258,8 +259,10 @@
   (let (( widgets (smt/r-widgets row))
         ( total-width 0))
     (dolist (widget widgets)
-      (setq widget (smt/t-normalize-widget
-                    (smt/get-current-theme) widget))
+      (setq widget
+            (smt/t-normalize-widget
+             (smt/get-current-theme)
+             widget))
       (incf total-width (smt/w-width widget)))
     total-width))
 
