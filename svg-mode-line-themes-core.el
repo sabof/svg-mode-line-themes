@@ -77,8 +77,8 @@
      '(1 &body))
 
 (defun smt/window-active-p ()
-  (and (eq (frame-selected-window (selected-frame))
-           (selected-window))))
+  (eq (frame-selected-window (selected-frame))
+      (selected-window)))
 
 (defun smt/get (object property &optional namespace)
   (when (symbolp object)
