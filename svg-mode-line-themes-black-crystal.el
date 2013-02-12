@@ -1,16 +1,16 @@
 (require 'svg-mode-line-themes-core)
 
-(defun smt/black-crystal-title-style ()
+(defun smt/black-crystal-title-style (widget)
   (list ;; :font-weight "bold"
    :fill (if (and (eq (frame-selected-window (selected-frame))
                       (selected-window)))
              "#EE0000"
              "#4C5055")))
 
-(defun smt/bg-black-crystal ()
+(defun smt/bg-black-crystal (theme)
   `((rect :width "100%" :height "100%" :x 0 :y 0 :fill "#000")))
 
-(defun smt/black-crystal-overlay ()
+(defun smt/black-crystal-overlay (theme)
   (let (( width (smt/window-pixel-width))
         ( height (frame-char-height)))
     `((\defs
@@ -30,22 +30,22 @@
   :defs (smt/filter-inset 1 0.3)
   :background 'smt/bg-black-crystal
   :style
-  (lambda ()
+  (lambda (theme)
     (smt/+
-     (smt/default-base-style)
+     (smt/t-style (smt/t-prototype theme))
      `(:fill "#7E868D")))
   :local-widgets
   (list (cons 'major-mode
               (smt/make-widget
-               :parent 'major-mode
+               :prototype 'major-mode
                :style 'smt/diesel-major-mode-style))
         (cons 'minor-modes
               (smt/make-widget
-               :parent 'minor-modes
+               :prototype 'minor-modes
                :style 'smt/black-crystal-title-style))
         (cons 'buffer-name
               (smt/make-widget
-               :parent 'buffer-name
+               :prototype 'buffer-name
                :style 'smt/black-crystal-title-style)))
   :rows (list 'default-left 'default-position 'default-right)
   :overlay 'smt/black-crystal-overlay)

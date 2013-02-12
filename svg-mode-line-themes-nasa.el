@@ -1,6 +1,6 @@
 (require 'svg-mode-line-themes-core)
 
-(defun smt/nasa-title-style ()
+(defun smt/nasa-title-style (widget)
   (list :font-weight "bold"
         :filter nil
         :fill (if (and (eq (frame-selected-window (selected-frame))
@@ -8,7 +8,7 @@
                   "#2B25E6"
                   "#404347")))
 
-(defun smt/nasa-background ()
+(defun smt/nasa-background (theme)
   (let (( width (smt/window-pixel-width))
         ( height (frame-char-height)))
     `((\defs
@@ -37,7 +37,7 @@
       (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.3)
       )))
 
-(defun smt/nasa-overlay ()
+(defun smt/nasa-overlay (theme)
   (let (( width (smt/window-pixel-width))
         ( height (frame-char-height)))
     `((\defs
@@ -52,32 +52,32 @@
       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad2)" )
       )))
 
-(defun smt/nasa-major-mode-style ()
-  (smt/+ (smt/diesel-major-mode-style)
+(defun smt/nasa-major-mode-style (widget)
+  (smt/+ (smt/diesel-major-mode-style nil)
          (list :fill "#DC1A0C")))
 
 (smt/deftheme nasa
   :defs (smt/filter-inset 0 1)
   :background 'smt/nasa-background
   :style
-  (lambda ()
+  (lambda (theme)
     (smt/+
-     (smt/default-base-style)
+     (smt/t-style (smt/t-prototype theme))
      `(:filter
        "url(#inset)"
        :fill "#404448")))
   :local-widgets
   (list (cons 'major-mode
               (smt/make-widget
-               :parent 'major-mode
+               :prototype 'major-mode
                :style 'smt/nasa-major-mode-style))
         (cons 'minor-modes
               (smt/make-widget
-               :parent 'minor-modes
+               :prototype 'minor-modes
                :style 'smt/nasa-title-style))
         (cons 'buffer-name
               (smt/make-widget
-               :parent 'buffer-name
+               :prototype 'buffer-name
                :style 'smt/nasa-title-style)))
   :rows (list 'default-left 'default-position 'default-right)
   :overlay 'smt/nasa-overlay)

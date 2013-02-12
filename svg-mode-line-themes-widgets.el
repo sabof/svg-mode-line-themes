@@ -1,6 +1,6 @@
 (require 'svg-mode-line-themes-core)
 
-(defun smt/default-buffer-name-text ()
+(defun smt/default-buffer-name-text (widget)
   (concat
    (format-mode-line "%b")
    (if (and (or (buffer-file-name)
@@ -8,7 +8,7 @@
             (buffer-modified-p))
        "*")))
 
-(defun smt/default-buffer-indicators-text ()
+(defun smt/default-buffer-indicators-text (widget)
   (let ((indicators
          (concat
           (unless (or (eq system-type 'windows-nt) (daemonp))
@@ -20,7 +20,7 @@
         indicators
         "")))
 
-(defun smt/minor-mode-indicators ()
+(defun smt/minor-mode-indicators (widget)
   (let (( text
           (concat
            (when (bound-and-true-p es-aai-mode) "I")
@@ -40,7 +40,7 @@
   :text 'smt/minor-mode-indicators)
 
 (smt/defwidget major-mode
-  :text (lambda ()
+  :text (lambda (widget)
           (format-mode-line "%m"))
   :on-click (lambda (e)
               (message
@@ -48,7 +48,7 @@
                      mode-line-modes))))
 
 (smt/defwidget version-control
-  :text (lambda ()
+  :text (lambda (widget)
           (format-mode-line 'vc-mode))
   :on-click (lambda (e)
               (popup-menu vc-menu-map)))
@@ -62,7 +62,7 @@
   :text 'smt/default-buffer-name-text)
 
 (smt/defwidget which-function
-  :text (lambda ()
+  :text (lambda (widget)
           (when (bound-and-true-p which-func-mode)
             (let ((text (format-mode-line which-func-current)))
               (when (and (> (length text) 0)
@@ -70,7 +70,7 @@
                 (concat " :: " text))))))
 
 (smt/defwidget position-info
-  :text (lambda ()
+  :text (lambda (widget)
           (format-mode-line "%l:%p"))
   :on-click (lambda (e)
               (interactive "e")

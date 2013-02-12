@@ -15,7 +15,9 @@ installing through package.el, this should be done automatically.
 (smt/enable)
 (smt/set-theme 'black-crystal)
 ```
-### Cycle through available themes
+
+### Usage
+## Cycle through available themes
 
 `M-x smt/next-theme`
 
@@ -24,3 +26,15 @@ installing through package.el, this should be done automatically.
 * nasa
 * black-crystal
 * diesel
+
+### Customization
+
+Font size calculation is imperfect at the moment, so it might require
+adjustments for your paritcular font/size. The easiest way to do it for all
+themes is by changing the corresponding "archetype" objects. Ex.
+
+```lisp
+(let ((archetype (cdr (assoc 'archetype smt/themes))))
+  (setf (getf archetype :baseline) 13))
+
+```

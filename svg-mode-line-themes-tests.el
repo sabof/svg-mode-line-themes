@@ -9,7 +9,7 @@
   :widgets '(test-center-label))
 
 (smt/deftheme test
-  :parent 'diesel
+  :prototype 'diesel
   :rows '(default-left
           center-test
           default-right
@@ -145,7 +145,7 @@
                             :shadow1 'shadow
                             :shadow2 'light))))
         ( obj1
-          (list :parent 'archetype
+          (list :prototype 'archetype
                 :prop1 1
                 :prop2 2
                 :prop3 3

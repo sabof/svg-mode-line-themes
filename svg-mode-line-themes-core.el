@@ -6,53 +6,84 @@
 
 (defmacro smt/deftree (name &rest props)
   (declare (indent 1))
-  (let (( maker-name
-          (intern (concat "smt/make-"
-                          (symbol-name name))))
-        ( \definer-name
-          (intern (concat "smt/def" (symbol-name name))))
-        ( namespace-name
-          (intern (concat "smt/" (symbol-name name) "s")))
-        ( predicate-name
-          (intern (concat "smt/" (symbol-name name) "-p")))
-        ( get-name (intern (concat "smt/"
-                                   (substring (symbol-name name)
-                                              0 1)
-                                   "-get"))))
+  (let* (( maker-sym
+           (intern (concat "smt/make-"
+                           (symbol-name name))))
+         ( \definer-name
+           (intern (concat "smt/def" (symbol-name name))))
+         ( namespace-sym
+           (intern (concat "smt/" (symbol-name name) "s")))
+         ( predicate-sym
+           (intern (concat "smt/" (symbol-name name) "-p")))
+         ( getter-prefix
+           (concat "smt/"
+                   (substring (symbol-name name)
+                              0 1)
+                   "-"))
+         ( get-sym
+           (intern (concat getter-prefix
+                           "get")))
+         ( object-prototype
+           (intern (concat getter-prefix
+                           "prototype")))
+         ( get-prototype-name
+           (intern (concat getter-prefix
+                           "get-prototype"))))
     `(progn
-       (defvar ,namespace-name nil)
-       (defun ,maker-name (&rest pairs)
-         (unless (memq :parent pairs)
-           (setf (getf pairs :parent) 'archetype))
+       (defvar ,namespace-sym nil)
+       (defun ,maker-sym (&rest pairs)
+         (unless (memq :prototype pairs)
+           (setf (getf pairs :prototype) 'archetype))
          pairs)
        (defmacro ,definer-name (name &rest pairs)
          (declare (indent 1))
-         `(let* (( object (,',maker-name ,@pairs)))
-            (setq ,',namespace-name (cl-delete ',name ,',namespace-name :key 'car)
-                  ,',namespace-name (acons ',name object ,',namespace-name))
+         `(let* (( object (,',maker-sym ,@pairs)))
+            (setq ,',namespace-sym (cl-delete ',name ,',namespace-sym :key 'car)
+                  ,',namespace-sym (acons ',name object ,',namespace-sym))
             object))
        (put (quote ,definer-name) 'common-lisp-indent-function
             '(1 &body))
        (,definer-name archetype
-           ,@(append (list :parent nil :type (list 'quote name))
+           ,@(append (list :prototype nil :type (list 'quote name))
                      props))
-       (defun ,get-name (object property)
-         (smt/get object property ,namespace-name))
-       (defun ,predicate-name (object)
+       ,@(progn
+          (let (result)
+            (dotimes (iter (length props))
+              (when (evenp iter)
+                (push `(defun ,(intern
+                                (concat getter-prefix
+                                        (substring
+                                         (symbol-name
+                                          (nth iter props))
+                                         1)))
+                           (,name)
+                         (smt/maybe-funcall
+                          ,(list get-sym name (nth iter props))
+                          ,name))
+                      result)))
+            result))
+       (defun ,get-sym (object property)
+         (smt/get object property ,namespace-sym))
+       (defun ,get-prototype-name (object property)
+         (let ((prototype (,get-sym object :prototype)))
+           (,get-sym prototype property)))
+       (defun ,object-prototype (object)
+         (,get-sym object :prototype))
+       (defun ,predicate-sym (object)
          (and (consp object)
-              (eq ',name (smt/get object :type ,namespace-name))))
+              (eq ',name (smt/get object :type ,namespace-sym))))
        )))
 (put 'smt/deftree 'common-lisp-indent-function
      '(1 &body))
 
 (defun smt/get (object property &optional namespace)
+  (when (symbolp object)
+    (setq object (cdr (assoc object namespace))))
   (cond ( (memq property object)
           (getf object property))
-        ( (getf object :parent)
-          (let* (( parent (getf object :parent)))
-            (when (symbolp parent)
-              (setq parent (cdr (assoc parent namespace))))
-            (smt/get parent property namespace)))))
+        ( (getf object :prototype)
+          (let* (( prototype (getf object :prototype)))
+            (smt/get prototype property namespace)))))
 
 (defun smt/maybe-funcall (thing &rest args)
   (if (or (functionp thing)
@@ -66,46 +97,32 @@
 (smt/deftree theme
   :background nil
   :overlay nil
+  :baseline 'smt/text-base-line
   :defs nil
   :export-func 'smt/t-export-default
-  :style 'smt/default-base-style
+  :style 'smt/default-style
   :local-widgets nil
   :rows nil)
-
-(defun smt/t-background (theme)
-  (smt/maybe-funcall (smt/t-get theme :background)))
-
-(defun smt/t-overlay (theme)
-  (smt/maybe-funcall (smt/t-get theme :overlay)))
-
-(defun smt/t-defs (theme)
-  (smt/maybe-funcall (smt/t-get theme :defs)))
 
 (defun smt/t-export (theme)
   (smt/maybe-funcall (smt/t-get theme :export-func) theme))
 
-(defun smt/t-style (theme)
-  (smt/maybe-funcall (smt/t-get theme :style)))
-
-(defun smt/t-local-widgets (theme)
-  (smt/maybe-funcall (smt/t-get theme :local-widgets)))
-
-(defun smt/t-rows (theme)
-  (smt/maybe-funcall (smt/t-get theme :rows)))
+(defun smt/t-baseline (theme)
+  (smt/maybe-funcall (smt/t-get theme :baseline)))
 
 ;;; Row
 
 (smt/deftree row
   :align 'left
-  :width-func 'smt/r-width-default
+  :width 'smt/r-width-default
   :margin 0
   :widgets nil
   :style nil
   :export-func 'smt/r-export-default)
 
 (defun smt/make-row (&rest pairs)
-  (unless (memq :parent pairs)
-    (setf (getf pairs :parent) 'archetype))
+  (unless (memq :prototype pairs)
+    (setf (getf pairs :prototype) 'archetype))
   (when (eq (getf pairs :align) 'center)
     (setf (getf pairs :align) 'left)
     (setf (getf pairs :margin)
@@ -116,21 +133,6 @@
                 2)))))
   pairs)
 
-(defun smt/r-align (row)
-  (smt/maybe-funcall (smt/r-get row :align)))
-
-(defun smt/r-width (row)
-  (smt/maybe-funcall (smt/r-get row :width-func) row))
-
-(defun smt/r-margin (row)
-  (smt/maybe-funcall (smt/r-get row :margin) row))
-
-(defun smt/r-widgets (row)
-  (smt/maybe-funcall (smt/r-get row :widgets)))
-
-(defun smt/r-style (row)
-  (smt/maybe-funcall (smt/r-get row :style)))
-
 (defun smt/r-export (row theme)
   (smt/maybe-funcall
    (smt/r-get row :export-func)
@@ -139,22 +141,14 @@
 ;;; Widget
 
 (smt/deftree widget
-  :style 'smt/default-base-style
+  :style 'smt/default-style
   :on-click nil
   :text ""
-  :width-func 'smt/w-width-default
+  :width 'smt/w-width-default
   :export-func 'smt/w-export-default)
 
-(defun smt/w-style (widget)
-  (smt/maybe-funcall (smt/w-get widget :style)))
-
-(defun smt/w-text (widget)
-  (smt/maybe-funcall (smt/w-get widget :text)))
-
-(defun smt/w-width (widget)
-  (smt/maybe-funcall
-   (smt/w-get widget :width-func)
-   widget))
+;; (defun smt/w-style (widget)
+;;   (smt/maybe-funcall (smt/w-get widget :style) widget))
 
 (defun smt/w-export (widget row theme)
   (smt/maybe-funcall
@@ -281,7 +275,7 @@
            ( right (- (smt/window-pixel-width)
                       (* (smt/r-margin row)
                          (frame-char-width))))))
-    :y ,(smt/text-base-line)
+    :y ,(smt/t-baseline theme)
     ,@(mapcar (lambda (widget-or-name)
                 (smt/w-export
                  (smt/t-normalize-widget
@@ -383,15 +377,17 @@
               font-size)
            2)))))
 
-(defun smt/default-base-style ()
+(defun smt/default-style (theme)
   `(:font-family
     ,(face-attribute 'default :family)
     :font-size
+    ;; ,(- (frame-char-height) 4)
     ,(concat (int-to-string
-              (round
+              (ceiling
                (/ (face-attribute 'default :height)
                   10.0)))
-             "pt")))
+             "pt")
+    ))
 
 (defun* smt/filter-inset (&optional (dark-opacity 0.5) (light-opacity 0.5))
   `((filter

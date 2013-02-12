@@ -1,13 +1,13 @@
 (require 'svg-mode-line-themes-core)
 
-(defun smt/diesel-title-style ()
+(defun smt/diesel-title-style (widget)
   `(:fill ,(if (and (eq (frame-selected-window (selected-frame))
                         (selected-window)))
                "#D4A535"
                "#4C5055")
           :font-weight "bold"))
 
-(defun smt/diesel-bg ()
+(defun smt/diesel-bg (theme)
   (let (( width (smt/window-pixel-width))
         ( height (frame-char-height)))
     `((\defs
@@ -25,7 +25,7 @@
       (rect :width "100%" :height "100%" :x 0 :y 0 :fill "url(#grad2)")
       )))
 
-(defun smt/diesel-overlay ()
+(defun smt/diesel-overlay (theme)
   (let (( width (smt/window-pixel-width))
         ( height (frame-char-height)))
     `((rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
@@ -33,7 +33,7 @@
       (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.6)
       )))
 
-(defun smt/diesel-major-mode-style ()
+(defun smt/diesel-major-mode-style (widget)
   `(:fill
     "#ccc"
     :font-family "Georgia, Serif"
@@ -46,24 +46,24 @@
   :defs (smt/filter-inset 0.5 0.3)
   :background 'smt/diesel-bg
   :style
-  (lambda ()
+  (lambda (theme)
     (smt/+
-     (smt/default-base-style)
+     (smt/t-style (smt/t-prototype theme))
      `(:filter
        "url(#inset)"
        :fill "#b7c3cd")))
   :local-widgets
   (list (cons 'major-mode
               (smt/make-widget
-               :parent 'major-mode
+               :prototype 'major-mode
                :style 'smt/diesel-major-mode-style))
         (cons 'minor-modes
               (smt/make-widget
-               :parent 'minor-modes
+               :prototype 'minor-modes
                :style 'smt/diesel-title-style))
         (cons 'buffer-name
               (smt/make-widget
-               :parent 'buffer-name
+               :prototype 'buffer-name
                :style 'smt/diesel-title-style)))
   :rows (list 'default-left 'default-position 'default-right)
   :overlay 'smt/diesel-overlay)
