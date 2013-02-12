@@ -42,7 +42,7 @@ Three types of objects are used: widgets, rows and themes. Widgets correspond to
 bits of text which might have an individual style and on-click behaviour.
 
 Objects are implemented as plists and prototype inheritance is used. Each object
-has a `:prototype` propety pointing to it's parrent. Each object type also has a
+has a `:prototype` property pointing to it's parent. Each object type also has a
 "namespace" - an alist (ex. smt/widgets). The prototype can contain a direct
 refference to an object, or a name of an object from the namespace. Ultimately
 each object of a certain type inherits from an "archetype" object contained
@@ -58,7 +58,7 @@ value - the object itself, but there are exceptions. The corresponding getter
 value directly, or will return the result of evaluation of a function.
 
 Each theme has a `:rows` property, which is a list of rows. The order is
-important - should rows happend to overlap, rows appearing later on the list
+important - should rows happened to overlap, rows appearing later on the list
 will be hidden.
 
 Here is an example of creating a theme derived from `black crystal`, but without
