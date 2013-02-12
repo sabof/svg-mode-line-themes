@@ -194,7 +194,7 @@
     (dotimes (iter (length rows))
       (when (nth iter rows)
         (let* (( current-row (nth iter rows))
-               ( following-rows (last rows (- (length rows) 1 iter)))
+               ( following-rows (nthcdr (1+ iter) rows))
                ( current-row-range
                  (smt/r-range current-row)))
           (dotimes (iter2 (length following-rows))
