@@ -71,10 +71,10 @@
      '(1 &body))
 
 (defun smt/get (object property &optional namespace resolution-stack)
-  (when (memq object resolution-stack)
-    (error "Cyclic inheritance"))
   (when (symbolp object)
     (setq object (cdr (assoc object namespace))))
+  (when (memq object resolution-stack)
+    (error "Cyclic inheritance"))
   (cond ( (memq property object)
           (getf object property))
         ( (getf object :prototype)
