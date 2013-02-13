@@ -80,7 +80,10 @@
             (smt/get prototype property namespace)))))
 
 (defun smt/maybe-funcall (thing &rest args)
-  (if (functionp thing)
+  (if (or (functionp thing)
+          ;; Will create an error should any proprty
+          ;; contain a symbol that is not fboundp.
+          (and (symbolp thing) (not (null thing))))
       (apply thing args)
       thing))
 
