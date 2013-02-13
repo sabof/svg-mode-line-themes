@@ -95,7 +95,6 @@
 (smt/deftree theme
   :background nil
   :overlay nil
-  :baseline 'smt/text-base-line-default
   :defs nil
   :export 'smt/t-export-default
   :style 'smt/style-default
@@ -106,6 +105,7 @@
 
 (smt/deftree row
   :align 'left
+  :baseline 'smt/text-base-line-default
   :width 'smt/r-width-default
   :margin 0
   :widgets nil
@@ -264,7 +264,7 @@
            ( right (- (smt/window-pixel-width)
                       (* (smt/r-margin row)
                          (frame-char-width))))))
-    :y ,(smt/t-baseline theme)
+    :y ,(smt/r-baseline theme)
     ,@(mapcar (lambda (widget-or-name)
                 (smt/w-export
                  (smt/t-normalize-widget

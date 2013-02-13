@@ -22,9 +22,10 @@ emacs default, clicking and row auto-hiding will not work precisely. The
 following example shows how to explicitly set font parameters.
 
 ```lisp
-(let (( archetype (cdr (assoc 'archetype smt/themes))))
-  (setf (getf archetype :baseline) 12)
-  (setf (getf archetype :style)
+(let (( theme-archetype (cdr (assoc 'archetype smt/themes)))
+      ( row-archetype (cdr (assoc 'archetype smt/rows))))
+  (setf (getf row-archetype :baseline) 12)
+  (setf (getf theme-archetype :style)
         (list :font-family "DejaVu Sans Mono"
               :font-size "10pt")))
 ```
