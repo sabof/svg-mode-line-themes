@@ -80,11 +80,10 @@
             (smt/get prototype property namespace)))))
 
 (defun smt/maybe-funcall (thing &rest args)
-  (if (or (functionp thing)
-          (and (symbolp thing)
-               (fboundp thing)))
+  (if (functionp thing)
       (apply thing args)
       thing))
+
 ;;;; Trees
 ;;; Theme
 
