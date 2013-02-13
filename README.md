@@ -6,7 +6,7 @@
 You need to obtain [xmlgen](https://github.com/philjackson/xmlgen). When
 installing through package.el, this should be done automatically.
 
-Add to your .emacs
+Add to your .emacs:
 
 ```lisp
 (require 'svg-mode-line-themes)
