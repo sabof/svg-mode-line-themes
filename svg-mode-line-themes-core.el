@@ -274,7 +274,7 @@
 
 (defun smt/w-export-default (widget row theme)
   `(tspan
-    ,@(smt/+ (smt/t-style theme)
+    ,@(smt/combine-styles (smt/t-style theme)
              (smt/r-style row)
              (smt/w-style widget))
     ,(smt/w-text widget)))
@@ -403,7 +403,7 @@
       (feMergeNode :in "SourceGraphic")
       ))))
 
-(defun smt/+ (&rest plists)
+(defun smt/combine-styles (&rest plists)
   "Combine styles."
   (cond
     ( (= 1 (length plists))
@@ -419,7 +419,7 @@
             (if (null val)
                 (remf plistC key)
                 (setf (getf plistC key) val)))
-          (apply 'smt/+ plistC (cddr plists))
+          (apply 'smt/combine-styles plistC (cddr plists))
           ))))
 
 (defun smt/modeline-format ()

@@ -30,7 +30,7 @@
   :background 'smt/bg-black-crystal
   :style
   (lambda (theme)
-    (smt/+
+    (smt/combine-styles
      (smt/t-style (smt/t-prototype theme))
      `(:fill "#7E868D")))
   :local-widgets

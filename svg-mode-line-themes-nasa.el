@@ -36,7 +36,7 @@
       )))
 
 (defun smt/nasa-major-mode-style (widget)
-  (smt/+ (smt/diesel-major-mode-style nil)
+  (smt/combine-styles (smt/diesel-major-mode-style nil)
          (list :fill "#DC1A0C")))
 
 (smt/deftheme nasa
@@ -44,7 +44,7 @@
   :background 'smt/nasa-background
   :style
   (lambda (theme)
-    (smt/+
+    (smt/combine-styles
      (smt/t-style (smt/t-prototype theme))
      `(:filter
        "url(#inset)"

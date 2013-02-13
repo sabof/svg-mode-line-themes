@@ -46,7 +46,7 @@
   :background 'smt/diesel-bg
   :style
   (lambda (theme)
-    (smt/+
+    (smt/combine-styles
      (smt/t-style (smt/t-prototype theme))
      `(:filter
        "url(#inset)"

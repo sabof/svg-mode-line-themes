@@ -91,12 +91,12 @@ This is an example of `diesel`, with blue titles.
 
 ```lisp
 (defun smt/diesel-blue-title-style (widget)
-  ;; smt+ combines styles
-  (smt/+ (smt/t-style (smt/t-prototype widget))
-         (list :fill (if (smt/window-active-p)
-                         "#21D0EE"
-                         "#4C5055")
-               :font-weight "bold")))
+  (smt/combine-styles
+   (smt/t-style (smt/t-prototype widget))
+   (list :fill (if (smt/window-active-p)
+                   "#21D0EE"
+                   "#4C5055")
+         :font-weight "bold")))
 
 (smt/deftheme diesel-blue
   :prototype 'diesel
