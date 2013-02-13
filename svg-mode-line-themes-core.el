@@ -412,7 +412,6 @@
       ))))
 
 (defun smt/combine-styles (&rest plists)
-  "Combine styles."
   (cond
     ( (= 1 (length plists))
       (car plists))
