@@ -156,5 +156,24 @@
     (should (eq 'shadow (smt/get obj1 :shadow2 namespace)))
     ))
 
+(smt/deftype atest
+  :some-prop 34)
+
+(smt/defatest self-reference
+  :prototype 'self-reference)
+
+(smt/defatest mutual-reference1
+  :prototype 'mutual-reference2)
+
+(smt/defatest mutual-reference2
+  :prototype 'mutual-reference1)
+
+(ert-deftest smt/cyclical-references ()
+  (let (( anonymous (smt/make-atest)))
+    (setf (getf anonymous :prototype) anonymous)
+    (should-error (smt/a-some-prop anonymous))
+    (should-error (smt/a-some-prop 'mutual-reference1))
+    (should-error (smt/a-some-prop 'self-reference))))
+
 (provide 'svg-mode-line-themes-tests)
 ;; svg-mode-line-themes-tests.el ends here
