@@ -83,8 +83,9 @@ well as it's own.
 
 Themes have a property called `:local-widgets`. When a row is being exported,
 and it encounters a symbol naming a widget, it will first look in the themes
-`:local-widgets`, and then in `smt/widgets` alist. Widgets can't use names of
-widgets in `:local-widgets` in their `:prototype`.
+`:local-widgets`, and then in `smt/widgets` alist. Widgets defined in
+`:local-widgets`, can't use names of previous widgets as their `:prototype`
+(`:local-widgets` works like let, and not like let*).
 
 This is an example of `diesel`, with blue titles.
 
