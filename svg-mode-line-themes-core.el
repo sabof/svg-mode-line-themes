@@ -99,7 +99,7 @@
 ;;; Row
 
 (smt/deftree row
-  :align 'left
+  :align "left"
   :baseline 'smt/text-base-line-default
   :width 'smt/r-width-default
   :margin 0
@@ -110,8 +110,8 @@
 (defun smt/make-row (&rest pairs)
   (unless (memq :prototype pairs)
     (setf (getf pairs :prototype) 'archetype))
-  (when (eq (getf pairs :align) 'center)
-    (setf (getf pairs :align) 'left)
+  (when (equal (getf pairs :align) "center")
+    (setf (getf pairs :align) "left")
     (setf (getf pairs :margin)
           (lambda (row)
             (floor
@@ -253,16 +253,22 @@
 (defun smt/r-export-default (row theme)
   `(text
     :text-anchor ,(progn
-                   (case (smt/r-align row)
-                     ( left "start")
-                     ( right "end")))
+                   (let ((align (smt/r-align row)))
+                     (cond
+                       ( (equal align "left")
+                         "start")
+                       ( (equal align "right")
+                         "end"))))
     :x ,(progn
-         (case ( smt/r-align row)
-           ( left (* (smt/r-margin row)
-                     (frame-char-width)))
-           ( right (- (smt/window-pixel-width)
-                      (* (smt/r-margin row)
-                         (frame-char-width))))))
+         (let ((align (smt/r-align row)))
+           (cond
+             ( (equal "left" align)
+               (* (smt/r-margin row)
+                  (frame-char-width)))
+             ( (equal "right" align)
+               (- (smt/window-pixel-width)
+                  (* (smt/r-margin row)
+                     (frame-char-width)))))))
     :y ,(smt/r-baseline theme)
     ,@(mapcar (lambda (widget-or-name)
                 (smt/w-export
@@ -322,7 +328,7 @@
 (defun smt/r-left (row)
   (let (( margin (smt/r-margin row))
         ( width (smt/r-width row)))
-    (if (eq 'left (smt/r-align row))
+    (if (equal "left" (smt/r-align row))
         margin
         (- (smt/window-width) (+ margin width)))))
 

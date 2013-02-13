@@ -84,12 +84,12 @@
 
 (smt/defrow default-right
   :widgets '(major-mode version-control minor-modes)
-  :align 'right
+  :align "right"
   :margin 14)
 
 (smt/defrow default-position
   :widgets '(position-info)
-  :align 'right
+  :align "right"
   :margin 2)
 
 (provide 'svg-mode-line-themes-widgets)

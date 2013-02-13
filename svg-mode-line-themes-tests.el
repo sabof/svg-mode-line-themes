@@ -5,7 +5,7 @@
   :text "center")
 
 (smt/defrow center-test
-  :align 'center
+  :align "center"
   :widgets '(test-center-label))
 
 (smt/deftheme test
