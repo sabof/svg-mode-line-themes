@@ -83,7 +83,7 @@
   (if (or (functionp thing)
           ;; Will create an error should any proprty
           ;; contain a symbol that is not fboundp.
-          (and (symbolp thing) (not (null thing))))
+          (and (symbolp thing) (not (booleanp thing))))
       (apply thing args)
       thing))
 
