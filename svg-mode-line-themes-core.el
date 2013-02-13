@@ -87,7 +87,7 @@
       (apply thing args)
       thing))
 
-;;;; Trees
+;;;; Types
 ;;; Theme
 
 (smt/deftype theme
@@ -145,7 +145,7 @@
 (defun smt/w-on-click (widget)
   (smt/w-get widget :on-click))
 
-;;; EOF Trees
+;;; EOF Types
 ;;;; Functions
 
 (defun smt/window-active-p ()
