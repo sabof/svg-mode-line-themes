@@ -1,6 +1,6 @@
 (require 'svg-mode-line-themes-core)
 
-(defun smt/default-buffer-name-text (widget)
+(defun smt/buffer-name-text (widget)
   (concat
    (format-mode-line "%b")
    (if (and (or (buffer-file-name)
@@ -8,7 +8,7 @@
             (buffer-modified-p))
        "*")))
 
-(defun smt/default-buffer-indicators-text (widget)
+(defun smt/buffer-indicators-text (widget)
   (let ((indicators
          (concat
           (unless (or (eq system-type 'windows-nt) (daemonp))
@@ -57,7 +57,7 @@
               (message (or (buffer-file-name)
                            (ignore-errors
                              (dired-current-directory)))))
-  :text 'smt/default-buffer-name-text)
+  :text 'smt/buffer-name-text)
 
 (smt/defwidget which-function
   :text (lambda (widget)
@@ -74,7 +74,7 @@
               (message "Column: %s" (current-column))))
 
 (smt/defwidget buffer-info
-  :text 'smt/default-buffer-indicators-text)
+  :text 'smt/buffer-indicators-text)
 
 ;;; Rows
 
