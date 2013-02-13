@@ -1,4 +1,5 @@
 (require 'svg-mode-line-themes-core)
+(require 'which-func)
 
 (defun smt/buffer-name-text (widget)
   (concat
