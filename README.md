@@ -54,9 +54,10 @@ reference to an object, or a name of an object from the namespace. Ultimately
 each object of a certain type inherits from an "archetype" object contained
 within the corresponding namespace.
 
-By using a macro such as `smt/deftheme`, one creates an object and adds it to the
-type's namespace. Should an object with the same name already exist, it will be
-replaced - which is an easy way to change the behaviour of existing themes.
+By using macros `smt/deftheme`, `smt/defrow` and `smt/defwidget`, one creates an
+object and adds it to the type's namespace. Should an object with the same name
+already exist, it will be replaced - which is an easy way to change the
+behaviour of existing themes.
 
 Most properties can have direct values, or contain a function that accepts one
 value - the object itself, but there are exceptions. A propety's getter (such as
