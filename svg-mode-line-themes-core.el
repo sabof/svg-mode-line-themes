@@ -282,9 +282,10 @@
 
 (defun smt/w-export-default (widget row theme)
   `(tspan
-    ,@(smt/combine-styles (smt/t-style theme)
-             (smt/r-style row)
-             (smt/w-style widget))
+    ,@(smt/combine-styles
+       (smt/t-style theme)
+       (smt/r-style row)
+       (smt/w-style widget))
     ,(smt/w-text widget)))
 
 (defun smt/w-width-default (widget)
