@@ -9,7 +9,7 @@
   (let* (( maker-sym
            (intern (concat "smt/make-"
                            (symbol-name name))))
-         ( \definer-name
+         ( \definer-sym
            (intern (concat "smt/def" (symbol-name name))))
          ( namespace-sym
            (intern (concat "smt/" (symbol-name name) "s")))
@@ -23,7 +23,7 @@
          ( get-sym
            (intern (concat getter-prefix
                            "get")))
-         ( object-prototype
+         ( prototype-getter-sym
            (intern (concat getter-prefix
                            "prototype"))))
     `(progn
@@ -32,15 +32,15 @@
          (unless (memq :prototype pairs)
            (setf (getf pairs :prototype) 'archetype))
          pairs)
-       (defmacro ,definer-name (name &rest pairs)
+       (defmacro ,definer-sym (name &rest pairs)
          (declare (indent 1))
          `(let* (( object (,',maker-sym ,@pairs)))
             (setq ,',namespace-sym (cl-delete ',name ,',namespace-sym :key 'car)
                   ,',namespace-sym (acons ',name object ,',namespace-sym))
             object))
-       (put (quote ,definer-name) 'common-lisp-indent-function
+       (put (quote ,definer-sym) 'common-lisp-indent-function
             '(1 &body))
-       (,definer-name archetype
+       (,definer-sym archetype
            ,@(append (list :prototype nil :type (list 'quote name))
                      props))
        ,@(progn
@@ -61,7 +61,7 @@
             result))
        (defun ,get-sym (object property)
          (smt/get object property ,namespace-sym))
-       (defun ,object-prototype (object)
+       (defun ,prototype-getter-sym (object)
          (,get-sym object :prototype))
        (defun ,predicate-sym (object)
          (and (consp object)
