@@ -44,7 +44,7 @@ bits of text which might have an individual style and on-click behaviour. Rows
 correspond to a number of widgets placed one after the other. Rows can be
 aligned to the left, right, or centered (the corresponding values of `:align`
 are "left", "right" and "center"). Themes can contain one or more rows, a
-background and an overlay (A layer place on top of everything else. You'd
+background and an overlay (A layer placed on top of everything else. You'd
 probably want to make it semi-transparent.)
 
 Objects are implemented as plists and prototype inheritance is used. Each object
