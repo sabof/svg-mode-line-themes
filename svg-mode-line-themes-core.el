@@ -70,10 +70,6 @@
 (put 'smt/deftree 'common-lisp-indent-function
      '(1 &body))
 
-(defun smt/window-active-p ()
-  (eq (frame-selected-window (selected-frame))
-      (selected-window)))
-
 (defun smt/get (object property &optional namespace)
   (when (symbolp object)
     (setq object (cdr (assoc object namespace))))
@@ -89,7 +85,7 @@
                (fboundp thing)))
       (apply thing args)
       thing))
-
+;;;; Trees
 ;;; Theme
 
 (smt/deftree theme
@@ -147,8 +143,12 @@
 (defun smt/w-on-click (widget)
   (smt/w-get widget :on-click))
 
-;;; Structs EOF
-;;; Methods
+;;; EOF Trees
+;;;; Functions
+
+(defun smt/window-active-p ()
+  (eq (frame-selected-window (selected-frame))
+      (selected-window)))
 
 (defun smt/ranges-overlapping-p (r1 r2)
   (cond ( (<= (cdr r1) (car r2))
