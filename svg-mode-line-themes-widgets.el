@@ -20,7 +20,7 @@
         indicators
         "")))
 
-(defun smt/minor-mode-indicators (widget)
+(defun smt/minor-mode-indicator-text (widget)
   (let (( text
           (concat
            (when (bound-and-true-p es-aai-mode) "I")
@@ -37,7 +37,7 @@
 ;;; Widgets
 
 (smt/defwidget minor-modes
-  :text 'smt/minor-mode-indicators)
+  :text 'smt/minor-mode-indicator-text)
 
 (smt/defwidget major-mode
   :text (lambda (widget)
