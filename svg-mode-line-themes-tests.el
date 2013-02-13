@@ -35,15 +35,15 @@
     (should (= 3 (getf result :c)))
     (should (= 6 (length result)))))
 
-(ert-deftest smt/ranges-overlap ()
-  (should (smt/ranges-overlap '(0 . 10) '(5 . 6)))
-  (should (smt/ranges-overlap '(0 . 10) '(9 . 20)))
-  (should (smt/ranges-overlap '(3 . 10) '(3 . 5)))
-  (should (smt/ranges-overlap '(3 . 5) '(3 . 10)))
-  (should-not (smt/ranges-overlap '(0 . 0) '(0 . 0)))
-  (should-not (smt/ranges-overlap '(0 . 10) '(10 . 10)))
-  (should-not (smt/ranges-overlap '(0 . 0) '(0 . 10)))
-  (should-not (smt/ranges-overlap '(0 . 10) '(0 . 0)))
+(ert-deftest smt/ranges-overlapping-p ()
+  (should (smt/ranges-overlapping-p '(0 . 10) '(5 . 6)))
+  (should (smt/ranges-overlapping-p '(0 . 10) '(9 . 20)))
+  (should (smt/ranges-overlapping-p '(3 . 10) '(3 . 5)))
+  (should (smt/ranges-overlapping-p '(3 . 5) '(3 . 10)))
+  (should-not (smt/ranges-overlapping-p '(0 . 0) '(0 . 0)))
+  (should-not (smt/ranges-overlapping-p '(0 . 10) '(10 . 10)))
+  (should-not (smt/ranges-overlapping-p '(0 . 0) '(0 . 10)))
+  (should-not (smt/ranges-overlapping-p '(0 . 10) '(0 . 0)))
   )
 
 (ert-deftest smt/row ()
@@ -55,7 +55,7 @@
                          (smt/make-widget
                           :text "456")))))
     (should (= (smt/r-width row) 6))
-    (should (eq (smt/r-align row) 'left))
+    (should (equal (smt/r-align row) "left"))
     (should (= (smt/maybe-funcall (smt/r-margin row)) 2))
     (should (= (smt/r-left row) 2))
     (should (equal (smt/r-range row) '(2 . 8)))))
@@ -102,13 +102,13 @@
                    (smt/make-widget
                     :text "first")))
                  (smt/make-row
-                  :align 'right
+                  :align "right"
                   :widgets
                   (list
                    (smt/make-widget
                     :text "123456")))
                  (smt/make-row
-                  :align 'right
+                  :align "right"
                   :widgets
                   (list
                    (smt/make-widget
@@ -130,7 +130,7 @@
                    (smt/make-widget
                     :text "12345")))
                  (smt/make-row
-                  :align 'right
+                  :align "right"
                   :widgets
                   (list
                    (smt/make-widget
@@ -155,6 +155,25 @@
     (should (null (smt/get obj1 :shadow1 namespace)))
     (should (eq 'shadow (smt/get obj1 :shadow2 namespace)))
     ))
+
+(smt/deftype atest
+  :some-prop 34)
+
+(smt/defatest self-reference
+  :prototype 'self-reference)
+
+(smt/defatest mutual-reference1
+  :prototype 'mutual-reference2)
+
+(smt/defatest mutual-reference2
+  :prototype 'mutual-reference1)
+
+(ert-deftest smt/cyclical-references ()
+  (let (( anonymous (smt/make-atest)))
+    (setf (getf anonymous :prototype) anonymous)
+    (should-error (smt/a-some-prop anonymous))
+    (should-error (smt/a-some-prop 'mutual-reference1))
+    (should-error (smt/a-some-prop 'self-reference))))
 
 (provide 'svg-mode-line-themes-tests)
 ;; svg-mode-line-themes-tests.el ends here

@@ -70,14 +70,19 @@
 (put 'smt/deftype 'common-lisp-indent-function
      '(1 &body))
 
-(defun smt/get (object property &optional namespace)
+(defun smt/get (object property &optional namespace resolution-stack)
+  (when (memq object resolution-stack)
+    (error "Cyclic inheritance"))
   (when (symbolp object)
     (setq object (cdr (assoc object namespace))))
   (cond ( (memq property object)
           (getf object property))
         ( (getf object :prototype)
           (let* (( prototype (getf object :prototype)))
-            (smt/get prototype property namespace)))))
+            (smt/get prototype
+                     property
+                     namespace
+                     (cons object resolution-stack))))))
 
 (defun smt/maybe-funcall (thing &rest args)
   (if (or (functionp thing)
@@ -272,7 +277,7 @@
                (- (smt/window-pixel-width)
                   (* (smt/r-margin row)
                      (frame-char-width)))))))
-    :y ,(smt/r-baseline theme)
+    :y ,(smt/r-baseline row)
     ,@(mapcar (lambda (widget-or-name)
                 (smt/w-export
                  (smt/t-normalize-widget
