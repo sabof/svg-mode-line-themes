@@ -101,10 +101,10 @@ This is an example of `diesel`, with blue titles.
 (smt/deftheme diesel-blue
   :prototype 'diesel
   :local-widgets
-  (lambda (widget)
+  (lambda (theme)
     (let (( parent-local-widgets
             (smt/t-local-widgets
-             (smt/t-prototype widget))))
+             (smt/t-prototype theme))))
       (append (list (cons 'buffer-name
                           (smt/make-widget
                            :prototype 'buffer-name
