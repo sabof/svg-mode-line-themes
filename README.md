@@ -40,12 +40,17 @@ You might want to see how the included themes are implemented, but here is a
 short introduction.
 
 Three types of objects are used: widgets, rows and themes. Widgets correspond to
-bits of text which might have an individual style and on-click behaviour.
+bits of text which might have an individual style and on-click behaviour. Rows
+correspond to a number of widgets placed one after the other. Rows can be
+aligned to the left, right, or centered (the corresponding values of `:align`
+are 'left, 'right and 'center). Themes can contain one or more rows, a
+background and an overlay (A layer place on top of everything else. You'd
+probably want to make it semi-transparent.)
 
 Objects are implemented as plists and prototype inheritance is used. Each object
 has a `:prototype` property pointing to it's parent. Each object type also has a
 "namespace" - an alist (ex. smt/widgets). The prototype can contain a direct
-refference to an object, or a name of an object from the namespace. Ultimately
+reference to an object, or a name of an object from the namespace. Ultimately
 each object of a certain type inherits from an "archetype" object contained
 within the corresponding namespace.
 
@@ -54,13 +59,12 @@ type's namespace. Should an object with the same name already exist, it will be
 replaced - which is an easy way to change the behaviour of existing themes.
 
 Most properties can have direct values, or contain a function that accepts one
-value - the object itself, but there are exceptions. The corresponding getter
-(such as `smt/w-text`, which retrieves the text from a widget) will return the
-value directly, or will return the result of evaluation of a function.
+value - the object itself, but there are exceptions. A propety's getter (such as
+`smt/w-text`, which retrieves the text from a widget) will return the value, or
+the result of evaluating the function.
 
-Each theme has a `:rows` property, which is a list of rows. The order is
-important - should rows happen to overlap, rows appearing later on the list
-will be hidden.
+Each theme has a `:rows` property, which is a list of rows. The order matters -
+should rows happen to overlap, rows appearing later on the list will be hidden.
 
 Here is an example of creating a theme derived from `black-crystal`, but without
 the line-number information:
