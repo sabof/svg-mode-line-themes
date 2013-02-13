@@ -4,7 +4,7 @@
 
 (defvar smt/current-theme nil)
 
-(defmacro smt/deftree (name &rest props)
+(defmacro smt/deftype (name &rest props)
   (declare (indent 1))
   (let* (( maker-sym
            (intern (concat "smt/make-"
@@ -67,7 +67,7 @@
          (and (consp object)
               (eq ',name (smt/get object :type ,namespace-sym))))
        )))
-(put 'smt/deftree 'common-lisp-indent-function
+(put 'smt/deftype 'common-lisp-indent-function
      '(1 &body))
 
 (defun smt/get (object property &optional namespace)
@@ -90,7 +90,7 @@
 ;;;; Trees
 ;;; Theme
 
-(smt/deftree theme
+(smt/deftype theme
   :background nil
   :overlay nil
   :defs nil
@@ -101,7 +101,7 @@
 
 ;;; Row
 
-(smt/deftree row
+(smt/deftype row
   :align "left"
   :baseline 'smt/text-base-line-default
   :width 'smt/r-width-default
@@ -130,7 +130,7 @@
 
 ;;; Widget
 
-(smt/deftree widget
+(smt/deftype widget
   :style 'smt/style-default
   :on-click nil
   :text ""
