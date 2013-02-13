@@ -75,8 +75,18 @@ the line-number information:
           :margin 2)))
 ```
 
-Themes also have a property called `:local-widgets` - an alist which can shadow
-globally defined widgets. This is an example of `diesel`, with blue titles.
+Themes, rows and widgets have a `:style` property. `:style` is different from
+the inline CSS style propety, it can contain any parameter (including `:style`,
+which will correspond to inline CSS). When a widget is being exported, it will
+contain attributes from the `:style` property of the relevant theme and row, as
+well as it's own.
+
+Themes have a property called `:local-widgets`. When a row is being exported,
+and it encounters a symbol naming a widget, it will first look in the themes
+`:local-widgets`, and then in `smt/widgets` alist. Widgets can't use names of
+widgets in `:local-widgets` in their `:prototype`.
+
+This is an example of `diesel`, with blue titles.
 
 ```lisp
 (defun smt/diesel-blue-title-style (widget)
