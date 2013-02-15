@@ -260,23 +260,16 @@
 
 (defun smt/r-export-default (row theme)
   `(text
-    :text-anchor ,(progn
-                   (let ((align (smt/r-align row)))
-                     (cond
-                       ( (equal align "left")
-                         "start")
-                       ( (equal align "right")
-                         "end"))))
-    :x ,(progn
-         (let ((align (smt/r-align row)))
-           (cond
-             ( (equal "left" align)
+    :text-anchor
+    ,(if (equal (smt/r-align row) "left")
+         "start"
+         "end")
+    :x ,(if (equal (smt/r-align row) "left")
+            (* (smt/r-margin row)
+               (frame-char-width))
+            (- (smt/window-pixel-width)
                (* (smt/r-margin row)
-                  (frame-char-width)))
-             ( (equal "right" align)
-               (- (smt/window-pixel-width)
-                  (* (smt/r-margin row)
-                     (frame-char-width)))))))
+                  (frame-char-width))))
     :y ,(smt/r-baseline row)
     ,@(mapcar (lambda (widget-or-name)
                 (smt/w-export
