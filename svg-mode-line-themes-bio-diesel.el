@@ -25,23 +25,22 @@
        "url(#inset)"
        :fill "#3B2B24")))
   :local-widgets
-  (lambda (theme)
-    (list (cons 'buffer-name
-                (smt/make-widget
-                 :prototype 'buffer-name
-                 :style 'smt/bio-diesel-title-style))
-          (cons 'minor-modes
-                (smt/make-widget
-                 :prototype 'minor-modes
-                 :style 'smt/bio-diesel-title-style))
-          (cons 'major-mode
-                (smt/make-widget
-                 :prototype 'major-mode
-                 :style
-                 (lambda (widget)
-                   (smt/combine-styles
-                    (smt/diesel-major-mode-style nil)
-                    '(:fill "#B8AD96"))))))))
+  (list (cons 'buffer-name
+              (smt/make-widget
+               :prototype 'buffer-name
+               :style 'smt/bio-diesel-title-style))
+        (cons 'minor-modes
+              (smt/make-widget
+               :prototype 'minor-modes
+               :style 'smt/bio-diesel-title-style))
+        (cons 'major-mode
+              (smt/make-widget
+               :prototype 'major-mode
+               :style
+               (lambda (widget)
+                 (smt/combine-styles
+                  (smt/diesel-major-mode-style nil)
+                  '(:fill "#B8AD96")))))))
 
 (provide 'svg-mode-line-themes-bio-diesel)
 ;; svg-mode-line-themes-bio-diesel.el ends here
