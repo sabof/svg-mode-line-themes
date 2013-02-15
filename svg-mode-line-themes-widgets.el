@@ -72,7 +72,7 @@
   :text (lambda (widget)
           (format-mode-line "%l:%p"))
   :on-click (lambda (widget event)
-              (message "Column: %s" (current-column))))
+              (what-cursor-position)))
 
 (smt/defwidget buffer-info
   :text 'smt/buffer-indicators-text)
