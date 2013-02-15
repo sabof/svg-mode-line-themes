@@ -12,9 +12,8 @@ Add to your .emacs:
 (require 'svg-mode-line-themes)
 (smt/enable)
 (smt/set-theme 'black-crystal)
-(set-face-attribute
-   'mode-line nil
-   :box nil)
+(set-face-attribute 'mode-line nil :box nil)
+(set-face-attribute 'mode-line-inactive nil :box nil)
 ```
 Font size calculation is imperfect, so it might require adjustments for your
 particular font/size combination. Should the font/size be different from the
