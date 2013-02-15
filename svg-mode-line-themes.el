@@ -33,6 +33,7 @@
 (require 'svg-mode-line-themes-core)
 (require 'svg-mode-line-themes-widgets)
 (require 'svg-mode-line-themes-diesel)
+(require 'svg-mode-line-themes-bio-diesel)
 (require 'svg-mode-line-themes-nasa)
 (require 'svg-mode-line-themes-black-crystal)
 
