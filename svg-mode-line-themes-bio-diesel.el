@@ -1,7 +1,7 @@
 (require 'svg-mode-line-themes-core)
 (require 'svg-mode-line-themes-diesel)
 
-(defun smt/shock-diesel-title-style (widget)
+(defun smt/bio-diesel-title-style (widget)
   (smt/combine-styles
    (smt/t-style (smt/t-prototype widget))
    (list :fill (if (smt/window-active-p)
@@ -9,7 +9,7 @@
                    "#3B2B24")
          :font-weight "bold")))
 
-(smt/deftheme shock-diesel
+(smt/deftheme bio-diesel
   :prototype 'diesel
   :background
   (lambda (theme)
@@ -29,11 +29,11 @@
     (list (cons 'buffer-name
                 (smt/make-widget
                  :prototype 'buffer-name
-                 :style 'smt/shock-diesel-title-style))
+                 :style 'smt/bio-diesel-title-style))
           (cons 'minor-modes
                 (smt/make-widget
                  :prototype 'minor-modes
-                 :style 'smt/shock-diesel-title-style))
+                 :style 'smt/bio-diesel-title-style))
           (cons 'major-mode
                 (smt/make-widget
                  :prototype 'major-mode
@@ -43,5 +43,5 @@
                     (smt/diesel-major-mode-style nil)
                     '(:fill "#B8AD96"))))))))
 
-(provide 'svg-mode-line-themes-shock-diesel)
-;; svg-mode-line-themes-shock-diesel.el ends here
+(provide 'svg-mode-line-themes-bio-diesel)
+;; svg-mode-line-themes-bio-diesel.el ends here
