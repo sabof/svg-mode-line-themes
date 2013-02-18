@@ -35,7 +35,8 @@
        (defmacro ,definer-sym (name &rest pairs)
          (declare (indent 1))
          `(let* (( object (,',maker-sym ,@pairs)))
-            (setq ,',namespace-sym (cl-delete ',name ,',namespace-sym :key 'car)
+            (setq ,',namespace-sym (remove-if (lambda (elem) (eq (car elem) ',name))
+                                              ,',namespace-sym)
                   ,',namespace-sym (acons ',name object ,',namespace-sym))
             object))
        (put (quote ,definer-sym) 'common-lisp-indent-function
