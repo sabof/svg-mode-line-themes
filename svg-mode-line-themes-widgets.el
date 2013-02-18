@@ -30,6 +30,7 @@
            (when truncate-lines "T")
            (when (bound-and-true-p dired-omit-mode) "O")
            (when (bound-and-true-p save-auto-hook) "A")
+           (when (buffer-narrowed-p) "N")
            (when (bound-and-true-p wmi) "M"))))
     (if (plusp (length text))
         (concat " " text)
