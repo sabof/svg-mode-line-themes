@@ -6,14 +6,22 @@
 
 (smt/defrow center-test
   :align "center"
-  :widgets '(test-center-label))
+  :widgets '(test-center-label)
+  :always-visible t)
 
 (smt/deftheme test
   :prototype 'diesel
-  :rows '(default-left
-          center-test
-          default-right
-          ))
+  :rows (list 'default-left
+              'center-test
+              (smt/make-row
+               :prototype 'center-test
+               :baseline
+               (lambda (row)
+                 (+ (smt/r-baseline
+                     (smt/r-prototype row))
+                    (frame-char-height))))
+              'default-right)
+  :pixel-height (* 2 (frame-char-height)))
 
 (ert-deftest smt/combine-styles ()
   (should (null (smt/combine-styles)))

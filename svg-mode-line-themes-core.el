@@ -114,6 +114,7 @@
   :baseline 'smt/text-base-line-default
   :width 'smt/r-width-default
   :margin 0
+  :always-visible nil
   :widgets nil
   :style nil
   :export 'smt/r-export-default)
@@ -181,7 +182,9 @@
                ( current-row-range
                  (smt/r-range current-row)))
           (dotimes (iter2 (length following-rows))
-            (when (nth iter2 following-rows)
+            (when (and (nth iter2 following-rows)
+                       (not (smt/r-always-visible
+                             (nth iter2 following-rows))))
               (let (( following-row-range
                       (smt/r-range (nth iter2 following-rows))))
                 (when (or (smt/ranges-overlapping-p
