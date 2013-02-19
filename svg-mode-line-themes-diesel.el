@@ -8,7 +8,7 @@
 
 (defun smt/diesel-bg (theme)
   (let (( width (smt/window-pixel-width))
-        ( height (frame-char-height)))
+        ( height (smt/t-pixel-height theme)))
     `((\defs
        (linearGradient
         :id "grad1" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
@@ -26,7 +26,7 @@
 
 (defun smt/diesel-overlay (theme)
   (let (( width (smt/window-pixel-width))
-        ( height (frame-char-height)))
+        ( height (smt/t-pixel-height theme)))
     `((rect :width "100%" :height 1 :x 0 :y 0 :fill "white" :fill-opacity 0.3)
       (rect :width "100%" :height 1 :x 0 :y ,(- height 2) :fill "black" :fill-opacity 0.2)
       (rect :width "100%" :height 1 :x 0 :y ,(1- height) :fill "black" :fill-opacity 0.6)
