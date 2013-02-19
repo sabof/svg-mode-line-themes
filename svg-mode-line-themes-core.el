@@ -103,7 +103,9 @@
   :export 'smt/t-export-default
   :style 'smt/style-default
   :local-widgets nil
+  :pixel-height (lambda (theme) (frame-char-height))
   :rows nil)
+
 
 ;;; Row
 
@@ -191,7 +193,7 @@
 
 (defun smt/t-export-default-xml (theme)
   (let* (( width (smt/window-pixel-width))
-         ( height (frame-char-height))
+         ( height (smt/t-pixel-height theme))
          ( rows (smt/t-visible-rows theme)))
     (xmlgen
      `(svg
@@ -348,6 +350,9 @@
 (defun smt/points-to-pixels (points)
   ;; points = pixels * 72 / 96
   (/ (* 96 points) 72))
+
+(defun smt/pixels-to-points (pixels)
+  (/ (* pixels 72) 96))
 
 (defun smt/font-pixel-size ()
   (ceiling

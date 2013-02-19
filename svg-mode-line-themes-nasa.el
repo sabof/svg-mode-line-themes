@@ -9,7 +9,7 @@
 
 (defun smt/nasa-background (theme)
   (let (( width (smt/window-pixel-width))
-        ( height (frame-char-height)))
+        ( height (smt/t-pixel-height theme)))
     `((\defs
        (filter
         :id "blur"
@@ -24,7 +24,7 @@
 
 (defun smt/nasa-overlay (theme)
   (let (( width (smt/window-pixel-width))
-        ( height (frame-char-height)))
+        ( height (smt/t-pixel-height theme)))
     `((\defs
        (linearGradient
         :id "grad2" :x1 "0%" :y1 "0%" :x2 "0%" :y2 "100%"
