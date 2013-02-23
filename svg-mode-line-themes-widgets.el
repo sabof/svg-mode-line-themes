@@ -1,5 +1,4 @@
 (require 'svg-mode-line-themes-core)
-(require 'which-func)
 
 (defun smt/buffer-name-text (widget)
   (concat
@@ -64,11 +63,12 @@
 
 (smt/defwidget which-function
   :text (lambda (widget)
-          (when (bound-and-true-p which-func-mode)
-            (let ((text (format-mode-line which-func-current)))
-              (when (and (> (length text) 0)
-                         (not (equal text "???")))
-                (concat " :: " text))))))
+          (if (bound-and-true-p which-func-mode)
+              (let ((text (format-mode-line which-func-current)))
+                (when (and (> (length text) 0)
+                           (not (equal text "???")))
+                  (concat " :: " text)))
+              "")))
 
 (smt/defwidget position-info
   :text (lambda (widget)
@@ -82,7 +82,7 @@
 ;;; Rows
 
 (smt/defrow default-left
-  :widgets '(buffer-info buffer-name)
+  :widgets '(buffer-info buffer-name which-function)
   :margin 2)
 
 (smt/defrow default-right
