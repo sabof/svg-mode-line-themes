@@ -258,6 +258,13 @@
           (cdr (assoc widget-or-name smt/widgets))
           (error "Can't process widget: %s" widget-or-name))))
 
+(defun smt/t-normalize-style (theme style-or-name)
+  (if (and (symbolp style-or-name)
+           (not (booleanp style-or-name))
+           (assoc style-or-name (smt/t-local-widgets theme)))
+      (cdr (assoc style-or-name (smt/t-local-widgets theme)))
+      style-or-name))
+
 (defun smt/t-normalize-row (theme row-or-name)
   (if (smt/row-p row-or-name)
       row-or-name
