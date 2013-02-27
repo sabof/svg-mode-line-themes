@@ -43,7 +43,7 @@
 
 (smt/defwidget major-mode
   :text (lambda (widget)
-          (format-mode-line "%m"))
+          (format-mode-line mode-name))
   :on-click (lambda (widget event)
               (message "%s" (format-mode-line
                              mode-line-modes))))
