@@ -78,4 +78,4 @@
   (force-mode-line-update))
 
 (provide 'svg-mode-line-themes)
-;; svg-mode-line-themes.el ends here
+;;; svg-mode-line-themes.el ends here
