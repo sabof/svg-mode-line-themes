@@ -66,4 +66,4 @@
   :overlay 'smt/nasa-overlay)
 
 (provide 'svg-mode-line-themes-nasa)
-;; svg-mode-line-themes-nasa.el ends here
+;;; svg-mode-line-themes-nasa.el ends here

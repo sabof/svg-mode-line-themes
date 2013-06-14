@@ -75,6 +75,7 @@
                    'header-line-format
                    'mode-line-format)
                '(:eval (smt/modeline-format)))
+  (add-hook 'post-command-hook 'smt/register-user-location)
   (force-mode-line-update))
 
 (provide 'svg-mode-line-themes)

@@ -23,7 +23,7 @@
 (defun smt/minor-mode-indicator-text (widget)
   (let (( text
           (concat
-           (when (bound-and-true-p es-aai-mode) "I")
+           (when (bound-and-true-p aai-mode) "I")
            (when (or (bound-and-true-p evil-local-mode)
                      (bound-and-true-p evil-mode)) "E")
            (when truncate-lines "T")
@@ -99,4 +99,4 @@
   :margin 2)
 
 (provide 'svg-mode-line-themes-widgets)
-;; svg-mode-line-themes-widgets.el ends here
+;;; svg-mode-line-themes-widgets.el ends here

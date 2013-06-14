@@ -2,6 +2,7 @@
 (or (require 'xmlgen nil t)
     (require 'xmlgen "xml-gen"))
 
+(defvar smt/user-selected-window nil)
 (defvar smt/current-theme nil)
 
 (defmacro smt/deftype (name &rest props)
@@ -158,8 +159,10 @@
 ;;;; Functions
 
 (defun smt/window-active-p ()
-  (eq (frame-selected-window (selected-frame))
-      (selected-window)))
+  "Meant to be used from within mode-line-format."
+  (or (eq smt/user-selected-window (selected-window))
+      (and (eq (last-nonminibuffer-frame) (selected-frame))
+           (not (cadr (window-list))))))
 
 (defun smt/ranges-overlapping-p (r1 r2)
   (cond ( (<= (cdr r1) (car r2))
@@ -217,6 +220,7 @@
   (kbd \"h\") 'backward-char
   (kbd \"l\") 'forward-char\)
  Returns the keymap in the end."
+  (declare (indent 1))
   (while bindings
     (define-key keymap (pop bindings) (pop bindings)))
   keymap)
@@ -229,10 +233,10 @@
          (image (create-image xml 'svg t)))
     (propertize
      "."
+     'pointer 'vdrag
      'display image
      'keymap (let (( map (make-sparse-keymap)))
-               (smt/define-keys
-                   map
+               (smt/define-keys map
                  (kbd "<mouse-1>") 'smt/receive-click
                  (kbd "<nil> <header-line> <mouse-1>") 'smt/receive-click
                  (kbd "<nil> <mode-line> <mouse-1>") 'smt/receive-click
@@ -474,5 +478,8 @@
         (unload-feature 'svg-mode-line-themes-tests t))
       (require (quote svg-mode-line-themes-tests)))))
 
+(defun smt/register-user-location ()
+  (setq smt/user-selected-window (selected-window)))
+
 (provide 'svg-mode-line-themes-core)
-;; svg-mode-line-themes-core.el ends here
+;;; svg-mode-line-themes-core.el ends here

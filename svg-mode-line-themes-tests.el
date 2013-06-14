@@ -184,4 +184,4 @@
     (should-error (smt/a-some-prop 'self-reference))))
 
 (provide 'svg-mode-line-themes-tests)
-;; svg-mode-line-themes-tests.el ends here
+;;; svg-mode-line-themes-tests.el ends here

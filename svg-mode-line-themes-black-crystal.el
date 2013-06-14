@@ -50,4 +50,4 @@
   :overlay 'smt/black-crystal-overlay)
 
 (provide 'svg-mode-line-themes-black-crystal)
-;; svg-mode-line-themes-black-crystal.el ends here
+;;; svg-mode-line-themes-black-crystal.el ends here

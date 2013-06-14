@@ -68,4 +68,4 @@
   :overlay 'smt/diesel-overlay)
 
 (provide 'svg-mode-line-themes-diesel)
-;; svg-mode-line-themes-diesel.el ends here
+;;; svg-mode-line-themes-diesel.el ends here

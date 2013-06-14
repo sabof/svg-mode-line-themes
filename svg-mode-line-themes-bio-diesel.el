@@ -43,4 +43,4 @@
                   '(:fill "#B8AD96")))))))
 
 (provide 'svg-mode-line-themes-bio-diesel)
-;; svg-mode-line-themes-bio-diesel.el ends here
+;;; svg-mode-line-themes-bio-diesel.el ends here
