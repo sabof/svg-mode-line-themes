@@ -23,6 +23,7 @@
 (defun smt/minor-mode-indicator-text (widget)
   (let (( text
           (concat
+           (when defining-kbd-macro "M")
            (when (bound-and-true-p aai-mode) "I")
            (when (or (bound-and-true-p evil-local-mode)
                      (bound-and-true-p evil-mode)) "E")

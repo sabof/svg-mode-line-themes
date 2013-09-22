@@ -1,4 +1,8 @@
+;; Hi-lock: (("(\\(smt/deftype\\)" (1 'font-lock-keyword-face append)))
+;; Hi-lock: end
+
 (require 'cl)
+
 (or (require 'xmlgen nil t)
     (require 'xmlgen "xml-gen"))
 
@@ -165,11 +169,8 @@
            (not (cadr (window-list))))))
 
 (defun smt/ranges-overlapping-p (r1 r2)
-  (cond ( (<= (cdr r1) (car r2))
-          nil)
-        ( (<= (cdr r2) (car r1))
-          nil)
-        ( t t)))
+  (and (> (cdr r1) (car r2))
+       (> (cdr r2) (car r1))))
 
 (defun smt/r-range (row)
   (let (( left (smt/r-left row)))
@@ -480,6 +481,11 @@
 
 (defun smt/register-user-location ()
   (setq smt/user-selected-window (selected-window)))
+
+
+;; Local Variables:
+;; eval: (hi-lock-mode)
+;; End:
 
 (provide 'svg-mode-line-themes-core)
 ;;; svg-mode-line-themes-core.el ends here
