@@ -73,9 +73,14 @@
 (defun smt/enable (&optional use-header-line)
   (set-default (if use-header-line
                    'header-line-format
-                   'mode-line-format)
+                 'mode-line-format)
                '(:eval (smt/modeline-format)))
-  (add-hook 'post-command-hook 'smt/register-user-location)
+  (if (and (boundp 'pre-redisplay-function)
+           (fboundp 'add-function))
+      (add-function :before
+                    pre-redisplay-function
+                    'smt/register-user-location)
+    (add-hook 'post-command-hook 'smt/register-user-location))
   (force-mode-line-update))
 
 (provide 'svg-mode-line-themes)

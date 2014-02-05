@@ -479,7 +479,7 @@
         (unload-feature 'svg-mode-line-themes-tests t))
       (require (quote svg-mode-line-themes-tests)))))
 
-(defun smt/register-user-location ()
+(defun smt/register-user-location (&optional ignore)
   (setq smt/user-selected-window (selected-window)))
 
 
