@@ -1,5 +1,5 @@
 ;;; svg-mode-line-themes.el --- SVG-based themes for mode-line
-;;; Version: 0.1.1
+;;; Version: 0.1.2
 ;;; Package-Requires: ((xmlgen "0.4"))
 ;;; Author: sabof
 ;;; URL: https://github.com/sabof/svg-mode-line-themes
@@ -30,6 +30,7 @@
 
 ;;; Code:
 
+(require 'nadvice nil t)
 (require 'svg-mode-line-themes-core)
 (require 'svg-mode-line-themes-widgets)
 (require 'svg-mode-line-themes-diesel)
