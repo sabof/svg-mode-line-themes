@@ -71,7 +71,10 @@
   (force-mode-line-update))
 
 ;;;###autoload
-(defun smt/enable (&optional use-header-line)
+(defun* smt/enable (&optional use-header-line)
+  (unless (image-type-available-p 'svg)
+    (display-warning 'svg-mode-line-themes "SVG support is not available")
+    (return-from smt/enable))
   (set-default (if use-header-line
                    'header-line-format
                  'mode-line-format)
