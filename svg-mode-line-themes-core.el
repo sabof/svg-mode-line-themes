@@ -10,6 +10,7 @@
 (defvar smt/current-theme nil)
 
 (defmacro smt/deftype (name &rest props)
+  "Define an object hierarchy."
   (declare (indent 1))
   (let* (( maker-sym
            (intern (concat "smt/make-"
@@ -77,6 +78,7 @@
      '(1 &body))
 
 (defun smt/get (object property &optional namespace resolution-stack)
+  "Get the value of PROPETY in OBJECT or it's prototype chain."
   (when (symbolp object)
     (setq object (cdr (assoc object namespace))))
   (when (memq object resolution-stack)
@@ -177,6 +179,7 @@
     (cons left (+ left (smt/r-width row)))))
 
 (defun smt/t-visible-rows (theme)
+  "Return non-overlapping rows."
   (let* (( rows (mapcar (apply-partially 'smt/t-normalize-row theme)
                         (smt/t-rows theme))))
     (dotimes (iter (length rows))
@@ -299,6 +302,7 @@
     ,(smt/w-text widget)))
 
 (defun smt/w-width-default (widget)
+  "Return the width of the widget in characters."
   (length (smt/w-text widget)))
 
 (defun* smt/r-receive-click (row theme event)
@@ -426,6 +430,9 @@
       ))))
 
 (defun smt/combine-styles (&rest plists)
+  "Combine lists of SVG attributes into one.
+
+Should an attribute exist in multiple lists, the latter will be used."
   (cond
     ( (= 1 (length plists))
       (car plists))
@@ -439,7 +446,7 @@
                   val (nth (1+ (* 2 iter)) plistB))
             (if (null val)
                 (remf plistC key)
-                (setf (getf plistC key) val)))
+              (setf (getf plistC key) val)))
           (apply 'smt/combine-styles plistC (cddr plists))
           ))))
 
